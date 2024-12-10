@@ -4,22 +4,22 @@ import attrs, re, os, json, subprocess
 from grazie.api.client.profiles import LLMProfile
 from grazie.api.client.llm_parameters import LLMParameters, Parameters
 
-SYSTEM_PROMPT_CLASSES = "/home/ynoviello/PycharmProjects/AI_Metaphors/prompts/SystemPromptClasses.txt"
-USER_PROMPT_CLASSES = "/home/ynoviello/PycharmProjects/AI_Metaphors/prompts/UserPromptClasses.txt"
+SYSTEM_PROMPT_CLASSES = "./prompts/SystemPromptClasses.txt"
+USER_PROMPT_CLASSES = "./prompts/UserPromptClasses.txt"
 
-SYSTEM_PROMPT_DESCRIPTION = "/home/ynoviello/PycharmProjects/AI_Metaphors/prompts/SystemPromptDescription.txt"
-USER_PROMPT_DESCRIPTION = "/home/ynoviello/PycharmProjects/AI_Metaphors/prompts/UserPromptDescription.txt"
+SYSTEM_PROMPT_DESCRIPTION = "./prompts/SystemPromptDescription.txt"
+USER_PROMPT_DESCRIPTION = "./prompts/UserPromptDescription.txt"
 
-SYSTEM_PROMPT_METAPHOR = "/home/ynoviello/PycharmProjects/AI_Metaphors/prompts/SystemPromptMetaphor.txt"
-USER_PROMPT_METAPHOR = "/home/ynoviello/PycharmProjects/AI_Metaphors/prompts/UserPromptMetaphor.txt"
+SYSTEM_PROMPT_METAPHOR = "./prompts/SystemPromptMetaphor.txt"
+USER_PROMPT_METAPHOR = "./prompts/UserPromptMetaphor.txt"
 
-SYSTEM_PROMPT_MANIM = "/home/ynoviello/PycharmProjects/AI_Metaphors/prompts/SystemPromptManim.txt"
-SYSTEM_PROMPT_MANIM_NO_DESC = "/home/ynoviello/PycharmProjects/AI_Metaphors/prompts/SystemPromptManimNoDesc.txt"
+SYSTEM_PROMPT_MANIM = "./prompts/SystemPromptManim.txt"
+SYSTEM_PROMPT_MANIM_NO_DESC = "./prompts/SystemPromptManimNoDesc.txt"
 
-USER_PROMPT_MANIM = "/home/ynoviello/PycharmProjects/AI_Metaphors/prompts/UserPromptManim.txt"
+USER_PROMPT_MANIM = "./prompts/UserPromptManim.txt"
 
-SYSTEM_PROMPT_REFINE = "/home/ynoviello/PycharmProjects/AI_Metaphors/prompts/SystemPromptRefineManim.txt"
-USER_PROMPT_REFINE = "/home/ynoviello/PycharmProjects/AI_Metaphors/prompts/UserPromptRefineManim.txt"
+SYSTEM_PROMPT_REFINE = "./prompts/SystemPromptRefineManim.txt"
+USER_PROMPT_REFINE = "./prompts/UserPromptRefineManim.txt"
 
 
 class GrazieProvider:
@@ -180,14 +180,14 @@ class ManimProvider:
         if code:
             try:
                 with open(self.file_path, "w") as file:
-                    file.write(f"import manimpango\nmanimpango.register_font('/home/ynoviello/Downloads/JetBrainsSans-Regular.ttf')\nfrom manim import DARK_BROWN as BROWN\n{code}")
+                    file.write(f"import manimpango\nmanimpango.register_font('./JetBrainsSans-Regular.ttf')\nfrom manim import DARK_BROWN as BROWN\n{code}")
             except:
                 raise Exception("Cannot write python file")
             return True
 
         try:
             with open(self.file_path, "w") as file:
-                file.write(f"import manimpango\nmanimpango.register_font('/home/ynoviello/Downloads/JetBrainsSans-Regular.ttf')\nfrom manim import DARK_BROWN as BROWN\n{text}")
+                file.write(f"import manimpango\nmanimpango.register_font('./JetBrainsSans-Regular.ttf')\nfrom manim import DARK_BROWN as BROWN\n{text}")
         except:
             raise Exception("Cannot write python file")
         return False
