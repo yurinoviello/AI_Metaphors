@@ -1,3 +1,5 @@
 **/.idea
 **/manim_stuff/
 token.secret
+**/ai_metaphors/__pycache__/
+ai_metaphors/notebook.ipynb

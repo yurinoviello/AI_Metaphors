@@ -1,10 +1,12 @@
-import datasets, argparse, os
-
+import datasets, argparse, os, sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from ai_metaphors.utils.text_utils import extract_json, extract_content
 from ai_metaphors.providers.grazie_provider import GrazieProvider
 from ai_metaphors.providers.manim_provider import ManimProvider
 from grazie.api.client.gateway import AuthType, GrazieApiGatewayClient, GrazieAgent
 from grazie.api.client.endpoints import GrazieApiGatewayUrls
+
+
 
 def main(term_name: str = "", term_definition: str = "", metaphor: str = "", generate_metaphor: bool = False, executable_path: str = "", working_dir: str = "") :
 
@@ -45,8 +47,8 @@ def main(term_name: str = "", term_definition: str = "", metaphor: str = "", gen
                                    working_dir=working_dir)
     manim_provider.write_python(manim_code, font_path="ai_metaphors/resources/JetBrainsSans-Regular.ttf", )
     error = manim_provider.execute_manim_script()
-    print(error)
-    # return error
+    return error
+
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Process term name, term definition, and metaphor.")
@@ -92,7 +94,7 @@ if __name__ == "__main__":
             print("Error: Definition must not be empty.")
             exit(1)  # Exit the program with an error code
         if not args.generate_metaphor:
-            if not args.definition.strip():
+            if not args.metaphor.strip():
                 print("Error: Metaphor must not be empty if not generating it.")
                 exit(1)  # Exit the program with an error code
         main(term_name=args.term_name,
