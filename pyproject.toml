@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "ai-metaphors"
+version = "0.1.0"
+description = "This Python module generates metaphors, associated classes, descriptions, and Manim animation code for a given term. It integrates several providers, including GrazieProvider and ManimProvider, to produce results and animations."
+authors = ["yurinovinello <novielloyuri@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.13"
+manim = "0.18.0"
+datasets = "^3.2.0"
+grazie-api-gateway-client = "0.1.10"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.8.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[[tool.poetry.source]]
+name = "space-grazie-ml"
+url = "https://packages.jetbrains.team/pypi/p/grazi/grazie-ml/simple"
+priority = "supplemental"  # Ensures this source supplements PyPI
