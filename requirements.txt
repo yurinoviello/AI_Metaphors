@@ -1,2 +1,5 @@
 grazie-api-gateway-client==0.1.10
 manim==0.18.0
+attrs==23.2.0
+manimpango==0.6.0
+datasets

@@ -1,5 +1,5 @@
 **/.idea
-**/manim_stuff/logs/
-**/manim_stuff/media/
-**/manim_stuff/scripts/
+manim_stuff/logs/
+manim_stuff/media/
+manim_stuff/scripts/
 token.secret
