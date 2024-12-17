@@ -22,7 +22,7 @@ Ensure the following tools and libraries are installed:
 - Python 3.10+
 - Manim Community Edition
 - Hugging Face `datasets`
-- Grazie API Client Library (custom implementation)
+- Grazie API Client Library
 
 Install the required Python libraries with:
 
@@ -58,32 +58,51 @@ Run the script with the following arguments:
 python main.py [OPTIONS]
 ```
 
-| **Option**               | **Type**  | **Description**                                                                                                                                         |
-|--------------------------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `--use_dataset_example`  | `int`     | Use an example from the dataset (index between 0 and 15). Set `-1` to disable. Default is `-1`.                                                         |
-| `--term_name`            | `str`     | The name of the term (required if `use_dataset_example` is not set).                                                                                    |
-| `--term_definition`      | `str`     | Definition of the term (required).                                                                                                                     |
-| `--metaphor`             | `str`     | The metaphor associated with the term. If `--generate_metaphor` is set, this will be ignored.                                                          |
-| `--generate_metaphor`    | `flag`    | Flag to generate the metaphor automatically using the Grazie API.                                                                                      |
-| `--executable_path`      | `str`     | Path to the executable for Manim. Default: `~/anaconda3/envs/jetbrains/bin`.                                                                            |
-| `--working_dir`          | `str`     | Working directory for Manim output. Default: `./manim_stuff`.                                                                                          |
+| **Option**               | **Type**  | **Description**                                                                                 |
+|--------------------------|-----------|-------------------------------------------------------------------------------------------------|
+| `--use_dataset_example`  | `int`     | Use an example from the dataset (index between 0 and 13). Set `-1` to disable. Default is `-1`. |
+| `--term_name`            | `str`     | The name of the term (required if `use_dataset_example` is not set).                            |
+| `--term_definition`      | `str`     | Definition of the term (required).                                                              |
+| `--metaphor`             | `str`     | The metaphor associated with the term. If `--generate_metaphor` is set, this will be ignored.   |
+| `--generate_metaphor`    | `flag`    | Flag to generate the metaphor automatically using the Grazie API.                               |
+| `--executable_path`      | `str`     | Path to the executable for Manim. Default: `~/anaconda3/envs/jetbrains/bin`.                    |
+| `--working_dir`          | `str`     | Working directory for Manim output. Default: `./manim_stuff`.                                   |
 
 ### Example Usage
 
 1. **With Manually Provided Inputs**:
    ```bash
-   python main.py --term_name "Black Hole" --term_definition "A region of space where gravity is so strong that nothing can escape."
+   python ai_metaphors/main.py --term_name Boolean --term_definition 'A data type that has one of two possible values (usually denoted true and false) intended to represent the two truth values of logic and Boolean algebra.' --metaphor "Imagine a light switch in your house. The switch can only be in one of two positions: ON or OFF.\n\n- When the switch is ON, it represents "true" – the light is working.\n- When the switch is OFF, it represents "false" – the light is not working.\n\nA Boolean is like this light switch. It can only hold one of two states: true (ON) or false (OFF)."
    ```
 
 2. **Generating a Metaphor**:
    ```bash
-   python ai_metaphors/main.py --term_name Boolean --term_definition 'A data type that has one of two possible values (usually denoted true and false) intended to represent the two truth values of logic and Boolean algebra.' --metaphor "Imagine a light switch in your house. The switch can only be in one of two positions: ON or OFF.\n\n- When the switch is ON, it represents "true" – the light is working.\n- When the switch is OFF, it represents "false" – the light is not working.\n\nA Boolean is like this light switch. It can only hold one of two states: true (ON) or false (OFF)."
+   python ai_metaphors/main.py --term_name Boolean --term_definition 'A data type that has one of two possible values (usually denoted true and false) intended to represent the two truth values of logic and Boolean algebra.' --generate_metaphor
    ```
 
 3. **Using a Dataset Example**:
    ```bash
-   python ai_metaphors/main.py --use_dataset_example 3
+   python ai_metaphors/main.py --use_dataset_example 0
    ```
+   You can use terms, metaphors, and definitions from this dataset:
+   
+   | index | term                  |
+   |-------|-----------------------|
+   | 0     | `Boolean`             |
+   | 1     | `append`              |
+   | 2     | `break`               |
+   | 3     | `else branch`         |
+   | 4     | `replace`             |
+   | 5     | `val`                 |
+   | 6     | `var`                 |
+   | 7     | `Class`               |
+   | 8     | `Companion object`    |
+   | 9     | `Extension functions` |
+   | 10    | `Map`                 |
+   | 11    | `Type alias `         |
+   | 12    | `reversed`            |
+   | 13    | `shuffled`            |
+
 
 ---
 

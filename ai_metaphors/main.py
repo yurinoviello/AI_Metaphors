@@ -52,7 +52,7 @@ def main(term_name: str = "", term_definition: str = "", metaphor: str = "", gen
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Process term name, term definition, and metaphor.")
-    parser.add_argument("--use_dataset_example", type=int, choices=range(-1, 16), default=-1,
+    parser.add_argument("--use_dataset_example", type=int, choices=range(-1, 14), default=-1,
                         help="Index of the example in the dataset to use directly")
     parser.add_argument("--term_name", type=str, default="", help="Name of the term")
     parser.add_argument("--term_definition", type=str, default="", help="Definition of the term")
