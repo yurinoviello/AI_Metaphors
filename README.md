@@ -58,15 +58,15 @@ Run the script with the following arguments:
 python main.py [OPTIONS]
 ```
 
-| **Option**                   | **Type**       | **Description**                                                                                                                                         |
-|------------------------------|----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `--use_dataset_example`      | `int`          | Use an example from the dataset (index between 0 and 15). Set `-1` to disable. Default is `-1`.                                                         |
-| `--term_name`                | `str`          | The name of the term (required if `use_dataset_example` is not set).                                                                                    |
-| `--term_definition`          | `str`          | Definition of the term (required).                                                                                                                     |
-| `--metaphor`                 | `str`          | The metaphor associated with the term. If `--generate_metaphor` is set, this will be ignored.                                                          |
-| `--generate_metaphor`        | `flag`         | Flag to generate the metaphor automatically using the Grazie API.                                                                                      |
-| `--executable_path`          | `str`          | Path to the executable for Manim. Default: `~/anaconda3/envs/jetbrains/bin`.                                                                            |
-| `--working_dir`              | `str`          | Working directory for Manim output. Default: `./manim_stuff`.                                                                                          |
+| **Option**               | **Type**  | **Description**                                                                                                                                         |
+|--------------------------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `--use_dataset_example`  | `int`     | Use an example from the dataset (index between 0 and 15). Set `-1` to disable. Default is `-1`.                                                         |
+| `--term_name`            | `str`     | The name of the term (required if `use_dataset_example` is not set).                                                                                    |
+| `--term_definition`      | `str`     | Definition of the term (required).                                                                                                                     |
+| `--metaphor`             | `str`     | The metaphor associated with the term. If `--generate_metaphor` is set, this will be ignored.                                                          |
+| `--generate_metaphor`    | `flag`    | Flag to generate the metaphor automatically using the Grazie API.                                                                                      |
+| `--executable_path`      | `str`     | Path to the executable for Manim. Default: `~/anaconda3/envs/jetbrains/bin`.                                                                            |
+| `--working_dir`          | `str`     | Working directory for Manim output. Default: `./manim_stuff`.                                                                                          |
 
 ### Example Usage
 
