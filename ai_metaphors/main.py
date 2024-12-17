@@ -58,11 +58,8 @@ def parse_arguments():
     parser.add_argument("--term_definition", type=str, default="", help="Definition of the term")
     parser.add_argument("--metaphor", type=str, default="", help="Metaphor associated with the term")
     parser.add_argument("--generate_metaphor", action="store_true", default=False, help="Flag to generate the metaphor")
-    
-    parser.add_argument("--executable_path", type=str, default="~/anaconda3/envs/jetbrains/bin",
-                        help="Path to the executable for ManimProvider")
-    parser.add_argument("--working_dir", type=str, default="./manim_stuff",
-                        help="Working directory for ManimProvider")
+    parser.add_argument("--executable_path", type=str, default="",help="Path to the executable for ManimProvider. This argument is not needed if the module is executed trough poetry")
+    parser.add_argument("--working_dir", type=str, default="./manim_stuff", help="Working directory for ManimProvider")
     return parser.parse_args()
 
 
@@ -70,7 +67,7 @@ if __name__ == "__main__":
     args = parse_arguments()
 
     # Check if the executable path exists
-    if not os.path.exists(os.path.expanduser(args.executable_path)):
+    if args.executable_path != "" and not os.path.exists(args.executable_path):
         print(f"Error: The executable path '{args.executable_path}' does not exist.")
         exit(1)
 
@@ -84,7 +81,7 @@ if __name__ == "__main__":
         main(term_name=ds[args.use_dataset_example]["value"],
              term_definition=ds[args.use_dataset_example]["definition"],
              metaphor=ds[args.use_dataset_example]["metaphor"],
-             executable_path=os.path.expanduser(args.executable_path),
+             executable_path=args.executable_path,
              working_dir=args.working_dir)
     else:
         if not args.term_name.strip():
@@ -101,5 +98,5 @@ if __name__ == "__main__":
              term_definition=args.term_definition,
              metaphor=args.metaphor,
              generate_metaphor=args.generate_metaphor,
-             executable_path=os.path.expanduser(args.executable_path),
+             executable_path=args.executable_path,
              working_dir=args.working_dir)

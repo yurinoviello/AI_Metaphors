@@ -24,12 +24,60 @@ Ensure the following tools and libraries are installed:
 - Hugging Face `datasets`
 - Grazie API Client Library
 
-Install the required Python libraries with:
+
+### Suggested Installation
+To set up the project and install all dependencies, follow these steps using **Poetry**:
+To set up the project and install all dependencies using **Poetry**, follow these steps:
+
+1. **Clone the Repository**  
+   Clone the project from GitHub to your local machine:
+
+   ```bash
+   git clone https://github.com/your-username/AI_Metaphors.git
+   cd AI_Metaphors
+   ```
+
+2. **Install Dependencies**  
+   Use Poetry to create a virtual environment and install all dependencies:
+
+   ```bash
+   poetry install
+   ```
+
+   This command will:
+   - Create a virtual environment for the project.
+   - Install all required dependencies specified in `pyproject.toml`.
+
+3. **Activate the Virtual Environment**  
+   To activate the virtual environment created by Poetry, run:
+
+   ```bash
+   poetry shell
+   ```
+
+4. **Verify the Installation**  
+   Run the following command to check that all dependencies are installed correctly:
+
+   ```bash
+   poetry run python ai_metaphors/main.py --help
+   ```
+   or
+   ```bash
+   python ai_metaphors/main.py --help
+   ```
+
+---
+
+
+### Manual Installation (not advised)
+
+Install the required Python libraries with (TO IMPROVE):
 
 ```bash
 pip install -r requirements.txt
 ```
-
+TODO
+...
 ---
 
 ## **Folder and File Requirements**
@@ -42,7 +90,9 @@ pip install -r requirements.txt
    ```
 
 2. **Manim working dir**:  
-   If you plan to use preloaded term examples, place a Hugging Face dataset in:  
+   Specify a directory in which the code related with animations and the output videos will be placed.
+
+   For example:
    ```
    ./AI_Metaphors/manim_stuff
    ```
@@ -58,15 +108,15 @@ Run the script with the following arguments:
 python main.py [OPTIONS]
 ```
 
-| **Option**               | **Type**  | **Description**                                                                                 |
-|--------------------------|-----------|-------------------------------------------------------------------------------------------------|
-| `--use_dataset_example`  | `int`     | Use an example from the dataset (index between 0 and 13). Set `-1` to disable. Default is `-1`. |
-| `--term_name`            | `str`     | The name of the term (required if `use_dataset_example` is not set).                            |
-| `--term_definition`      | `str`     | Definition of the term (required).                                                              |
-| `--metaphor`             | `str`     | The metaphor associated with the term. If `--generate_metaphor` is set, this will be ignored.   |
-| `--generate_metaphor`    | `flag`    | Flag to generate the metaphor automatically using the Grazie API.                               |
-| `--executable_path`      | `str`     | Path to the executable for Manim. Default: `~/anaconda3/envs/jetbrains/bin`.                    |
-| `--working_dir`          | `str`     | Working directory for Manim output. Default: `./manim_stuff`.                                   |
+| **Option**               | **Type**  | **Description**                                                                                       |
+|--------------------------|-----------|-------------------------------------------------------------------------------------------------------|
+| `--use_dataset_example`  | `int`     | Use an example from the dataset (index between 0 and 13). Set `-1` to disable. Default is `-1`.       |
+| `--term_name`            | `str`     | The name of the term (required if `use_dataset_example` is not set).                                  |
+| `--term_definition`      | `str`     | Definition of the term (required).                                                                    |
+| `--metaphor`             | `str`     | The metaphor associated with the term. If `--generate_metaphor` is set, this will be ignored.         |
+| `--generate_metaphor`    | `flag`    | Flag to generate the metaphor automatically using the Grazie API.                                     |
+| `--executable_path`      | `str`     | Path to the executable for Manim. Default: `""`. Not needed if the project was installed with poetry. |
+| `--working_dir`          | `str`     | Working directory for Manim output. Default: `./manim_stuff`.                                         |
 
 ### Example Usage
 
