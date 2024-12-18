@@ -15,6 +15,7 @@ def extract_python_code(text: str) -> str | None:
         return match.group(1).strip()
     return None
 
+
 def extract_json(text: str) -> str | None:
     """
     :param text: A string that potentially contains a JSON object wrapped in triple backticks.
@@ -32,7 +33,7 @@ def extract_json(text: str) -> str | None:
     return None
 
 
-def extract_content(input_string : str) -> str:
+def extract_content(input_string: str) -> str:
     # Regex pattern to match content inside triple backticks
     pattern = r"```(.*?)```"
     match = re.search(pattern, input_string, re.DOTALL)

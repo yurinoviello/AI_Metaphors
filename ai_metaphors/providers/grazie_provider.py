@@ -33,9 +33,8 @@ class GrazieProvider:
     :param model: A string representing the model to be used for generating responses. Defaults to "openai-gpt-4o".
     :param temperature: A float that determines the randomness of the model's output. Defaults to 0.0.
     """
-    def __init__(self, client: GrazieApiGatewayClient,
-                 model: str = "openai-gpt-4o",
-                 temperature: float = 0.0) -> None:
+
+    def __init__(self, client: GrazieApiGatewayClient, model: str = "openai-gpt-4o", temperature: float = 0.0) -> None:
         self.client = client
         self.model = model
         self.temperature = temperature
@@ -60,61 +59,79 @@ class GrazieProvider:
     def get_metaphor(self, term: dict) -> str:
         return self.__safe_call(
             system_prompt=Path(SYSTEM_PROMPT_METAPHOR).read_text(),
-            user_prompt=Path(USER_PROMPT_METAPHOR).read_text().format_map({
-                "topic": term["value"].strip(),
-                "definition": term["definition"].strip(),
-            }),
+            user_prompt=Path(USER_PROMPT_METAPHOR)
+            .read_text()
+            .format_map(
+                {
+                    "topic": term["value"].strip(),
+                    "definition": term["definition"].strip(),
+                }
+            ),
         )
 
     def get_classes(self, term: dict, metaphor: str) -> str:
         return self.__safe_call(
             system_prompt=Path(SYSTEM_PROMPT_CLASSES).read_text(),
-            user_prompt=Path(USER_PROMPT_CLASSES).read_text().format_map({
-            "topic" : term["value"].strip(),
-            "definition" : term["definition"].strip(),
-            "metaphor" : metaphor.strip()}),
+            user_prompt=Path(USER_PROMPT_CLASSES)
+            .read_text()
+            .format_map({"topic": term["value"].strip(), "definition": term["definition"].strip(), "metaphor": metaphor.strip()}),
         )
 
     def get_description(self, term: dict, metaphor: str, classes: str) -> str:
         return self.__safe_call(
             system_prompt=Path(SYSTEM_PROMPT_DESCRIPTION).read_text(),
-            user_prompt=Path(USER_PROMPT_DESCRIPTION).read_text().format_map({
-                "topic": term["value"].strip(),
-                "definition": term["definition"].strip(),
-                "metaphor": metaphor.strip(),
-                "classes" : classes.strip(),
-            }),
+            user_prompt=Path(USER_PROMPT_DESCRIPTION)
+            .read_text()
+            .format_map(
+                {
+                    "topic": term["value"].strip(),
+                    "definition": term["definition"].strip(),
+                    "metaphor": metaphor.strip(),
+                    "classes": classes.strip(),
+                }
+            ),
         )
 
     def get_manim(self, term: dict, metaphor: str, classes: str, instructions: str = "") -> str:
         if instructions != "":
             return self.__safe_call(
                 system_prompt=Path(SYSTEM_PROMPT_MANIM_NO_DESC).read_text(),
-                user_prompt=Path(USER_PROMPT_DESCRIPTION).read_text().format_map({
-                    "topic": term["value"].strip(),
-                    "definition": term["definition"].strip(),
-                    "metaphor": metaphor.strip(),
-                    "classes" : classes.strip(),
-                    "instructions" : instructions.strip(),
-                }),
+                user_prompt=Path(USER_PROMPT_DESCRIPTION)
+                .read_text()
+                .format_map(
+                    {
+                        "topic": term["value"].strip(),
+                        "definition": term["definition"].strip(),
+                        "metaphor": metaphor.strip(),
+                        "classes": classes.strip(),
+                        "instructions": instructions.strip(),
+                    }
+                ),
             )
         return self.__safe_call(
             system_prompt=Path(SYSTEM_PROMPT_MANIM_NO_DESC).read_text(),
-            user_prompt=Path(USER_PROMPT_DESCRIPTION).read_text().format_map({
+            user_prompt=Path(USER_PROMPT_DESCRIPTION)
+            .read_text()
+            .format_map(
+                {
                     "topic": term["value"].strip(),
                     "definition": term["definition"].strip(),
                     "metaphor": metaphor.strip(),
-                    "classes" : classes.strip(),
-                }),
-            )
-
+                    "classes": classes.strip(),
+                }
+            ),
+        )
 
     def refine_manim(self, code: str, runtime_error: str, static_error: str) -> str:
         return self.__safe_call(
             system_prompt=Path(SYSTEM_PROMPT_REFINE).read_text(),
-            user_prompt=Path(USER_PROMPT_REFINE).read_text().format_map({
-                "code": code.strip(),
-                "runtime-error": runtime_error.strip(),
-                "static-error": static_error.strip(),
-            }),
+            user_prompt=Path(USER_PROMPT_REFINE)
+            .read_text()
+            .format_map(
+                {
+                    "code": code.strip(),
+                    "runtime-error": runtime_error.strip(),
+                    "static-error": static_error.strip(),
+                }
+            ),
         )

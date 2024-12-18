@@ -21,10 +21,8 @@ class ManimProvider:
     :param working_dir: The directory where scripts, media, and logs are
                         stored. Defaults to "./animations".
     """
-    def __init__(self,
-                 provider : GrazieProvider, term: dict,
-                 executable: str = "",
-                 working_dir: str = "./animations") -> None:
+
+    def __init__(self, provider: GrazieProvider, term: dict, executable: str = "", working_dir: str = "./animations") -> None:
         self.provider = provider
         self.term = term
         self.executable = Path(executable)
@@ -41,10 +39,7 @@ class ManimProvider:
 
         self.file_path = self.scripts_dir / f"{term['value'].replace(' ', '_')}.py"
 
-
-
     def write_python(self, text: str, font_path: str = "./resources/JetBrainsSans-Regular.ttf") -> bool:
-
         code = extract_python_code(text)
         script_path = Path(self.file_path)
         if code:
@@ -62,14 +57,15 @@ class ManimProvider:
             raise RuntimeError("Cannot write manim text") from e
         return False
 
-
-
     def execute_manim_script(self) -> str:
         command = [
             self.executable / "manim",
-            "-pql", self.file_path,
-            "--media_dir", self.media_dir,
-            "--log_dir", self.log_dir,
+            "-pql",
+            self.file_path,
+            "--media_dir",
+            self.media_dir,
+            "--log_dir",
+            self.log_dir,
         ]
 
         try:
@@ -101,9 +97,9 @@ class ManimProvider:
 
         with Path(self.file_path).open() as f:
             manim_script = self.provider.refine_manim(
-                code = f.read(),
-                runtime_error = error,
-                static_error = static_errors,
+                code=f.read(),
+                runtime_error=error,
+                static_error=static_errors,
             )
 
         self.write_python(manim_script)

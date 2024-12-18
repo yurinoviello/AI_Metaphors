@@ -1,6 +1,5 @@
 import argparse
 import sys
-from enum import Enum
 from pathlib import Path
 
 import datasets
@@ -12,9 +11,7 @@ from ai_metaphors.providers.manim_provider import ManimProvider
 from ai_metaphors.utils.text_utils import extract_content, extract_json
 
 
-def main(term_name: str, term_definition: str, metaphor: str, generate_metaphor: bool,
-         executable_path: str, working_dir: str) -> int:
-
+def main(term_name: str, term_definition: str, metaphor: str, generate_metaphor: bool, executable_path: str, working_dir: str) -> int:
     token_path = Path("token.secret")
     with token_path.open() as t:
         token = t.read()
@@ -54,10 +51,8 @@ def animate_term(provider: GrazieProvider, term: dict, metaphor: str, executable
     print("Manim code created")
 
     # Execution
-    manim_provider = ManimProvider(provider, term,
-                                   executable=executable_path,
-                                   working_dir=working_dir)
-    manim_provider.write_python(manim_code, font_path="ai_metaphors/resources/JetBrainsSans-Regular.ttf" )
+    manim_provider = ManimProvider(provider, term, executable=executable_path, working_dir=working_dir)
+    manim_provider.write_python(manim_code, font_path="ai_metaphors/resources/JetBrainsSans-Regular.ttf")
     print("Execution...")
     error = manim_provider.execute_manim_script()
     if error == "success":
@@ -73,16 +68,19 @@ def animate_term(provider: GrazieProvider, term: dict, metaphor: str, executable
     raise RuntimeError("Cannot execute Manim script")
 
 
-def parse_arguments() -> argparse.Namespace :
+def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Process term name, term definition, and metaphor.")
-    parser.add_argument("--use_dataset_example", type=int, choices=range(-1, 14), default=-1,
-                        help="Index of the example in the dataset to use directly")
+    parser.add_argument("--use_dataset_example", type=int, choices=range(-1, 14), default=-1, help="Index of the example in the dataset to use directly")
     parser.add_argument("--term_name", type=str, default="", help="Name of the term")
     parser.add_argument("--term_definition", type=str, default="", help="Definition of the term")
     parser.add_argument("--metaphor", type=str, default="", help="Metaphor associated with the term")
     parser.add_argument("--generate_metaphor", action="store_true", default=False, help="Flag to generate the metaphor")
-    parser.add_argument("--executable_path", type=str, default="",help="Path to the executable for ManimProvider."
-                                                                       "This argument is not needed if the module is executed trough poetry")
+    parser.add_argument(
+        "--executable_path",
+        type=str,
+        default="",
+        help="Path to the executable for ManimProvider." "This argument is not needed if the module is executed trough poetry",
+    )
     parser.add_argument("--working_dir", type=str, default="./animations", help="Working directory for ManimProvider")
     return parser.parse_args()
 
@@ -103,12 +101,14 @@ if __name__ == "__main__":
 
     if args.use_dataset_example != -1:
         ds = datasets.load_from_disk("ai_metaphors/resources/subset")
-        main(term_name=ds[args.use_dataset_example]["value"],
-             term_definition=ds[args.use_dataset_example]["definition"],
-             metaphor=ds[args.use_dataset_example]["metaphor"],
-             generate_metaphor=args.generate_metaphor,
-             executable_path=args.executable_path,
-             working_dir=args.working_dir)
+        main(
+            term_name=ds[args.use_dataset_example]["value"],
+            term_definition=ds[args.use_dataset_example]["definition"],
+            metaphor=ds[args.use_dataset_example]["metaphor"],
+            generate_metaphor=args.generate_metaphor,
+            executable_path=args.executable_path,
+            working_dir=args.working_dir,
+        )
     else:
         if not args.term_name.strip():
             print("Error: Term must not be empty.")
@@ -119,9 +119,11 @@ if __name__ == "__main__":
         if not args.generate_metaphor and not args.metaphor.strip():
             print("Error: Metaphor must not be empty if not generating it.")
             sys.exit(1)  # Exit the program with an error code
-        main(term_name=args.term_name,
-             term_definition=args.term_definition,
-             metaphor=args.metaphor,
-             generate_metaphor=args.generate_metaphor,
-             executable_path=args.executable_path,
-             working_dir=args.working_dir)
+        main(
+            term_name=args.term_name,
+            term_definition=args.term_definition,
+            metaphor=args.metaphor,
+            generate_metaphor=args.generate_metaphor,
+            executable_path=args.executable_path,
+            working_dir=args.working_dir,
+        )
