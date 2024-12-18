@@ -8,6 +8,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
 manim = "0.18.0"
+manimpango= "0.6.0"
 datasets = "^3.2.0"
 grazie-api-gateway-client = "0.1.10"
 pylint = "^3.3.2"
