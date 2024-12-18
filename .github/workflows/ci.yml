@@ -19,23 +19,24 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libpango1.0-dev \
-            libcairo2-dev \
-            pkg-config
-
-      - name: Install Poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      - name: Install dependencies
-        run: |
-          poetry lock --no-update
-          poetry install
+#      This steps will be re-added on Space
+#      - name: Install system dependencies
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get install -y \
+#            libpango1.0-dev \
+#            libcairo2-dev \
+#            pkg-config
+#
+#      - name: Install Poetry
+#        run: |
+#          curl -sSL https://install.python-poetry.org | python3 -
+#          echo "$HOME/.local/bin" >> $GITHUB_PATH
+#
+#      - name: Install dependencies
+#        run: |
+#          poetry lock --no-update
+#          poetry install
 
   code-style:
     needs: setup
@@ -51,9 +52,11 @@ jobs:
         with:
           python-version: "3.10"
 
+      - name: Install Ruff
+        run: pip install ruff
+
       - name: Check the code
         run: |
-          poetry shell
           ruff check --output-format=github
 
       - name: Format the code
