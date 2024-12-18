@@ -24,9 +24,8 @@ jobs:
           curl -sSL https://install.python-poetry.org | python3 -
           export PATH="$HOME/.local/bin:$PATH"
 
-      - name: Update poetry.lock file
+      - name: Install dependencies
         run: |
-          poetry lock --no-update
           poetry install
 
   code-style:
