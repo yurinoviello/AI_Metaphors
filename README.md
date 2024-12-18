@@ -1,4 +1,4 @@
-# AI Metaphors Pipeline
+# AI Metaphors
 
 This Python module generates metaphors, associated classes, descriptions, and Manim animation code for a given term. It integrates several providers, including **GrazieProvider** and **ManimProvider**, to produce results and animations.
 
