@@ -19,10 +19,14 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install dependencies
+      - name: Install Poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
           export PATH="$HOME/.local/bin:$PATH"
+
+      - name: Update poetry.lock file
+        run: |
+          poetry lock --no-update
           poetry install
 
   code-style:
