@@ -61,5 +61,4 @@ jobs:
 
       - name: Format the code
         run: |
-          poetry shell
           ruff format --check
