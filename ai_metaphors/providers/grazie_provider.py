@@ -1,8 +1,10 @@
+from pathlib import Path
+
 import attrs
-from grazie.api.client.gateway import  GrazieApiGatewayClient
 from grazie.api.client.chat.prompt import ChatPrompt
-from grazie.api.client.profiles import LLMProfile
+from grazie.api.client.gateway import GrazieApiGatewayClient
 from grazie.api.client.llm_parameters import LLMParameters, Parameters
+from grazie.api.client.profiles import LLMProfile
 
 SYSTEM_PROMPT_CLASSES = "ai_metaphors/prompts/SystemPromptClasses.txt"
 USER_PROMPT_CLASSES = "ai_metaphors/prompts/UserPromptClasses.txt"
@@ -33,86 +35,86 @@ class GrazieProvider:
     """
     def __init__(self, client: GrazieApiGatewayClient,
                  model: str = "openai-gpt-4o",
-                 temperature: float = 0.0,):
+                 temperature: float = 0.0) -> None:
         self.client = client
         self.model = model
         self.temperature = temperature
 
-    def __safe_call(self, system_prompt: str, user_prompt: str):
+    def __safe_call(self, system_prompt: str, user_prompt: str) -> str:
         @attrs.define(auto_attribs=True, frozen=True)
         class MyProfile(LLMProfile):
             name: str = self.model
 
         if self.model == "openai-o1":
             return self.client.chat(
-                chat=ChatPrompt().add_user(system_prompt + '\n' + user_prompt),
+                chat=ChatPrompt().add_user(system_prompt + "\n" + user_prompt),
                 profile=MyProfile(),
             ).content
 
         return self.client.chat(
             chat=ChatPrompt().add_system(system_prompt).add_user(user_prompt),
             profile=MyProfile(),
-            parameters={LLMParameters.Temperature: Parameters.FloatValue(self.temperature)}
+            parameters={LLMParameters.Temperature: Parameters.FloatValue(self.temperature)},
         ).content
 
-
-    def get_metaphor(self, term: dict):
+    def get_metaphor(self, term: dict) -> str:
         return self.__safe_call(
-            system_prompt = open(SYSTEM_PROMPT_METAPHOR).read(),
-            user_prompt = open(USER_PROMPT_METAPHOR).read().format_map({
-            "topic" : term['value'].strip(),
-            "definition" : term['definition'].strip()})
+            system_prompt=Path(SYSTEM_PROMPT_METAPHOR).read_text(),
+            user_prompt=Path(USER_PROMPT_METAPHOR).read_text().format_map({
+                "topic": term["value"].strip(),
+                "definition": term["definition"].strip(),
+            }),
         )
 
-    def get_classes(self, term: dict, metaphor: str,):
+    def get_classes(self, term: dict, metaphor: str) -> str:
         return self.__safe_call(
-            system_prompt = open(SYSTEM_PROMPT_CLASSES).read(),
-            user_prompt = open(USER_PROMPT_CLASSES).read().format_map({
-            "topic" : term['value'].strip(),
-            "definition" : term['definition'].strip(),
-            "metaphor" : metaphor.strip()})
+            system_prompt=Path(SYSTEM_PROMPT_CLASSES).read_text(),
+            user_prompt=Path(USER_PROMPT_CLASSES).read_text().format_map({
+            "topic" : term["value"].strip(),
+            "definition" : term["definition"].strip(),
+            "metaphor" : metaphor.strip()}),
         )
 
-    def get_description(self, term: dict, metaphor: str, classes: str):
+    def get_description(self, term: dict, metaphor: str, classes: str) -> str:
         return self.__safe_call(
-            system_prompt = open(SYSTEM_PROMPT_DESCRIPTION).read(),
-            user_prompt = open(USER_PROMPT_DESCRIPTION).read().format_map({
-                "topic": term['value'].strip(),
-                "definition": term['definition'].strip(),
+            system_prompt=Path(SYSTEM_PROMPT_DESCRIPTION).read_text(),
+            user_prompt=Path(USER_PROMPT_DESCRIPTION).read_text().format_map({
+                "topic": term["value"].strip(),
+                "definition": term["definition"].strip(),
                 "metaphor": metaphor.strip(),
-                "classes" : classes.strip()
-            })
+                "classes" : classes.strip(),
+            }),
         )
 
-    def get_manim(self, term: dict, metaphor: str, classes: str, instructions: str = ""):
+    def get_manim(self, term: dict, metaphor: str, classes: str, instructions: str = "") -> str:
         if instructions != "":
             return self.__safe_call(
-                system_prompt = open(SYSTEM_PROMPT_MANIM).read(),
-                user_prompt = open(USER_PROMPT_MANIM).read().format_map({
-                    "topic": term['value'].strip(),
-                    "definition": term['definition'].strip(),
+                system_prompt=Path(SYSTEM_PROMPT_MANIM_NO_DESC).read_text(),
+                user_prompt=Path(USER_PROMPT_DESCRIPTION).read_text().format_map({
+                    "topic": term["value"].strip(),
+                    "definition": term["definition"].strip(),
                     "metaphor": metaphor.strip(),
                     "classes" : classes.strip(),
-                    "instructions" : instructions.strip()
-                })
+                    "instructions" : instructions.strip(),
+                }),
             )
         return self.__safe_call(
-                system_prompt = open(SYSTEM_PROMPT_MANIM_NO_DESC).read(),
-                user_prompt = open(USER_PROMPT_DESCRIPTION).read().format_map({
-                    "topic": term['value'].strip(),
-                    "definition": term['definition'].strip(),
+            system_prompt=Path(SYSTEM_PROMPT_MANIM_NO_DESC).read_text(),
+            user_prompt=Path(USER_PROMPT_DESCRIPTION).read_text().format_map({
+                    "topic": term["value"].strip(),
+                    "definition": term["definition"].strip(),
                     "metaphor": metaphor.strip(),
                     "classes" : classes.strip(),
-                })
+                }),
             )
 
 
-    def refine_manim(self, code: str, runtime_error: str, static_error: str):
+    def refine_manim(self, code: str, runtime_error: str, static_error: str) -> str:
         return self.__safe_call(
-            system_prompt = open(SYSTEM_PROMPT_REFINE).read(),
-            user_prompt = open(USER_PROMPT_REFINE).read().format_map({
+            system_prompt=Path(SYSTEM_PROMPT_REFINE).read_text(),
+            user_prompt=Path(USER_PROMPT_REFINE).read_text().format_map({
                 "code": code.strip(),
                 "runtime-error": runtime_error.strip(),
-                "static-error": static_error.strip()
-            })
+                "static-error": static_error.strip(),
+            }),
         )

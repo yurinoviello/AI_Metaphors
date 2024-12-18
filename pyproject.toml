@@ -22,4 +22,50 @@ build-backend = "poetry.core.masonry.api"
 [[tool.poetry.source]]
 name = "space-grazie-ml"
 url = "https://packages.jetbrains.team/pypi/p/grazi/grazie-ml/simple"
-priority = "supplemental"  # Ensures this source supplements PyPI
+priority = "supplemental"
+
+
+# ---------------------------Ruff configuration---------------------------
+[tool.ruff]
+line-length = 160
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    # pydocstyle
+    "D",
+    # flake8-pytest-style
+    "PT",
+    # flake8-print
+    "T20",
+    # Missing type annotation for self/cls in method
+    "ANN10",
+    # Checks that function arguments are annotated with a more specific type than Any
+    "ANN401",
+    # Checks for missing from __future__ import annotations imports upon detecting type annotations that can be written more succinctly under PEP 563
+    "FA100",
+    # Checks for packages that are missing an __init__.py file
+    "INP001",
+    # Checks for the use of string literals in exception constructors
+    "EM101",
+    # Checks for long exception messages that are not defined in the exception class itself
+    "TRY003",
+
+    # Ignore "too many arguments in function definition"
+    "PLR0913",
+    # Ignore "Boolean-typed positional argument"
+    "FBT001",
+    # Ignore "`subprocess` call: check for execution of untrusted input"
+    "S603",
+]
+
+[tool.rufflint.per-file-ignores]
+"common/base_test_mixins.py" = ["N802"] # We're using camelCase here to be consistent with unittest
+
+[tool.rufflint.isort]
+known-local-folder = ["data", "common", "task"]
+force-sort-within-sections = true
+order-by-type = true
+
+[tool.rufflint.flake8-annotations]
+suppress-none-returning = true

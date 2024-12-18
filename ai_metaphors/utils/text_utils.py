@@ -1,4 +1,7 @@
-import re, json
+from __future__ import annotations
+
+import json
+import re
 
 
 def extract_python_code(text: str) -> str | None:
@@ -12,12 +15,12 @@ def extract_python_code(text: str) -> str | None:
         return match.group(1).strip()
     return None
 
-def extract_json(text):
+def extract_json(text: str) -> str | None:
     """
     :param text: A string that potentially contains a JSON object wrapped in triple backticks.
-    :return: A dictionary representing the extracted JSON object if valid JSON is found and decoded successfully, otherwise None.
+    :return: A dictionary representing the extracted JSON object if valid JSON is found and decoded successfully,otherwise None.
     """
-    json_pattern = r'```json(.*?)```'
+    json_pattern = r"```json(.*?)```"
     match = re.search(json_pattern, text, re.DOTALL)
     if match:
         json_content = match.group(1)
@@ -29,9 +32,9 @@ def extract_json(text):
     return None
 
 
-def extract_content(input_string):
+def extract_content(input_string : str) -> str:
     # Regex pattern to match content inside triple backticks
-    pattern = r'```(.*?)```'
+    pattern = r"```(.*?)```"
     match = re.search(pattern, input_string, re.DOTALL)
 
     # If a match is found, return the content inside backticks

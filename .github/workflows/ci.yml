@@ -1,0 +1,50 @@
+name: Python build
+
+on: [push]
+
+env:
+  JETBRAINS_MONO_VERSION: 2.304
+  PYTHON_VERSION: "3.10"
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          export PATH="$HOME/.local/bin:$PATH"
+          poetry install
+
+  code-style:
+    needs: setup
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Check the code
+        run: |
+          poetry shell
+          ruff check --output-format=github
+
+      - name: Format the code
+        run: |
+          poetry shell
+          ruff format --check
