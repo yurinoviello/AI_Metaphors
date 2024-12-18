@@ -94,7 +94,7 @@ TODO
 
    For example:
    ```
-   ./AI_Metaphors/manim_stuff
+   ./AI_Metaphors/animations
    ```
 ---
 
@@ -116,7 +116,7 @@ python main.py [OPTIONS]
 | `--metaphor`             | `str`     | The metaphor associated with the term. If `--generate_metaphor` is set, this will be ignored.         |
 | `--generate_metaphor`    | `flag`    | Flag to generate the metaphor automatically using the Grazie API.                                     |
 | `--executable_path`      | `str`     | Path to the executable for Manim. Default: `""`. Not needed if the project was installed with poetry. |
-| `--working_dir`          | `str`     | Working directory for Manim output. Default: `./manim_stuff`.                                         |
+| `--working_dir`          | `str`     | Working directory for Manim output. Default: `./animations`.                                          |
 
 ### Example Usage
 
