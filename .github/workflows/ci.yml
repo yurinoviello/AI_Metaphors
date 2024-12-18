@@ -34,6 +34,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          poetry lock --no-update
           poetry install
 
   code-style:
