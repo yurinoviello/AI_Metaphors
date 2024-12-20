@@ -1,60 +1,50 @@
-job("Python Build") {
-    // Trigger: Start the pipeline on every push
+job("Python build") {
+    container(image = "ubuntu:latest") {
+        env["JETBRAINS_MONO_VERSION"] = "2.304"
+        env["PYTHON_VERSION"] = "3.10"
+
+        shellScript {
+            content = """
+                echo "Setting up Python environment..."
+
+                echo "Installing system dependencies..."
+                sudo apt-get update
+                sudo apt-get install -y \
+                    libpango1.0-dev \
+                    libcairo2-dev \
+                    pkg-config
+
+                echo "Installing Poetry..."
+                curl -sSL https://install.python-poetry.org | python3 -
+
+                echo "Installing project dependencies..."
+                poetry lock --no-update
+                poetry install
+            """
+        }
+    }
+}
+
+job("Code style check and format") {
     startOn {
         gitPush {}
     }
-    // Environment variables
-    env["JETBRAINS_MONO_VERSION"] = "2.304"
-    env["PYTHON_VERSION"] = "3.10"
 
-    pipeline {
-        stage("Setup Environment") {
-            container("ubuntu:latest") {
-                kotlinScript {
-                    scriptContent = """
-                        # Checkout code
-                        git clone ${'$'}{repo.url}
+    container(image = "ubuntu") {
 
-                        # Install system dependencies
-                        sudo apt-get update
-                        sudo apt-get install -y \
-                            libpango1.0-dev \
-                            libcairo2-dev \
-                            pkg-config
+        shellScript {
+            content = """
+                echo "Setting up Python environment for code style check..."
 
-                        # Install Poetry
-                        curl -sSL https://install.python-poetry.org | python3 -
-                        echo "$HOME/.local/bin" >> ${'$'}PATH
+                echo "Installing Ruff..."
+                pip install ruff
 
-                        # Install project dependencies
-                        poetry lock --no-update
-                        poetry install
-                    """.trimIndent()
-                }
-            }
-        }
+                echo "Checking the code..."
+                ruff check --output-format=github
 
-        stage("Code Style Checks") {
-            container("ubuntu:latest") {
-                kotlinScript {
-                    scriptContent = """
-                        # Checkout code
-                        git clone ${'$'}{repo.url}
-
-                        # Install Python
-                        sudo apt install -y python${'$'}PYTHON_VERSION python3-pip
-
-                        # Install Ruff linter/formatter
-                        pip install ruff
-
-                        # Lint the code
-                        ruff check --output-format=github
-
-                        # Format the code
-                        ruff format --check
-                    """.trimIndent()
-                }
-            }
+                echo "Formatting the code..."
+                ruff format --check
+            """
         }
     }
 }
