@@ -1,5 +1,5 @@
-import subprocess
 from pathlib import Path
+import subprocess
 
 from ai_metaphors.providers.grazie_provider import GrazieProvider
 from ai_metaphors.utils.text_utils import extract_python_code
@@ -22,7 +22,13 @@ class ManimProvider:
                         stored. Defaults to "./animations".
     """
 
-    def __init__(self, provider: GrazieProvider, term: dict, executable: str = "", working_dir: str = "./animations") -> None:
+    def __init__(
+        self,
+        provider: GrazieProvider,
+        term: dict,
+        executable: str = "",
+        working_dir: str = "./animations",
+    ) -> None:
         self.provider = provider
         self.term = term
         self.executable = Path(executable)
@@ -45,14 +51,20 @@ class ManimProvider:
         if code:
             try:
                 with script_path.open("w") as file:
-                    file.write(f"import manimpango\nmanimpango.register_font('{font_path}')\nfrom manim import DARK_BROWN as BROWN\n{code}")
+                    file.write(
+                        f"import manimpango\nmanimpango.register_font('{font_path}')\n"
+                        f"from manim import DARK_BROWN as BROWN\n{code}",
+                    )
             except FileNotFoundError as e:
                 raise RuntimeError("Cannot write manim code") from e
             return True
 
         try:
             with script_path.open("w") as file:
-                file.write(f"import manimpango\nmanimpango.register_font('{font_path}')\nfrom manim import DARK_BROWN as BROWN\n{text}")
+                file.write(
+                    f"import manimpango\nmanimpango.register_font('{font_path}')\n"
+                    f"from manim import DARK_BROWN as BROWN\n{text}",
+                )
         except FileNotFoundError as e:
             raise RuntimeError("Cannot write manim text") from e
         return False

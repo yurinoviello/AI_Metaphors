@@ -74,7 +74,13 @@ class GrazieProvider:
             system_prompt=Path(SYSTEM_PROMPT_CLASSES).read_text(),
             user_prompt=Path(USER_PROMPT_CLASSES)
             .read_text()
-            .format_map({"topic": term["value"].strip(), "definition": term["definition"].strip(), "metaphor": metaphor.strip()}),
+            .format_map(
+                {
+                    "topic": term["value"].strip(),
+                    "definition": term["definition"].strip(),
+                    "metaphor": metaphor.strip(),
+                },
+            ),
         )
 
     def get_description(self, term: dict, metaphor: str, classes: str) -> str:

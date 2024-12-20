@@ -1,8 +1,10 @@
 import argparse
-import sys
+import os
 from pathlib import Path
+import sys
 
 import datasets
+from dotenv import load_dotenv
 from grazie.api.client.endpoints import GrazieApiGatewayUrls
 from grazie.api.client.gateway import AuthType, GrazieAgent, GrazieApiGatewayClient
 
@@ -10,16 +12,22 @@ from ai_metaphors.providers.grazie_provider import GrazieProvider
 from ai_metaphors.providers.manim_provider import ManimProvider
 from ai_metaphors.utils.text_utils import extract_content, extract_json
 
+load_dotenv()
+GRAZIE_JWT_TOKEN = os.getenv("GRAZIE_JWT_TOKEN")
 
-def main(term_name: str, term_definition: str, metaphor: str, generate_metaphor: bool, executable_path: str, working_dir: str) -> int:
-    token_path = Path("token.secret")
-    with token_path.open() as t:
-        token = t.read()
 
+def main(
+    term_name: str,
+    term_definition: str,
+    metaphor: str,
+    generate_metaphor: bool,
+    executable_path: str,
+    working_dir: str,
+) -> int:
     client = GrazieApiGatewayClient(
         grazie_agent=GrazieAgent(name="grazie-api-gateway-client-readme", version="dev"),
         url=GrazieApiGatewayUrls.STAGING,
-        grazie_jwt_token=token,
+        grazie_jwt_token=GRAZIE_JWT_TOKEN,
         auth_type=AuthType.USER,
     )
 
@@ -70,7 +78,13 @@ def animate_term(provider: GrazieProvider, term: dict, metaphor: str, executable
 
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Process term name, term definition, and metaphor.")
-    parser.add_argument("--use_dataset_example", type=int, choices=range(-1, 14), default=-1, help="Index of the example in the dataset to use directly")
+    parser.add_argument(
+        "--use_dataset_example",
+        type=int,
+        choices=range(-1, 14),
+        default=-1,
+        help="Index of the example in the dataset to use directly",
+    )
     parser.add_argument("--term_name", type=str, default="", help="Name of the term")
     parser.add_argument("--term_definition", type=str, default="", help="Definition of the term")
     parser.add_argument("--metaphor", type=str, default="", help="Metaphor associated with the term")
@@ -79,7 +93,8 @@ def parse_arguments() -> argparse.Namespace:
         "--executable_path",
         type=str,
         default="",
-        help="Path to the executable for ManimProvider.This argument is not needed if the module is executed trough poetry",
+        help="Path to the executable for ManimProvider."
+        "This argument is not needed if the module is executed trough poetry",
     )
     parser.add_argument("--working_dir", type=str, default="./animations", help="Working directory for ManimProvider")
     return parser.parse_args()

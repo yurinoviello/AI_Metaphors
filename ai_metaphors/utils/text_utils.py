@@ -19,7 +19,8 @@ def extract_python_code(text: str) -> str | None:
 def extract_json(text: str) -> str | None:
     """
     :param text: A string that potentially contains a JSON object wrapped in triple backticks.
-    :return: A dictionary representing the extracted JSON object if valid JSON is found and decoded successfully,otherwise None.
+    :return: A dictionary representing the extracted JSON object if valid JSON is found and decoded successfully,
+            otherwise None.
     """
     json_pattern = r"```json(.*?)```"
     match = re.search(json_pattern, text, re.DOTALL)

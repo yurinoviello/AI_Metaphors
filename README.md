@@ -19,10 +19,10 @@ The script performs the following steps:
 
 Ensure the following tools and libraries are installed:
 
-- Python 3.10+
-- Manim Community Edition
-- Hugging Face `datasets`
-- Grazie API Client Library
+- **Python 3.10+**
+- **Manim Community Edition** (refer to the [official page](https://github.com/ManimCommunity/manim) for installation troubles )
+- Hugging Face **datasets**
+- **Grazie API Client Library**
 
 
 ### Suggested Installation
@@ -68,26 +68,19 @@ To set up the project and install all dependencies using **Poetry**, follow thes
 
 ---
 
-
-### Manual Installation (not advised)
-
-Install the required Python libraries with (TO IMPROVE):
-
-```bash
-pip install -r requirements.txt
-```
-TODO
-...
----
-
 ## **Folder and File Requirements**
 
 1. **Token File**:  
-   Place your Grazie JWT token in a file named `token.secret` inside the project root folder:
+   Place the following tokens in a file named `.env` inside the project root folder.
+   - `GRAZIE_JWT_TOKEN`: it will be used to authenticate via the `GrazieApiGatewayClient`
+   - `POETRY_HTTP_BASIC_SPACE_GRAZIE_ML_USERNAME`
+   - `POETRY_HTTP_BASIC_SPACE_GRAZIE_ML_PASSWORD`
+   
+   You can rename the example file `.env.example` to `.env` and add your tokens inside it.
 
-   ```
-   ./AI_Metaphors/token.secret
-   ```
+      ```
+      ./AI_Metaphors/.env.example
+      ```
 
 2. **Manim working dir**:  
    Specify a directory in which the code related with animations and the output videos will be placed.
