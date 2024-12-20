@@ -20,7 +20,7 @@ The script performs the following steps:
 Ensure the following tools and libraries are installed:
 
 - **Python 3.10+**
-- **Manim Community Edition** (refer to the [official page](https://github.com/ManimCommunity/manim) for installation troubles )
+- **Manim Community Edition** (refer to the [official page](https://github.com/ManimCommunity/manim) for installation troubles)
 - Hugging Face **datasets**
 - **Grazie API Client Library**
 
@@ -172,15 +172,5 @@ The script checks for:
    If `term_name` or `term_definition` is empty, the script exits with an error.
 4. **Metaphor Requirements**:  
    If `--generate_metaphor` is **not** used, a metaphor must be provided.
-
----
-
-## **Troubleshooting**
-
-1. **Token Issues**:
-   - Ensure your `token.secret` file contains a valid Grazie JWT token.
-
-2. **Manim Issues**:
-   - Verify that the Manim installation is functional and accessible through the provided executable path.
 
 ---
