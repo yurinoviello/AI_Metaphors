@@ -94,5 +94,6 @@ __pycache__
 
 # Personal rules
 .env
+**/.venv/
 **/animations/
 ai_metaphors/notebook.ipynb
