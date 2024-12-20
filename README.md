@@ -68,7 +68,7 @@ To set up the project and install all dependencies using **Poetry**, follow thes
 
 ---
 
-## **Folder and File Requirements**
+## **Folder and Token Requirements**
 
 1. **Token File**:  
    Place the following tokens in a file named `.env` inside the project root folder.
