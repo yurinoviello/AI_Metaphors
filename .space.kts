@@ -1,5 +1,5 @@
 job("Python build") {
-    container(image = "ubuntu:latest") {
+    container(image = "python:3.10") {
         env["JETBRAINS_MONO_VERSION"] = "2.304"
         env["PYTHON_VERSION"] = "3.10"
 
@@ -30,7 +30,7 @@ job("Code style check and format") {
         gitPush {}
     }
 
-    container(image = "ubuntu") {
+    container(image = "python:3.10") {
 
         shellScript {
             content = """
