@@ -8,14 +8,15 @@ job("Python build") {
                 echo "Setting up Python environment..."
 
                 echo "Installing system dependencies..."
-                sudo apt-get update
-                sudo apt-get install -y \
+                apt-get update
+                apt-get install -y \
                     libpango1.0-dev \
                     libcairo2-dev \
                     pkg-config
 
                 echo "Installing Poetry..."
                 curl -sSL https://install.python-poetry.org | python3 -
+                export PATH="/root/.local/bin:${'$'}PATH"
 
                 echo "Installing project dependencies..."
                 poetry lock --no-update
