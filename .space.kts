@@ -1,30 +1,27 @@
-job("Python build") {
-    container(image = "python:3.10") {
-        env["JETBRAINS_MONO_VERSION"] = "2.304"
-        env["PYTHON_VERSION"] = "3.10"
-
-        shellScript {
-            content = """
-                echo "Setting up Python environment..."
-
-                echo "Installing system dependencies..."
-                apt-get update
-                apt-get install -y \
-                    libpango1.0-dev \
-                    libcairo2-dev \
-                    pkg-config
-
-                echo "Installing Poetry..."
-                curl -sSL https://install.python-poetry.org | python3 -
-                export PATH="/root/.local/bin:${'$'}PATH"
-
-                echo "Installing project dependencies..."
-                poetry lock --no-update
-                poetry install
-            """
-        }
-    }
-}
+//job("Python build") {
+//    container(image = "python:3.10") {
+//        shellScript {
+//            content = """
+//                echo "Setting up Python environment..."
+//
+//                echo "Installing system dependencies..."
+//                apt-get update
+//                apt-get install -y \
+//                    libpango1.0-dev \
+//                    libcairo2-dev \
+//                    pkg-config
+//
+//                echo "Installing Poetry..."
+//                curl -sSL https://install.python-poetry.org | python3 -
+//                export PATH="/root/.local/bin:${'$'}PATH"
+//
+//                echo "Installing project dependencies..."
+//                poetry lock --no-update
+//                poetry install
+//            """
+//        }
+//    }
+//}
 
 job("Code style check and format") {
     startOn {

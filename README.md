@@ -24,8 +24,32 @@ Ensure the following tools and libraries are installed:
 - Hugging Face **datasets**
 - **Grazie API Client Library**
 
+---
 
-### Suggested Installation
+## **Folder and Token Requirements**
+
+1. **Token File**:  
+   Place the following tokens in a file named `.env` inside the project root folder.
+   - `GRAZIE_JWT_TOKEN`: it will be used to authenticate via the `GrazieApiGatewayClient`
+   - `POETRY_HTTP_BASIC_SPACE_GRAZIE_ML_USERNAME`
+   - `POETRY_HTTP_BASIC_SPACE_GRAZIE_ML_PASSWORD`
+
+   You can rename the example file `.env.example` to `.env` and add your tokens inside it.
+
+      ```
+      ./AI_Metaphors/.env.example
+      ```
+
+2. **Manim working dir**:  
+   Specify a directory in which the code related with animations and the output videos will be placed.
+
+   For example:
+   ```
+   ./AI_Metaphors/animations
+   ```
+---
+
+## Suggested Installation
 To set up the project and install all dependencies, follow these steps using **Poetry**:
 To set up the project and install all dependencies using **Poetry**, follow these steps:
 
@@ -36,11 +60,21 @@ To set up the project and install all dependencies using **Poetry**, follow thes
    git clone https://github.com/your-username/AI_Metaphors.git
    cd AI_Metaphors
    ```
+   
+2. **Add the tokens to the local environment**
 
-2. **Install Dependencies**  
+   Execute the following command to export the tokens in your shell.
+   It will allow you to install the `grazie-api-gateway-client` package:
+
+   ```bash
+   set -o allexport && source .env && set +o allexport
+   ```
+
+3. **Install Dependencies**  
    Use Poetry to create a virtual environment and install all dependencies:
 
    ```bash
+   poetry lock --no-update
    poetry install
    ```
 
@@ -48,7 +82,7 @@ To set up the project and install all dependencies using **Poetry**, follow thes
    - Create a virtual environment for the project.
    - Install all required dependencies specified in `pyproject.toml`.
 
-3. **Activate the Virtual Environment**  
+4. **Activate the Virtual Environment**  
    To activate the virtual environment created by Poetry, run:
 
    ```bash
@@ -66,29 +100,6 @@ To set up the project and install all dependencies using **Poetry**, follow thes
    python ai_metaphors/main.py --help
    ```
 
----
-
-## **Folder and Token Requirements**
-
-1. **Token File**:  
-   Place the following tokens in a file named `.env` inside the project root folder.
-   - `GRAZIE_JWT_TOKEN`: it will be used to authenticate via the `GrazieApiGatewayClient`
-   - `POETRY_HTTP_BASIC_SPACE_GRAZIE_ML_USERNAME`
-   - `POETRY_HTTP_BASIC_SPACE_GRAZIE_ML_PASSWORD`
-   
-   You can rename the example file `.env.example` to `.env` and add your tokens inside it.
-
-      ```
-      ./AI_Metaphors/.env.example
-      ```
-
-2. **Manim working dir**:  
-   Specify a directory in which the code related with animations and the output videos will be placed.
-
-   For example:
-   ```
-   ./AI_Metaphors/animations
-   ```
 ---
 
 ## **Usage**
