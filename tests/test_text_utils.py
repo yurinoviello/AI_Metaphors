@@ -96,21 +96,35 @@ class TestUtilsExtractJSON(unittest.TestCase):
 
 
 class TestUtilsExtractPythonCode(unittest.TestCase):
-    def test_extract_python_code(self):
-        input1 = "Here is some Python code:\n```python\nprint('Hello, World!')\n```"
-        self.assertEqual(text_utils.extract_python_code(input1), "print('Hello, World!')")
+    def setUp(self):
+        self.input1 = "Here is some Python code:\n```python\nprint('Hello, World!')\n```"
+        self.input2 = "Here is some text without Python code: print('Hello, World!')"
+        self.input3 = "Multiple python code blocks \n```python\nprint('Block 1')\n```\n```python\nprint('Block 2')\n```"
+        self.input4 = "Python code without 'python' after backticks \n```\na = 5\nb = 10\nprint(a+b)\n```"
+        self.input5 = ""
 
-        input2 = "Here is some text without Python code: print('Hello, World!')"
-        self.assertIsNone(text_utils.extract_python_code(input2))
+    def tearDown(self):
+        """This method is called after each test"""
 
-        input3 = "Multiple python code blocks \n```python\nprint('Block 1')\n```\n```python\nprint('Block 2')\n```"
-        self.assertEqual(text_utils.extract_python_code(input3), "print('Block 1')")
+    def test_extract_python_code_valid(self):
+        """Test case for valid python code"""
+        self.assertEqual(text_utils.extract_python_code(self.input1), "print('Hello, World!')")
 
-        input4 = "Python code without 'python' after backticks \n```\na = 5\nb = 10\nprint(a+b)\n```"
-        self.assertEqual(text_utils.extract_python_code(input4), "a = 5\nb = 10\nprint(a+b)")
+    def test_extract_python_code_no_python_block(self):
+        """Test case for no python code block"""
+        self.assertIsNone(text_utils.extract_python_code(self.input2))
 
-        input5 = ""
-        self.assertIsNone(text_utils.extract_python_code(input5))
+    def test_extract_python_code_multiple_blocks(self):
+        """Test case for multiple python code blocks"""
+        self.assertEqual(text_utils.extract_python_code(self.input3), "print('Block 1')")
+
+    def test_extract_python_code_without_language_label(self):
+        """Test case for python code block without language label"""
+        self.assertEqual(text_utils.extract_python_code(self.input4), "a = 5\nb = 10\nprint(a+b)")
+
+    def test_extract_python_code_empty_string(self):
+        """Test case for empty string"""
+        self.assertIsNone(text_utils.extract_python_code(self.input5))
 
 
 if __name__ == "__main__":
