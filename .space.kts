@@ -46,3 +46,20 @@ job("Code style check and format") {
         }
     }
 }
+
+job("Test execution") {
+    startOn {
+        gitPush {}
+    }
+
+    container(image = "python:3.10") {
+
+        shellScript {
+            content = """
+                echo "Execution of Python unit tests..."
+
+                python -m unittest tests/test_text_utils.py 
+            """
+        }
+    }
+}

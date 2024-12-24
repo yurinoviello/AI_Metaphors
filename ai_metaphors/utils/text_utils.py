@@ -29,7 +29,6 @@ def extract_json(text: str) -> str | None:
         try:
             return json.loads(json_content)
         except json.JSONDecodeError:
-            print("Invalid JSON found.")
             return None
     return None
 
