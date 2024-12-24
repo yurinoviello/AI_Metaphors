@@ -96,4 +96,4 @@ __pycache__
 .env
 **/.venv/
 **/animations/
-ai_metaphors/notebook.ipynb
+notebook.ipynb

@@ -36,9 +36,9 @@ Ensure the following tools and libraries are installed:
 
    You can rename the example file `.env.example` to `.env` and add your tokens inside it.
 
-      ```
-      ./AI_Metaphors/.env.example
-      ```
+   ```
+   ./AI_Metaphors/.env.example
+   ```
 
 2. **Manim working dir**:  
    Specify a directory in which the code related with animations and the output videos will be placed.
@@ -57,7 +57,7 @@ To set up the project and install all dependencies using **Poetry**, follow thes
    Clone the project from GitHub to your local machine:
 
    ```bash
-   git clone https://github.com/your-username/AI_Metaphors.git
+   git clone https://git.jetbrains.team/edu-research/AI_Metaphors.git
    cd AI_Metaphors
    ```
    

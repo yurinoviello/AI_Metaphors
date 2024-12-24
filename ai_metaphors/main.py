@@ -40,10 +40,20 @@ def main(
     if generate_metaphor:
         metaphor = extract_content(provider.get_metaphor(term))
     print(f"Metaphor: {metaphor}")
-    return animate_term(provider, term, metaphor, executable_path, working_dir)
+
+    one_line_metaphor = extract_content(provider.get_one_line_metaphor(term, metaphor))
+    print(f"One-line Metaphor: {one_line_metaphor}")
+    return animate_term(provider, term, metaphor, one_line_metaphor, executable_path, working_dir)
 
 
-def animate_term(provider: GrazieProvider, term: dict, metaphor: str, executable_path: str, working_dir: str) -> int:
+def animate_term(
+    provider: GrazieProvider,
+    term: dict,
+    metaphor: str,
+    one_line_metaphor: str,
+    executable_path: str,
+    working_dir: str,
+) -> int:
     # Creating classes
     classes = provider.get_classes(term, metaphor)
     print("Classes created")
@@ -51,11 +61,11 @@ def animate_term(provider: GrazieProvider, term: dict, metaphor: str, executable
     print("Classes extracted")
 
     # Creating description
-    desc = provider.get_description(term, metaphor, str(classes_dict))
+    desc = provider.get_description(term, metaphor, one_line_metaphor, str(classes_dict))
     print("Description created")
 
     # Creating code
-    manim_code = provider.get_manim(term, metaphor, str(classes_dict), desc)
+    manim_code = provider.get_manim(term, metaphor, one_line_metaphor, str(classes_dict), desc)
     print("Manim code created")
 
     # Execution

@@ -6,12 +6,13 @@ The animation regards a metaphor that explains a Computer Science concept.
 You will receive:
 — the name of the topic that we want to explain followed by the explanation;
 — the metaphor that makes the concept easier for the student;
+— the `one-line-metaphor` that summarize in few words the whole metaphor;
 — the list of elements and relative instructions that must be used for the animation;
 — the code related to each elements and actions, for your reference.
 
 You must create a step-by-step description of the development on the manim scene.
 Every high-quality animation starts with a white short title on a black background.
-The title's text is the topic name only.
+The title's text is the `one-line-metaphor` only.
 Then, the title disappears from the scene after 2 seconds, and the metaphor scenes start.
 At the end of the scene, remove everything from the scene and show the message `Thanks for watching` for 2 seconds.
 

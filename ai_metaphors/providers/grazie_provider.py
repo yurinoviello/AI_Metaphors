@@ -15,6 +15,9 @@ USER_PROMPT_DESCRIPTION = "ai_metaphors/prompts/UserPromptDescription.txt"
 SYSTEM_PROMPT_METAPHOR = "ai_metaphors/prompts/SystemPromptMetaphor.txt"
 USER_PROMPT_METAPHOR = "ai_metaphors/prompts/UserPromptMetaphor.txt"
 
+SYSTEM_PROMPT_ONE_LINE_METAPHOR = "ai_metaphors/prompts/SystemPromptOneLineMetaphor.txt"
+USER_PROMPT_ONE_LINE_METAPHOR = "ai_metaphors/prompts/UserPromptOneLineMetaphor.txt"
+
 SYSTEM_PROMPT_MANIM = "ai_metaphors/prompts/SystemPromptManim.txt"
 SYSTEM_PROMPT_MANIM_NO_DESC = "ai_metaphors/prompts/SystemPromptManimNoDesc.txt"
 
@@ -69,6 +72,20 @@ class GrazieProvider:
             ),
         )
 
+    def get_one_line_metaphor(self, term: dict, metaphor: str) -> str:
+        return self.__safe_call(
+            system_prompt=Path(SYSTEM_PROMPT_ONE_LINE_METAPHOR).read_text(),
+            user_prompt=Path(USER_PROMPT_ONE_LINE_METAPHOR)
+            .read_text()
+            .format_map(
+                {
+                    "topic": term["value"].strip(),
+                    "definition": term["definition"].strip(),
+                    "metaphor": metaphor.strip(),
+                },
+            ),
+        )
+
     def get_classes(self, term: dict, metaphor: str) -> str:
         return self.__safe_call(
             system_prompt=Path(SYSTEM_PROMPT_CLASSES).read_text(),
@@ -83,7 +100,7 @@ class GrazieProvider:
             ),
         )
 
-    def get_description(self, term: dict, metaphor: str, classes: str) -> str:
+    def get_description(self, term: dict, metaphor: str, one_line_metaphor: str, classes: str) -> str:
         return self.__safe_call(
             system_prompt=Path(SYSTEM_PROMPT_DESCRIPTION).read_text(),
             user_prompt=Path(USER_PROMPT_DESCRIPTION)
@@ -93,12 +110,13 @@ class GrazieProvider:
                     "topic": term["value"].strip(),
                     "definition": term["definition"].strip(),
                     "metaphor": metaphor.strip(),
+                    "one_line_metaphor": one_line_metaphor.strip(),
                     "classes": classes.strip(),
                 },
             ),
         )
 
-    def get_manim(self, term: dict, metaphor: str, classes: str, instructions: str = "") -> str:
+    def get_manim(self, term: dict, metaphor: str, one_line_metaphor: str, classes: str, instructions: str = "") -> str:
         if instructions != "":
             return self.__safe_call(
                 system_prompt=Path(SYSTEM_PROMPT_MANIM_NO_DESC).read_text(),
@@ -109,6 +127,7 @@ class GrazieProvider:
                         "topic": term["value"].strip(),
                         "definition": term["definition"].strip(),
                         "metaphor": metaphor.strip(),
+                        "one_line_metaphor": one_line_metaphor.strip(),
                         "classes": classes.strip(),
                         "instructions": instructions.strip(),
                     },
@@ -123,6 +142,7 @@ class GrazieProvider:
                     "topic": term["value"].strip(),
                     "definition": term["definition"].strip(),
                     "metaphor": metaphor.strip(),
+                    "one_line_metaphor": one_line_metaphor.strip(),
                     "classes": classes.strip(),
                 },
             ),
