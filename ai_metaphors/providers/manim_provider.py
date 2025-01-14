@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 import subprocess
 
@@ -17,22 +18,21 @@ class ManimProvider:
     :param term: A dictionary containing keyword information, specifically a
                  'value' key for naming purposes.
     :param executable: The path to the Manim executable directory.
-                        Defaults to "".
     :param working_dir: The directory where scripts, media, and logs are
-                        stored. Defaults to "./animations".
+                        stored.
     """
 
     def __init__(
         self,
         provider: GrazieProvider,
         term: dict,
-        executable: str = "",
-        working_dir: str = "./animations",
+        executable: Path,
+        working_dir: Path,
     ) -> None:
         self.provider = provider
         self.term = term
-        self.executable = Path(executable)
-        self.working_dir = Path(working_dir)
+        self.executable = executable
+        self.working_dir = working_dir
 
         self.scripts_dir = self.working_dir / "scripts"
         self.scripts_dir.mkdir(parents=True, exist_ok=True)
@@ -45,7 +45,12 @@ class ManimProvider:
 
         self.file_path = self.scripts_dir / f"{term['value'].replace(' ', '_')}.py"
 
-    def write_python(self, text: str, font_path: str = "./resources/JetBrainsSans-Regular.ttf") -> bool:
+    def write_python(self, text: str, font_path: str = "ai_metaphors/resources/JetBrainsSans-Regular.ttf") -> bool:
+        # Check the font path
+        if not Path(font_path).is_file():
+            msg = f"The specified font path does not exist or is not a file: {font_path}"
+            raise FileNotFoundError(msg)
+
         code = extract_python_code(text)
         script_path = Path(self.file_path)
         if code:
@@ -92,7 +97,7 @@ class ManimProvider:
         return errors
 
     def fix_code(self, error: str) -> str:
-        print("There was an error during execution.")
+        logging.warning("There was an error during execution.")
 
         command = [
             self.executable / "pylint",
@@ -105,7 +110,6 @@ class ManimProvider:
             raise RuntimeError("Manim executable not found") from e
 
         static_errors = process.stdout
-        print(static_errors)
 
         with Path(self.file_path).open() as f:
             manim_script = self.provider.refine_manim(

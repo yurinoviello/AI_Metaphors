@@ -59,6 +59,7 @@ job("Test execution") {
                 echo "Execution of Python unit tests..."
 
                 python -m unittest tests/test_text_utils.py 
+                python -m unittest tests/test_path_utils.py
             """
         }
     }
