@@ -119,8 +119,9 @@ python main.py [OPTIONS]
 | `--term_definition`      | `str`     | Definition of the term (required).                                                                    |
 | `--metaphor`             | `str`     | The metaphor associated with the term. If `--generate_metaphor` is set, this will be ignored.         |
 | `--generate_metaphor`    | `flag`    | Flag to generate the metaphor automatically using the Grazie API.                                     |
-| `--executable_path`      | `str`     | Path to the executable for Manim. Default: `""`. Not needed if the project was installed with poetry. |
+| `--executable_path`      | `str`     | Path to the executable for Manim. Default: `.venv/bin`												   |
 | `--working_dir`          | `str`     | Working directory for Manim output. Default: `./animations`.                                          |
+| `--max_retries`          | `int`     | Number of attempts to retry executing the Manim script in case of failure (1-9).                      |
 
 ### Example Usage
 
