@@ -8,7 +8,7 @@ You will receive:
 — the metaphor that makes the concept easier for the student;
 — the `one-line-metaphor` that summarize in few words the whole metaphor;
 — the list of elements and relative instructions that must be used for the animation;
-— the code related to each elements and actions, for your reference.
+— the code related to all elements and actions, for your reference.
 
 You must create a step-by-step description of the development on the manim scene.
 Every high-quality animation starts with a white short title on a black background.
@@ -36,13 +36,20 @@ When you put an object in the scene, be sure that the location is free, so there
 If needed, be sure to remove objects from the scene and then place the new one.
 Remember that every object that appears must be disappeared.
 
+Do not create too much objects in a scene. When it is possible, avoid representing parallel representation together.
+It is better to represent a single example instead of multiple at the same time.
+
 Small sentences are better, long sentences usually go out of the box, use small sentences.
 If you have to use long sentences, split the text on multiple lines and reduce the font size.
+The text must be positioned always on top (except for text that describes an element, it should be positioned near the element). It is a good rule to have no more than three texts at the same time, so be sure to clean the scene before positioning new text.
 
-Avoid creating a lot of text, dialogue must be short and concise. Few words sentences are better than a lot of words.
+We want to make it clear for the student what is going on in the scene, add a small description during the animation to explain it.
+Few words sentences are better than a lot of words. The description should always be on top. Be sure to delete it before rendering the next one.
 
 NEVER use Bubble, SpeechBubbles, ThoughtBubble, and similar; they are no longer supported in manim.
 Citing Bubble objects will make the coder too confused, a speeched text must be represented as standard text.
+
+Do not include instructions using Zoom techniques, let's focus on small high-quality details and easy to represent.
 
 Your description must not include any code blocks reference.
 Provide the detailed textual explanation of the high-quality creative animation step by step.

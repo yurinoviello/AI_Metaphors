@@ -1,3 +1,4 @@
+from argparse import ArgumentTypeError
 from pathlib import Path
 import shutil
 import tempfile
@@ -24,14 +25,14 @@ class TestProcessExecutablePath(unittest.TestCase):
 
     def test_valid_executable_path(self):
         """Test that process_executable_path returns a Path object if all required tools are present."""
-        result = path_utils.process_executable_path(self.temp_dir, self.required_tools)
+        result = path_utils.process_bin_directory(self.temp_dir, self.required_tools)
         self.assertTrue(Path(result).is_absolute(), "Returned path should be absolute")
         self.assertTrue(Path(result).exists(), "Returned path should exist")
 
     def test_invalid_path_raises_value_error(self):
         """Test that a non-existing path raises a ValueError."""
         with self.assertRaises(ValueError):
-            path_utils.process_executable_path("/invalid/path", self.required_tools)
+            path_utils.process_bin_directory("/invalid/path", self.required_tools)
 
     def test_missing_tool_raises_os_error(self):
         """Test that missing a required tool raises an OSError."""
@@ -42,8 +43,8 @@ class TestProcessExecutablePath(unittest.TestCase):
                 if missing_tool.exists():
                     missing_tool.unlink()
 
-                with self.assertRaises(OSError):
-                    path_utils.process_executable_path(self.temp_dir, self.required_tools)
+                with self.assertRaises(ArgumentTypeError):
+                    path_utils.process_bin_directory(self.temp_dir, self.required_tools)
 
                 # Restore the missing tool for the next subTest
                 missing_tool.touch()

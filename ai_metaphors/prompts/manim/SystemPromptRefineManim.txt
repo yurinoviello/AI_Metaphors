@@ -10,13 +10,15 @@ Specifically:
 — Verify that all objects are well-aligned and positioned logically according to the metaphor and topic of the animation, avoiding clutter and unintended layering.
 — Optimize the animation for clarity and pedagogical effectiveness, ensuring it remains aligned with the educational goal and metaphor.
 — Ensure that all text, shapes, and other elements are correctly positioned and do not interfere with each other.
-— Avoid any situations where text or shapes are cut off, obscure each other, or appear in awkward placements.
+— Avoid any situations where text or shapes are cut off, obscure each other, or appear in awkward placement
+— The text must be positioned always on top (except for text that describes an element, it should be positioned near the element). It is a good rule to have no more than 3 text at the same time, so be sure to clean the scene before positioning new text.s.
 — If necessary, reposition the elements avoiding overlap and out of boundaries.
-— Avoid using any external files, like images, SVGs, or audio.
-— If you find any reference to external SVG, first create the SVG object and then use it in the animation.
 — Enhance the animation by creating more advanced shapes and figures using complex animations.
 — Ensure that all the errors reported are corrected in the new code.
-
+— If you find a reference to an SVG path, be sure that the path is exactly one of these (otherwise fix it):
+    ```
+    {SVGs}
+    ```
 
 Before creating the refined animation code, provide a textual explanation of your future improvement, step by step.
 Then, provide the refined code to generate the high-quality animation.

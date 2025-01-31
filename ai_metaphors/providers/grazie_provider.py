@@ -1,31 +1,39 @@
+import os
 from pathlib import Path
 
+from openai import OpenAI
 import attrs
 from grazie.api.client.chat.prompt import ChatPrompt
 from grazie.api.client.gateway import GrazieApiGatewayClient
 from grazie.api.client.llm_parameters import LLMParameters, Parameters
 from grazie.api.client.profiles import LLMProfile
 
-SYSTEM_PROMPT_CLASSES = "ai_metaphors/prompts/SystemPromptClasses.txt"
-USER_PROMPT_CLASSES = "ai_metaphors/prompts/UserPromptClasses.txt"
+from ai_metaphors.utils.text_utils import wrap_keyword
 
-SYSTEM_PROMPT_DESCRIPTION = "ai_metaphors/prompts/SystemPromptDescription.txt"
-USER_PROMPT_DESCRIPTION = "ai_metaphors/prompts/UserPromptDescription.txt"
+SYSTEM_PROMPT_CLASSES = "ai_metaphors/prompts/manim/SystemPromptClasses.txt"
+USER_PROMPT_CLASSES = "ai_metaphors/prompts/manim/UserPromptClasses.txt"
 
-SYSTEM_PROMPT_METAPHOR = "ai_metaphors/prompts/SystemPromptMetaphor.txt"
-USER_PROMPT_METAPHOR = "ai_metaphors/prompts/UserPromptMetaphor.txt"
+SYSTEM_PROMPT_DESCRIPTION = "ai_metaphors/prompts/manim/SystemPromptDescription.txt"
+USER_PROMPT_DESCRIPTION = "ai_metaphors/prompts/manim/UserPromptDescription.txt"
 
-SYSTEM_PROMPT_ONE_LINE_METAPHOR = "ai_metaphors/prompts/SystemPromptOneLineMetaphor.txt"
-USER_PROMPT_ONE_LINE_METAPHOR = "ai_metaphors/prompts/UserPromptOneLineMetaphor.txt"
+SYSTEM_PROMPT_METAPHOR = "ai_metaphors/prompts/metaphors/SystemPromptMetaphor.txt"
+USER_PROMPT_METAPHOR = "ai_metaphors/prompts/metaphors/UserPromptMetaphor.txt"
 
-SYSTEM_PROMPT_MANIM = "ai_metaphors/prompts/SystemPromptManim.txt"
-SYSTEM_PROMPT_MANIM_NO_DESC = "ai_metaphors/prompts/SystemPromptManimNoDesc.txt"
+SYSTEM_PROMPT_ONE_LINE_METAPHOR = "ai_metaphors/prompts/metaphors/SystemPromptOneLineMetaphor.txt"
+USER_PROMPT_ONE_LINE_METAPHOR = "ai_metaphors/prompts/metaphors/UserPromptOneLineMetaphor.txt"
 
-USER_PROMPT_MANIM = "ai_metaphors/prompts/UserPromptManim.txt"
+SYSTEM_PROMPT_MANIM = "ai_metaphors/prompts/manim/SystemPromptManim.txt"
+SYSTEM_PROMPT_MANIM_NO_DESC = "ai_metaphors/prompts/manim/SystemPromptManimNoDesc.txt"
+USER_PROMPT_MANIM = "ai_metaphors/prompts/manim/UserPromptManim.txt"
 
-SYSTEM_PROMPT_REFINE = "ai_metaphors/prompts/SystemPromptRefineManim.txt"
-USER_PROMPT_REFINE = "ai_metaphors/prompts/UserPromptRefineManim.txt"
+SYSTEM_PROMPT_REFINE = "ai_metaphors/prompts/manim/SystemPromptRefineManim.txt"
+USER_PROMPT_REFINE = "ai_metaphors/prompts/manim/UserPromptRefineManim.txt"
 
+SYSTEM_EVALUATE_VIDEO_PROMPT = "ai_metaphors/prompts/validate/SystemEvaluateVideo.txt"
+USER_EVALUATE_VIDEO_PROMPT = "ai_metaphors/prompts/validate/UserEvaluateVideo.txt"
+
+SYSTEM_FIX_VIDEO_PROMPT = "ai_metaphors/prompts/validate/SystemFixVideo.txt"
+USER_FIX_VIDEO_PROMPT = "ai_metaphors/prompts/validate/UserFixVideo.txt"
 
 class GrazieProvider:
     """
@@ -56,7 +64,9 @@ class GrazieProvider:
         return self.client.chat(
             chat=ChatPrompt().add_system(system_prompt).add_user(user_prompt),
             profile=MyProfile(),
-            parameters={LLMParameters.Temperature: Parameters.FloatValue(self.temperature)},
+            parameters={
+                LLMParameters.Temperature: Parameters.FloatValue(self.temperature)
+            },
         ).content
 
     def get_metaphor(self, term: dict) -> str:
@@ -86,9 +96,11 @@ class GrazieProvider:
             ),
         )
 
-    def get_classes(self, term: dict, metaphor: str) -> str:
+    def get_classes(self, term: dict, metaphor: str, svg: str) -> str:
         return self.__safe_call(
-            system_prompt=Path(SYSTEM_PROMPT_CLASSES).read_text(),
+            system_prompt=wrap_keyword(Path(SYSTEM_PROMPT_CLASSES).read_text(), "SVGs").format(
+                SVGs=svg
+            ),
             user_prompt=Path(USER_PROMPT_CLASSES)
             .read_text()
             .format_map(
@@ -116,11 +128,13 @@ class GrazieProvider:
             ),
         )
 
-    def get_manim(self, term: dict, metaphor: str, one_line_metaphor: str, classes: str, instructions: str = "") -> str:
+    def get_manim(self, term: dict, metaphor: str, one_line_metaphor: str, classes: str, svg: str, instructions: str = "") -> str:
         if instructions != "":
             return self.__safe_call(
-                system_prompt=Path(SYSTEM_PROMPT_MANIM_NO_DESC).read_text(),
-                user_prompt=Path(USER_PROMPT_DESCRIPTION)
+                system_prompt=Path(SYSTEM_PROMPT_MANIM).read_text().format(
+                    SVGs=svg
+                ),
+                user_prompt=Path(USER_PROMPT_MANIM)
                 .read_text()
                 .format_map(
                     {
@@ -148,16 +162,87 @@ class GrazieProvider:
             ),
         )
 
-    def refine_manim(self, code: str, runtime_error: str, static_error: str) -> str:
+    def request_static_refinement(self, code: str, runtime_error: str, static_error: str, svg: str) -> str:
         return self.__safe_call(
-            system_prompt=Path(SYSTEM_PROMPT_REFINE).read_text(),
+            system_prompt=Path(SYSTEM_PROMPT_REFINE).read_text().format(
+                SVGs=svg
+            ),
             user_prompt=Path(USER_PROMPT_REFINE)
             .read_text()
             .format_map(
+
                 {
                     "code": code.strip(),
                     "runtime-error": runtime_error.strip(),
                     "static-error": static_error.strip(),
+                },
+            ),
+        )
+
+    def request_video_evaluation(self, code: str, instructions: str, images: list[str]) -> str:
+        # This should be done by ManimProvider, for now it is devoted to OPENAI
+        client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+        messages = [
+            {
+                "role": "developer",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": Path(SYSTEM_EVALUATE_VIDEO_PROMPT).read_text()
+                    }
+                ]
+            },
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": Path(USER_EVALUATE_VIDEO_PROMPT).read_text().format_map({"instructions": instructions, "code": code})
+                    }
+                ]
+            }
+        ]
+
+        for i, img in enumerate(images):
+            messages.append(
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": f"Frame {i+1}:"
+                        },
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{img}",
+                            }
+                        }
+                    ]
+                }
+            )
+
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=messages,
+            max_tokens=3_000,
+            seed=10
+        )
+        return response.choices[0].message.content
+
+
+    def request_video_refinement(self, instructions: str, errors_explanation: str, code: str, svg: str) -> str:
+        return self.__safe_call(
+            system_prompt=Path(SYSTEM_FIX_VIDEO_PROMPT).read_text().format(
+                SVGs=svg
+            ),
+            user_prompt=Path(USER_FIX_VIDEO_PROMPT)
+            .read_text()
+            .format_map(
+                {
+                    "instructions": instructions.strip(),
+                    "errors_explanation": errors_explanation.strip(),
+                    "code": code.strip(),
                 },
             ),
         )

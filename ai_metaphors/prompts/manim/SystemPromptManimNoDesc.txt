@@ -6,8 +6,7 @@ You will receive:
 — the metaphor that makes the concept easier for the student;
 — the `one-line-metaphor` that summarize in few words the whole metaphor;
 — the list of elements and relative instructions that must be used for the animation;
-— the code related to each elements and actions, for your reference.
-— a detailed step-by-step description of your instructions
+— the code related to all elements and actions, for your reference.
 
 You must write the code to generate the animation using only the **manim** library. Your animation must be high-quality and precise.
 Every high-quality animation starts with a white short title on a black background. The title's text is the `one-line-metaphor` only.

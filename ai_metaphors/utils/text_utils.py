@@ -43,3 +43,10 @@ def extract_content(input_string: str) -> str:
         return match.group(1)
     # If no match, return the whole string
     return input_string.strip()
+
+
+def wrap_keyword(text: str, keyword: str) -> str:
+    return (text
+            .replace("{", "{{")
+            .replace("}", "}}")
+            .replace("{{" + keyword + "}}", "{" + keyword + "}"))

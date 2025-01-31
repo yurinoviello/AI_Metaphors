@@ -33,6 +33,7 @@ Ensure the following tools and libraries are installed:
    - `GRAZIE_JWT_TOKEN`: it will be used to authenticate via the `GrazieApiGatewayClient`
    - `POETRY_HTTP_BASIC_SPACE_GRAZIE_ML_USERNAME`
    - `POETRY_HTTP_BASIC_SPACE_GRAZIE_ML_PASSWORD`
+   - `OPENAI_API_KEY`: it will be used to execute the video evaluation
 
    You can rename the example file `.env.example` to `.env` and add your tokens inside it.
 
@@ -112,32 +113,31 @@ Run the script with the following arguments:
 python main.py [OPTIONS]
 ```
 
-| **Option**               | **Type**  | **Description**                                                                                       |
-|--------------------------|-----------|-------------------------------------------------------------------------------------------------------|
-| `--use_dataset_example`  | `int`     | Use an example from the dataset (index between 0 and 13). Set `-1` to disable. Default is `-1`.       |
-| `--term_name`            | `str`     | The name of the term (required if `use_dataset_example` is not set).                                  |
-| `--term_definition`      | `str`     | Definition of the term (required).                                                                    |
-| `--metaphor`             | `str`     | The metaphor associated with the term. If `--generate_metaphor` is set, this will be ignored.         |
-| `--generate_metaphor`    | `flag`    | Flag to generate the metaphor automatically using the Grazie API.                                     |
-| `--executable_path`      | `str`     | Path to the executable for Manim. Default: `.venv/bin`												   |
-| `--working_dir`          | `str`     | Working directory for Manim output. Default: `./animations`.                                          |
-| `--max_retries`          | `int`     | Number of attempts to retry executing the Manim script in case of failure (1-9).                      |
-
+| **Option**              | **Type**  | **Description**                                                                                 |
+|-------------------------|-----------|-------------------------------------------------------------------------------------------------|
+| `--use-dataset-example` | `int`     | Use an example from the dataset (index between 0 and 13). Set `-1` to disable. Default is `-1`. |
+| `--term-name`           | `str`     | The name of the term (required if `use-dataset-example` is not set).                            |
+| `--term-definition`     | `str`     | Definition of the term (required).                                                              |
+| `--metaphor`            | `str`     | The metaphor associated with the term. If `--generate-metaphor` is set, this will be ignored.   |
+| `--generate-metaphor`   | `flag`    | Flag to generate the metaphor automatically using the Grazie API.                               |
+| `--bin-directory`       | `str`     | Path to the executable for Manim. Default: `.venv/bin`                                          |
+| `--working-dir`         | `str`     | Working directory for Manim output. Default: `./animations`.                                    |
+| `--debug`               | `flag`    | Activate debug mode.                                                                            |
 ### Example Usage
 
 1. **With Manually Provided Inputs**:
    ```bash
-   python ai_metaphors/main.py --term_name Boolean --term_definition 'A data type that has one of two possible values (usually denoted true and false) intended to represent the two truth values of logic and Boolean algebra.' --metaphor "Imagine a light switch in your house. The switch can only be in one of two positions: ON or OFF.\n\n- When the switch is ON, it represents "true" – the light is working.\n- When the switch is OFF, it represents "false" – the light is not working.\n\nA Boolean is like this light switch. It can only hold one of two states: true (ON) or false (OFF)."
+   python ai_metaphors/main.py --term-name Boolean --term-definition 'A data type that has one of two possible values (usually denoted true and false) intended to represent the two truth values of logic and Boolean algebra.' --metaphor "Imagine a light switch in your house. The switch can only be in one of two positions: ON or OFF.\n\n- When the switch is ON, it represents "true" – the light is working.\n- When the switch is OFF, it represents "false" – the light is not working.\n\nA Boolean is like this light switch. It can only hold one of two states: true (ON) or false (OFF)."
    ```
 
 2. **Generating a Metaphor**:
    ```bash
-   python ai_metaphors/main.py --term_name Boolean --term_definition 'A data type that has one of two possible values (usually denoted true and false) intended to represent the two truth values of logic and Boolean algebra.' --generate_metaphor
+   python ai_metaphors/main.py --term-name Boolean --term-definition 'A data type that has one of two possible values (usually denoted true and false) intended to represent the two truth values of logic and Boolean algebra.' --generate-metaphor
    ```
 
 3. **Using a Dataset Example**:
    ```bash
-   python ai_metaphors/main.py --use_dataset_example 0
+   python ai_metaphors/main.py --use-dataset-example 0
    ```
    You can use terms, metaphors, and definitions from this dataset:
    
@@ -168,7 +168,7 @@ python main.py [OPTIONS]
    - Outputs errors for missing paths or inputs.
 
 2. **Manim Animation**:
-   - The generated Manim script will be written to the working directory specified by `--working_dir`.
+   - The generated Manim script will be written to the working directory specified by `--working-dir`.
    - Manim will execute the script to generate the animation.
 
 ---
@@ -177,12 +177,12 @@ python main.py [OPTIONS]
 
 The script checks for:
 1. **Missing executable paths**:  
-   If the `--executable_path` does not exist, the script exits with an error.
+   If the `--bin-directory` does not exist, the script exits with an error.
 2. **Missing working directories**:  
-   If the `--working_dir` does not exist, the script exits with an error.
+   If the `--working-dir` does not exist, the script exits with an error.
 3. **Empty required inputs**:  
-   If `term_name` or `term_definition` is empty, the script exits with an error.
+   If `--term-name` or `--term-definition` is empty, the script exits with an error.
 4. **Metaphor Requirements**:  
-   If `--generate_metaphor` is **not** used, a metaphor must be provided.
+   If `--generate-metaphor` is **not** used, a metaphor must be provided.
 
 ---

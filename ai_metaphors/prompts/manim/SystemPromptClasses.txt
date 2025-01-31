@@ -68,7 +68,7 @@ Your response should include the JSON-formatted output with each element's detai
           "Contains multiple trees lined up or scattered",
           "Provides a path for the person to walk through"
         ],
-        "code": "from manim import *\n\nclass Forest(VGroup):\n    def __init__(self, num_trees=10, tree_spacing=2.0, target_tree_index=5, **kwargs):\n        super().__init__(**kwargs)\n        self.trees = []\n        for i in range(num_trees):\n            position = LEFT * (num_trees / 2 - i) * tree_spacing\n            if i == target_tree_index:\n                tree = SpecificTree(position=position)\n            else:\n                tree = Tree(position=position)\n            self.trees.append(tree)\n            self.add(tree)"
+        "code": "from manim import *\n\nclass Forest(VGroup):\n    def __init__(self, num_trees=5, tree_spacing=2.0, target_tree_index=2, **kwargs):\n        super().__init__(**kwargs)\n        self.trees = []\n        for i in range(num_trees):\n            position = LEFT * (num_trees / 2 - i) * tree_spacing\n            if i == target_tree_index:\n                tree = SpecificTree(position=position)\n            else:\n                tree = Tree(position=position)\n            self.trees.append(tree)\n            self.add(tree)"
       },
       {
         "name": "Tree",
@@ -99,4 +99,16 @@ Your response should include the JSON-formatted output with each element's detai
     ]
   }
   ```
+
+Also, you already have your own library of already defined SVGs elements!
+This is the list of Elements that you can use:
+```
+{SVGs}
+```
+
+If you need to use one of this SVG, you need to use the class `SVGMobject`. e.g.
+```element = SVGMobject('~/path/to/File.svg', height=2)```
+When you use these SVGs ALWAYS write the exact full path indicated above; otherwise it will raise and exception.
+Understand if you need an object or not by the file-name. If you are not sure, then build the element by yourself.
+
 Escape any special characters like backslashes (\) and double quotes (").

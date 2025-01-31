@@ -7,12 +7,14 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
-manim = "0.18.0"
+manim = "0.19.0"
 manimpango= "0.6.0"
 datasets = "^3.2.0"
-grazie-api-gateway-client = "0.1.10"
+grazie-api-gateway-client = "0.1.13"
 pylint = "^3.3.2"
 python-dotenv = "^1.0.1"
+openai = ">=1.52.1"
+scikit-image = ">=0.19.3"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.8.3"
@@ -26,6 +28,8 @@ name = "space-grazie-ml"
 url = "https://packages.jetbrains.team/pypi/p/grazi/grazie-ml/simple"
 priority = "supplemental"
 
+[tool.poetry.scripts]
+ai-metaphors = "ai_metaphors.main:main"
 
 # ---------------------------Ruff configuration---------------------------
 [tool.ruff]
