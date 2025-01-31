@@ -84,7 +84,12 @@ def animate_term(
 
     # Creating code
     manim_code = grazie_provider.get_manim(
-        term, metaphor, one_line_metaphor, str(classes_dict), manim_provider.svg, desc
+        term,
+        metaphor,
+        one_line_metaphor,
+        str(classes_dict),
+        manim_provider.svg,
+        desc,
     )
     logging.info("Manim code created")
 

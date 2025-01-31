@@ -5,7 +5,7 @@ from pathlib import Path
 
 def process_bin_directory(bin_directory: str, required_tools: tuple = ("manim", "pylint", "python")) -> Path:
     if not Path(bin_directory).is_dir():
-        msg = f"The bin directory '{bin_directory}' does not exist." "Please provide a valid path to the bin directory."
+        msg = f"The bin directory '{bin_directory}' does not exist.Please provide a valid path to the bin directory."
         raise ValueError(msg)
     # Check if required dependencies are installed within the executable path
     for tool in required_tools:

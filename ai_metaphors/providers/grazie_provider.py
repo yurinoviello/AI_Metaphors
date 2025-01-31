@@ -218,7 +218,7 @@ class GrazieProvider:
                     "content": [
                         {
                             "type": "text",
-                            "text": f"Frame {i+1}:",
+                            "text": f"Frame {i + 1}:",
                         },
                         {
                             "type": "image_url",
