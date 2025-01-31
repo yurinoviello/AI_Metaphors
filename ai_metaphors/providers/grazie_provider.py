@@ -1,12 +1,12 @@
 import os
 from pathlib import Path
 
-from openai import OpenAI
 import attrs
 from grazie.api.client.chat.prompt import ChatPrompt
 from grazie.api.client.gateway import GrazieApiGatewayClient
 from grazie.api.client.llm_parameters import LLMParameters, Parameters
 from grazie.api.client.profiles import LLMProfile
+from openai import OpenAI
 
 from ai_metaphors.utils.text_utils import wrap_keyword
 
@@ -34,6 +34,7 @@ USER_EVALUATE_VIDEO_PROMPT = "ai_metaphors/prompts/validate/UserEvaluateVideo.tx
 
 SYSTEM_FIX_VIDEO_PROMPT = "ai_metaphors/prompts/validate/SystemFixVideo.txt"
 USER_FIX_VIDEO_PROMPT = "ai_metaphors/prompts/validate/UserFixVideo.txt"
+
 
 class GrazieProvider:
     """
@@ -65,7 +66,7 @@ class GrazieProvider:
             chat=ChatPrompt().add_system(system_prompt).add_user(user_prompt),
             profile=MyProfile(),
             parameters={
-                LLMParameters.Temperature: Parameters.FloatValue(self.temperature)
+                LLMParameters.Temperature: Parameters.FloatValue(self.temperature),
             },
         ).content
 
@@ -99,7 +100,7 @@ class GrazieProvider:
     def get_classes(self, term: dict, metaphor: str, svg: str) -> str:
         return self.__safe_call(
             system_prompt=wrap_keyword(Path(SYSTEM_PROMPT_CLASSES).read_text(), "SVGs").format(
-                SVGs=svg
+                SVGs=svg,
             ),
             user_prompt=Path(USER_PROMPT_CLASSES)
             .read_text()
@@ -128,11 +129,15 @@ class GrazieProvider:
             ),
         )
 
-    def get_manim(self, term: dict, metaphor: str, one_line_metaphor: str, classes: str, svg: str, instructions: str = "") -> str:
+    def get_manim(
+        self, term: dict, metaphor: str, one_line_metaphor: str, classes: str, svg: str, instructions: str = ""
+    ) -> str:
         if instructions != "":
             return self.__safe_call(
-                system_prompt=Path(SYSTEM_PROMPT_MANIM).read_text().format(
-                    SVGs=svg
+                system_prompt=Path(SYSTEM_PROMPT_MANIM)
+                .read_text()
+                .format(
+                    SVGs=svg,
                 ),
                 user_prompt=Path(USER_PROMPT_MANIM)
                 .read_text()
@@ -164,13 +169,14 @@ class GrazieProvider:
 
     def request_static_refinement(self, code: str, runtime_error: str, static_error: str, svg: str) -> str:
         return self.__safe_call(
-            system_prompt=Path(SYSTEM_PROMPT_REFINE).read_text().format(
-                SVGs=svg
+            system_prompt=Path(SYSTEM_PROMPT_REFINE)
+            .read_text()
+            .format(
+                SVGs=svg,
             ),
             user_prompt=Path(USER_PROMPT_REFINE)
             .read_text()
             .format_map(
-
                 {
                     "code": code.strip(),
                     "runtime-error": runtime_error.strip(),
@@ -188,19 +194,21 @@ class GrazieProvider:
                 "content": [
                     {
                         "type": "text",
-                        "text": Path(SYSTEM_EVALUATE_VIDEO_PROMPT).read_text()
-                    }
-                ]
+                        "text": Path(SYSTEM_EVALUATE_VIDEO_PROMPT).read_text(),
+                    },
+                ],
             },
             {
                 "role": "user",
                 "content": [
                     {
                         "type": "text",
-                        "text": Path(USER_EVALUATE_VIDEO_PROMPT).read_text().format_map({"instructions": instructions, "code": code})
-                    }
-                ]
-            }
+                        "text": Path(USER_EVALUATE_VIDEO_PROMPT)
+                        .read_text()
+                        .format_map({"instructions": instructions, "code": code}),
+                    },
+                ],
+            },
         ]
 
         for i, img in enumerate(images):
@@ -210,31 +218,32 @@ class GrazieProvider:
                     "content": [
                         {
                             "type": "text",
-                            "text": f"Frame {i+1}:"
+                            "text": f"Frame {i+1}:",
                         },
                         {
                             "type": "image_url",
                             "image_url": {
                                 "url": f"data:image/jpeg;base64,{img}",
-                            }
-                        }
-                    ]
-                }
+                            },
+                        },
+                    ],
+                },
             )
 
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=messages,
             max_tokens=3_000,
-            seed=10
+            seed=10,
         )
         return response.choices[0].message.content
 
-
     def request_video_refinement(self, instructions: str, errors_explanation: str, code: str, svg: str) -> str:
         return self.__safe_call(
-            system_prompt=Path(SYSTEM_FIX_VIDEO_PROMPT).read_text().format(
-                SVGs=svg
+            system_prompt=Path(SYSTEM_FIX_VIDEO_PROMPT)
+            .read_text()
+            .format(
+                SVGs=svg,
             ),
             user_prompt=Path(USER_FIX_VIDEO_PROMPT)
             .read_text()

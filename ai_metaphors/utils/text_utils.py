@@ -46,7 +46,4 @@ def extract_content(input_string: str) -> str:
 
 
 def wrap_keyword(text: str, keyword: str) -> str:
-    return (text
-            .replace("{", "{{")
-            .replace("}", "}}")
-            .replace("{{" + keyword + "}}", "{" + keyword + "}"))
+    return text.replace("{", "{{").replace("}", "}}").replace("{{" + keyword + "}}", "{" + keyword + "}")

@@ -1,11 +1,13 @@
 import logging
 from pathlib import Path
 import subprocess
+
 from ai_metaphors.providers.grazie_provider import GrazieProvider
-from ai_metaphors.utils.text_utils import extract_python_code
 from ai_metaphors.utils.image_utils import create_partial_movies_file_dict, extract_key_frames
+from ai_metaphors.utils.text_utils import extract_python_code
 
 MAX_TRIES = 10
+
 
 class ManimProvider:
     """
@@ -34,7 +36,7 @@ class ManimProvider:
         self.term = term
         self.bin_directory = bin_directory
         self.working_dir = working_dir
-        self.svg = "\n".join([f"'{svg.as_posix()}'" for svg in Path('ai_metaphors/resources/SVGs').iterdir()])
+        self.svg = "\n".join([f"'{svg.as_posix()}'" for svg in Path("ai_metaphors/resources/SVGs").iterdir()])
 
         self.scripts_dir = self.working_dir / "scripts"
         self.scripts_dir.mkdir(parents=True, exist_ok=True)
@@ -44,7 +46,14 @@ class ManimProvider:
 
         self.movie_file = self.media_dir / "videos" / f"{term['value'].replace(' ', '_')}" / "480p15" / "GenScene.mp4"
 
-        self.partial_movies = self.media_dir / "videos" / f"{term['value'].replace(' ', '_')}" / "480p15" / "partial_movie_files" / "GenScene"
+        self.partial_movies = (
+            self.media_dir
+            / "videos"
+            / f"{term['value'].replace(' ', '_')}"
+            / "480p15"
+            / "partial_movie_files"
+            / "GenScene"
+        )
 
         self.log_dir = self.working_dir / "logs"
         self.log_dir.mkdir(parents=True, exist_ok=True)
@@ -141,18 +150,17 @@ class ManimProvider:
                 code=f.read(),
                 runtime_error=error,
                 static_error=static_errors,
-                svg=self.svg
+                svg=self.svg,
             )
 
         self.write_and_run_python(manim_script)
         return self.execute_manim_script()
 
-
     def validate_video(self) -> int:
         # This is just a temp code, the system should be able to automatically detect if we need to refine or not
         logging.warning("This feature is still under development")
         refine_video_quality = input("Do you want to refine the video quality? Enter 0 for NO or 1 for YES:")
-        while refine_video_quality not in ['0', '1']:
+        while refine_video_quality not in ["0", "1"]:
             logging.warning("Invalid input. Please enter 0 for NO or 1 for YES.")
             refine_video_quality = input("Do you want to refine the video quality? Enter 0 for NO or 1 for YES:")
         return int(refine_video_quality)
@@ -161,9 +169,8 @@ class ManimProvider:
         frames_dict = create_partial_movies_file_dict(Path(self.partial_movies) / "partial_movie_file_list.txt")
         key_frames = extract_key_frames(frames_dict)
 
-        evaluation = self.grazie_provider.request_video_evaluation(
+        return self.grazie_provider.request_video_evaluation(
             code=self.script_path.read_text(),
             instructions=self.description_file.read_text(),
-            images=key_frames
+            images=key_frames,
         )
-        return evaluation

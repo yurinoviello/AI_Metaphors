@@ -1,8 +1,9 @@
 import argparse
+import json
 import logging
 import os
-import json
 from pathlib import Path
+
 import datasets
 from dotenv import load_dotenv
 from grazie.api.client.endpoints import GrazieApiGatewayUrls
@@ -31,7 +32,7 @@ def parse_arguments() -> argparse.Namespace:
         type=process_bin_directory,
         default=".venv/bin",
         help="Path to the bin directory for ManimProvider."
-             "This argument is not needed if the module is executed trough poetry",
+        "This argument is not needed if the module is executed trough poetry",
     )
     parser.add_argument(
         "--working-dir",
@@ -71,18 +72,20 @@ def animate_term(
     classes = grazie_provider.get_classes(term, metaphor, manim_provider.svg)
     logging.info("Classes created")
     classes_dict = extract_json(classes)
-    with manim_provider.classes_file.open(mode='w', encoding='utf-8') as json_file:
+    with manim_provider.classes_file.open(mode="w", encoding="utf-8") as json_file:
         json.dump(classes_dict, json_file, indent=4)
     logging.info("Classes extracted")
 
     # Creating description
     desc = grazie_provider.get_description(term, metaphor, one_line_metaphor, str(classes_dict))
-    with manim_provider.description_file.open(mode='w', encoding='utf-8') as text_file:
+    with manim_provider.description_file.open(mode="w", encoding="utf-8") as text_file:
         text_file.write(desc)
     logging.info("Description created")
 
     # Creating code
-    manim_code = grazie_provider.get_manim(term, metaphor, one_line_metaphor, str(classes_dict), manim_provider.svg, desc)
+    manim_code = grazie_provider.get_manim(
+        term, metaphor, one_line_metaphor, str(classes_dict), manim_provider.svg, desc
+    )
     logging.info("Manim code created")
 
     # Execution
@@ -127,10 +130,16 @@ def metaphor_generation(
         logging.info("Evaluation complete")
         logging.info("Video Evaluation: %s", video_analysis)
 
-        video_refined_code = grazie_provider.request_video_refinement(instructions=manim_provider.description_file.read_text(), code=manim_provider.script_path.read_text(), errors_explanation=video_analysis, svg=manim_provider.svg)
+        video_refined_code = grazie_provider.request_video_refinement(
+            instructions=manim_provider.description_file.read_text(),
+            code=manim_provider.script_path.read_text(),
+            errors_explanation=video_analysis,
+            svg=manim_provider.svg,
+        )
 
         logging.info("Execution...")
         manim_provider.write_and_run_python(video_refined_code)
+
 
 def main():
     args = parse_arguments()
