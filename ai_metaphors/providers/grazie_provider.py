@@ -130,7 +130,13 @@ class GrazieProvider:
         )
 
     def get_manim(
-        self, term: dict, metaphor: str, one_line_metaphor: str, classes: str, svg: str, instructions: str = ""
+        self,
+        term: dict,
+        metaphor: str,
+        one_line_metaphor: str,
+        classes: str,
+        svg: str,
+        instructions: str = "",
     ) -> str:
         if instructions != "":
             return self.__safe_call(

@@ -70,7 +70,7 @@ class ManimProvider:
 
         self.script_path = self.scripts_dir / f"{term['value'].replace(' ', '_')}.py"
 
-    def write_and_run_python(self, text: str, font_path: str = "ai_metaphors/resources/JetBrainsSans-Regular.ttf"):
+    def write_python(self, text: str, font_path: str = "ai_metaphors/resources/JetBrainsSans-Regular.ttf"):
         # Check the font path
         if not Path(font_path).is_file():
             msg = f"The specified font path does not exist or is not a file: {font_path}"
@@ -96,6 +96,9 @@ class ManimProvider:
                     )
             except FileNotFoundError as e:
                 raise RuntimeError("Cannot write manim text") from e
+
+    def write_and_run_python(self, text: str, font_path: str = "ai_metaphors/resources/JetBrainsSans-Regular.ttf"):
+        self.write_python(text, font_path)
 
         error = self.execute_manim_script()
         if error == "success":
@@ -153,7 +156,7 @@ class ManimProvider:
                 svg=self.svg,
             )
 
-        self.write_and_run_python(manim_script)
+        self.write_python(manim_script)
         return self.execute_manim_script()
 
     def validate_video(self) -> int:
