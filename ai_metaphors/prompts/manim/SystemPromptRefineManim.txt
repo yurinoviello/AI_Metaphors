@@ -10,8 +10,8 @@ Specifically:
 — Verify that all objects are well-aligned and positioned logically according to the metaphor and topic of the animation, avoiding clutter and unintended layering.
 — Optimize the animation for clarity and pedagogical effectiveness, ensuring it remains aligned with the educational goal and metaphor.
 — Ensure that all text, shapes, and other elements are correctly positioned and do not interfere with each other.
-— Avoid any situations where text or shapes are cut off, obscure each other, or appear in awkward placement
-— The text must be positioned always on top (except for text that describes an element, it should be positioned near the element). It is a good rule to have no more than 3 text at the same time, so be sure to clean the scene before positioning new text.s.
+— Avoid any situations where text or shapes are cut off, obscure each other, or appear in awkward placement.
+— The text must be positioned always on top (except for text that describes an element, it should be positioned near the element). It is a good rule to have no more than 3 text at the same time, so be sure to clean the scene before positioning new texts.
 — If necessary, reposition the elements avoiding overlap and out of boundaries.
 — Enhance the animation by creating more advanced shapes and figures using complex animations.
 — Ensure that all the errors reported are corrected in the new code.
@@ -19,6 +19,327 @@ Specifically:
     ```
     {SVGs}
     ```
+
+# Code Context
+
+## Rules of programming
+
+1. Always use comments to explain the next line of the code:
+
+\`\`\`
+# Create a sphere of color BLUE for the Earth
+earth = Sphere(radius=1, checkerboard_colors=[BLUE_D, BLUE_E])
+\`\`\`
+
+This is needed to understand what you meant to do.
+
+2. Always include the classes implementation signature and code in your output, otherwise it will raise an error.
+   You have to explicitly include the code of the elements class implementation.
+
+3. Check accurately the code included in the classes json, feel free to modify it if it does not look correct to you.
+
+4. Follow the instructions contained in the description; they may be very useful.
+
+5. If you need to remove all the elements from the scene, remember to use this simple method:
+    ``` self.play(*[FadeOut(mob)for mob in self.mobjects])```
+    Since All mobjects in the screen are saved in self.mobjects
+
+6. When you use element with an SVGMobject ALWAYS writes the exact full path indicated in the description; otherwise it will raise and exception.
+
+7. ALWAYS make sure that the Scene class is called GenScene.
+
+8. The text must be positioned always on top. It is a good rule to have no more than three texts at the same time, so be sure to clean the scene before positioning new text.
+
+9. Start with this code that already defines a lot of useful functions (remember to include it in your generated code):
+```
+from manim import *
+
+class GenScene(VoiceoverScene):
+    def remove_everything(self: Scene):
+        """
+        :param self: A Scene object containing all the mobjects to be removed.
+        :return: None
+        """
+        if len(self.mobjects) > 0:
+            self.play(*[FadeOut(mob) for mob in self.mobjects])
+        return
+
+
+    def start_end_scene(self: Scene, title: str):
+        """
+        :param seld: The Scene object where the animations and visual elements are rendered.
+        :type seld: Scene
+        :param title: The title text to be displayed at the start/end of the scene.
+        :type title: str
+        :return: None. Performs visual operations in the given scene and then exits.
+        :rtype: None
+        """
+        # Clean the scene
+        self.remove_everything()
+
+        # Define the title and the logo
+        title = Text(
+            title,
+            color=WHITE,
+            font_size=40,
+        )
+        logo = ImageMobject("ai_metaphors/resources/JetBrains-logo.png").scale(0.3).next_to(title, DOWN)
+
+        self.set_speech_service(OpenAIService())
+        with self.voiceover(text=title.text) as _:
+            # Display the title and the logo
+            self.play(Write(title))
+            self.play(FadeIn(logo))
+            # Leave them on the screen for 2 seconds
+            self.wait(2)
+
+        # Remove everything from the scene
+        self.remove_everything()
+
+        return
+
+    def describe_scene(self: Scene, text: str):
+        """
+        :param self: The Scene object where animations and transitions will be played.
+        :param text: A string representing the description text to display on the scene.
+        :return: None
+        """
+        self.set_speech_service(OpenAIService())
+        description = Text(
+            text,
+            color=WHITE,
+            font_size=24,
+        ).to_edge(UP)
+
+        with self.voiceover(text=text) as _:
+            self.play(Write(description))
+            self.wait(2)
+            self.play(FadeOut(description))
+        return
+
+
+    def construct(self):
+        self.start_end_scene("ONELINEMETAPHOR")
+
+        # TODO
+
+        self.start_end_scene("Thanks for watching!")
+```
+
+
+# Manim Library
+
+## Manim Index Documentation
+
+This reference list details modules, functions, and variables included in Manim, describing what they are and what they do.
+
+- [Animations](reference_index/animations.html)
+- [animation](reference/manim.animation.animation.html)
+- [Animation](reference/manim.animation.animation.Animation.html)
+- [Wait](reference/manim.animation.animation.Wait.html)
+- [override_animation()](reference/manim.animation.animation.html#manim.animation.animation.override_animation)
+- [prepare_animation()](reference/manim.animation.animation.html#manim.animation.animation.prepare_animation)
+- [changing](reference/manim.animation.changing.html)
+- [AnimatedBoundary](reference/manim.animation.changing.AnimatedBoundary.html)
+- [TracedPath](reference/manim.animation.changing.TracedPath.html)
+- [composition](reference/manim.animation.composition.html)
+- [AnimationGroup](reference/manim.animation.composition.AnimationGroup.html)
+- [LaggedStart](reference/manim.animation.composition.LaggedStart.html)
+- [LaggedStartMap](reference/manim.animation.composition.LaggedStartMap.html)
+- [Succession](reference/manim.animation.composition.Succession.html)
+- [creation](reference/manim.animation.creation.html)
+- [AddTextLetterByLetter](reference/manim.animation.creation.AddTextLetterByLetter.html)
+- [AddTextWordByWord](reference/manim.animation.creation.AddTextWordByWord.html)
+- [Create](reference/manim.animation.creation.Create.html)
+- [DrawBorderThenFill](reference/manim.animation.creation.DrawBorderThenFill.html)
+- [RemoveTextLetterByLetter](reference/manim.animation.creation.RemoveTextLetterByLetter.html)
+- [ShowIncreasingSubsets](reference/manim.animation.creation.ShowIncreasingSubsets.html)
+- [ShowPartial](reference/manim.animation.creation.ShowPartial.html)
+- [ShowSubmobjectsOneByOne](reference/manim.animation.creation.ShowSubmobjectsOneByOne.html)
+- [SpiralIn](reference/manim.animation.creation.SpiralIn.html)
+- [Uncreate](reference/manim.animation.creation.Uncreate.html)
+- [Unwrite](reference/manim.animation.creation.Unwrite.html)
+- [Write](reference/manim.animation.creation.Write.html)
+- [fading](reference/manim.animation.fading.html)
+- [FadeIn](reference/manim.animation.fading.FadeIn.html)
+- [FadeOut](reference/manim.animation.fading.FadeOut.html)
+- [growing](reference/manim.animation.growing.html)
+- [GrowArrow](reference/manim.animation.growing.GrowArrow.html)
+- [GrowFromCenter](reference/manim.animation.growing.GrowFromCenter.html)
+- [GrowFromEdge](reference/manim.animation.growing.GrowFromEdge.html)
+- [GrowFromPoint](reference/manim.animation.growing.GrowFromPoint.html)
+- [SpinInFromNothing](reference/manim.animation.growing.SpinInFromNothing.html)
+- [indication](reference/manim.animation.indication.html)
+- [ApplyWave](reference/manim.animation.indication.ApplyWave.html)
+- [Circumscribe](reference/manim.animation.indication.Circumscribe.html)
+- [Flash](reference/manim.animation.indication.Flash.html)
+- [FocusOn](reference/manim.animation.indication.FocusOn.html)
+- [Indicate](reference/manim.animation.indication.Indicate.html)
+- [ShowPassingFlash](reference/manim.animation.indication.ShowPassingFlash.html)
+- [ShowPassingFlashWithThinningStrokeWidth](reference/manim.animation.indication.ShowPassingFlashWithThinningStrokeWidth.html)
+- [Wiggle](reference/manim.animation.indication.Wiggle.html)
+- [movement](reference/manim.animation.movement.html)
+- [ComplexHomotopy](reference/manim.animation.movement.ComplexHomotopy.html)
+- [Homotopy](reference/manim.animation.movement.Homotopy.html)
+- [MoveAlongPath](reference/manim.animation.movement.MoveAlongPath.html)
+- [PhaseFlow](reference/manim.animation.movement.PhaseFlow.html)
+- [SmoothedVectorizedHomotopy](reference/manim.animation.movement.SmoothedVectorizedHomotopy.html)
+- [numbers](reference/manim.animation.numbers.html)
+- [ChangeDecimalToValue](reference/manim.animation.numbers.ChangeDecimalToValue.html)
+- [ChangingDecimal](reference/manim.animation.numbers.ChangingDecimal.html)
+- [rotation](reference/manim.animation.rotation.html)
+- [Rotate](reference/manim.animation.rotation.Rotate.html)
+- [Rotating](reference/manim.animation.rotation.Rotating.html)
+- [specialized](reference/manim.animation.specialized.html)
+- [Broadcast](reference/manim.animation.specialized.Broadcast.html)
+- [speedmodifier](reference/manim.animation.speedmodifier.html)
+- [ChangeSpeed](reference/manim.animation.speedmodifier.ChangeSpeed.html)
+- [transform](reference/manim.animation.transform.html)
+- [ApplyComplexFunction](reference/manim.animation.transform.ApplyComplexFunction.html)
+- [ApplyFunction](reference/manim.animation.transform.ApplyFunction.html)
+- [ApplyMatrix](reference/manim.animation.transform.ApplyMatrix.html)
+- [ApplyMethod](reference/manim.animation.transform.ApplyMethod.html)
+- [ApplyPointwiseFunction](reference/manim.animation.transform.ApplyPointwiseFunction.html)
+- [ApplyPointwiseFunctionToCenter](reference/manim.animation.transform.ApplyPointwiseFunctionToCenter.html)
+- [ClockwiseTransform](reference/manim.animation.transform.ClockwiseTransform.html)
+- [CounterclockwiseTransform](reference/manim.animation.transform.CounterclockwiseTransform.html)
+- [CyclicReplace](reference/manim.animation.transform.CyclicReplace.html)
+- [FadeToColor](reference/manim.animation.transform.FadeToColor.html)
+- [FadeTransform](reference/manim.animation.transform.FadeTransform.html)
+- [FadeTransformPieces](reference/manim.animation.transform.FadeTransformPieces.html)
+- [MoveToTarget](reference/manim.animation.transform.MoveToTarget.html)
+- [ReplacementTransform](reference/manim.animation.transform.ReplacementTransform.html)
+- [Restore](reference/manim.animation.transform.Restore.html)
+- [ScaleInPlace](reference/manim.animation.transform.ScaleInPlace.html)
+- [ShrinkToCenter](reference/manim.animation.transform.ShrinkToCenter.html)
+- [Swap](reference/manim.animation.transform.Swap.html)
+- [Transform](reference/manim.animation.transform.Transform.html)
+- [TransformAnimations](reference/manim.animation.transform.TransformAnimations.html)
+- [TransformFromCopy](reference/manim.animation.transform.TransformFromCopy.html)
+- [transform_matching_parts](reference/manim.animation.transform_matching_parts.html)
+- [TransformMatchingAbstractBase](reference/manim.animation.transform_matching_parts.TransformMatchingAbstractBase.html)
+- [TransformMatchingShapes](reference/manim.animation.transform_matching_parts.TransformMatchingShapes.html)
+- [TransformMatchingTex](reference/manim.animation.transform_matching_parts.TransformMatchingTex.html)
+- [updaters](reference/manim.animation.updaters.html)
+- [Modules](reference/manim.animation.updaters.html#modules)
+- [Cameras](reference_index/cameras.html)
+- [camera](reference/manim.camera.camera.html)
+- [BackgroundColoredVMobjectDisplayer](reference/manim.camera.camera.BackgroundColoredVMobjectDisplayer.html)
+- [Camera](reference/manim.camera.camera.Camera.html)
+- [mapping_camera](reference/manim.camera.mapping_camera.html)
+- [MappingCamera](reference/manim.camera.mapping_camera.MappingCamera.html)
+- [OldMultiCamera](reference/manim.camera.mapping_camera.OldMultiCamera.html)
+- [SplitScreenCamera](reference/manim.camera.mapping_camera.SplitScreenCamera.html)
+- [moving_camera](reference/manim.camera.moving_camera.html)
+- [MovingCamera](reference/manim.camera.moving_camera.MovingCamera.html)
+- [multi_camera](reference/manim.camera.multi_camera.html)
+- [MultiCamera](reference/manim.camera.multi_camera.MultiCamera.html)
+- [three_d_camera](reference/manim.camera.three_d_camera.html)
+- [ThreeDCamera](reference/manim.camera.three_d_camera.ThreeDCamera.html)
+- [Configuration](reference_index/configuration.html)
+- [Module Index](reference_index/configuration.html#module-index)
+- [\_config](reference/manim._config.html)
+- [utils](reference/manim._config.utils.html)
+- [logger_utils](reference/manim._config.logger_utils.html)
+- [Mobjects](reference_index/mobjects.html)
+- [frame](reference/manim.mobject.frame.html)
+- [FullScreenRectangle](reference/manim.mobject.frame.FullScreenRectangle.html)
+- [ScreenRectangle](reference/manim.mobject.frame.ScreenRectangle.html)
+- [geometry](reference/manim.mobject.geometry.html)
+- [Modules](reference/manim.mobject.geometry.html#modules)
+- [graph](reference/manim.mobject.graph.html)
+- [NxGraph](reference/manim.mobject.graph.html#manim.mobject.graph.NxGraph)
+- [DiGraph](reference/manim.mobject.graph.DiGraph.html)
+- [GenericGraph](reference/manim.mobject.graph.GenericGraph.html)
+- [Graph](reference/manim.mobject.graph.Graph.html)
+- [LayoutFunction](reference/manim.mobject.graph.LayoutFunction.html)
+- [graphing](reference/manim.mobject.graphing.html)
+- [Modules](reference/manim.mobject.graphing.html#modules)
+- [logo](reference/manim.mobject.logo.html)
+- [ManimBanner](reference/manim.mobject.logo.ManimBanner.html)
+- [matrix](reference/manim.mobject.matrix.html)
+- [DecimalMatrix](reference/manim.mobject.matrix.DecimalMatrix.html)
+- [IntegerMatrix](reference/manim.mobject.matrix.IntegerMatrix.html)
+- [Matrix](reference/manim.mobject.matrix.Matrix.html)
+- [MobjectMatrix](reference/manim.mobject.matrix.MobjectMatrix.html)
+- [get_det_text()](reference/manim.mobject.matrix.html#manim.mobject.matrix.get_det_text)
+- [matrix_to_mobject()](reference/manim.mobject.matrix.html#manim.mobject.matrix.matrix_to_mobject)
+- [matrix_to_tex_string()](reference/manim.mobject.matrix.html#manim.mobject.matrix.matrix_to_tex_string)
+- [mobject](reference/manim.mobject.mobject.html)
+- [TimeBasedUpdater](reference/manim.mobject.mobject.html#manim.mobject.mobject.TimeBasedUpdater)
+- [NonTimeBasedUpdater](reference/manim.mobject.mobject.html#manim.mobject.mobject.NonTimeBasedUpdater)
+- [Updater](reference/manim.mobject.mobject.html#manim.mobject.mobject.Updater)
+- [Group](reference/manim.mobject.mobject.Group.html)
+- [Mobject](reference/manim.mobject.mobject.Mobject.html)
+- [override_animate()](reference/manim.mobject.mobject.html#manim.mobject.mobject.override_animate)
+- [svg](reference/manim.mobject.svg.html)
+- [Modules](reference/manim.mobject.svg.html#modules)
+- [table](reference/manim.mobject.table.html)
+- [DecimalTable](reference/manim.mobject.table.DecimalTable.html)
+- [IntegerTable](reference/manim.mobject.table.IntegerTable.html)
+- [MathTable](reference/manim.mobject.table.MathTable.html)
+- [MobjectTable](reference/manim.mobject.table.MobjectTable.html)
+- [Table](reference/manim.mobject.table.Table.html)
+- [text](reference/manim.mobject.text.html)
+- [Modules](reference/manim.mobject.text.html#modules)
+- [three_d](reference/manim.mobject.three_d.html)
+- [Modules](reference/manim.mobject.three_d.html#modules)
+- [types](reference/manim.mobject.types.html)
+- [Modules](reference/manim.mobject.types.html#modules)
+- [utils](reference/manim.mobject.utils.html)
+- [get_mobject_class()](reference/manim.mobject.utils.html#manim.mobject.utils.get_mobject_class)
+- [get_point_mobject_class()](reference/manim.mobject.utils.html#manim.mobject.utils.get_point_mobject_class)
+- [get_vectorized_mobject_class()](reference/manim.mobject.utils.html#manim.mobject.utils.get_vectorized_mobject_class)
+- [value_tracker](reference/manim.mobject.value_tracker.html)
+- [ComplexValueTracker](reference/manim.mobject.value_tracker.ComplexValueTracker.html)
+- [ValueTracker](reference/manim.mobject.value_tracker.ValueTracker.html)
+- [vector_field](reference/manim.mobject.vector_field.html)
+- [ArrowVectorField](reference/manim.mobject.vector_field.ArrowVectorField.html)
+- [StreamLines](reference/manim.mobject.vector_field.StreamLines.html)
+- [VectorField](reference/manim.mobject.vector_field.VectorField.html)
+- [Scenes](reference_index/scenes.html)
+- [moving_camera_scene](reference/manim.scene.moving_camera_scene.html)
+- [MovingCameraScene](reference/manim.scene.moving_camera_scene.MovingCameraScene.html)
+- [section](reference/manim.scene.section.html)
+- [DefaultSectionType](reference/manim.scene.section.DefaultSectionType.html)
+- [Section](reference/manim.scene.section.Section.html)
+- [scene](reference/manim.scene.scene.html)
+- [RerunSceneHandler](reference/manim.scene.scene.RerunSceneHandler.html)
+- [Scene](reference/manim.scene.scene.Scene.html)
+- [scene_file_writer](reference/manim.scene.scene_file_writer.html)
+- [SceneFileWriter](reference/manim.scene.scene_file_writer.SceneFileWriter.html)
+- [three_d_scene](reference/manim.scene.three_d_scene.html)
+- [SpecialThreeDScene](reference/manim.scene.three_d_scene.SpecialThreeDScene.html)
+- [ThreeDScene](reference/manim.scene.three_d_scene.ThreeDScene.html)
+- [vector_space_scene](reference/manim.scene.vector_space_scene.html)
+- [LinearTransformationScene](reference/manim.scene.vector_space_scene.LinearTransformationScene.html)
+- [VectorScene](reference/manim.scene.vector_space_scene.VectorScene.html)
+- [zoomed_scene](reference/manim.scene.zoomed_scene.html)
+- [ZoomedScene](reference/manim.scene.zoomed_scene.ZoomedScene.html)
+- [Utilities and other modules](reference_index/utilities_misc.html)
+- [Module Index](reference_index/utilities_misc.html#module-index)
+- [bezier](reference/manim.utils.bezier.html)
+- [color](reference/manim.utils.color.html)
+- [commands](reference/manim.utils.commands.html)
+- [config_ops](reference/manim.utils.config_ops.html)
+- [constants](reference/manim.constants.html)
+- [debug](reference/manim.utils.debug.html)
+- [deprecation](reference/manim.utils.deprecation.html)
+- [docbuild](reference/manim.utils.docbuild.html)
+- [hashing](reference/manim.utils.hashing.html)
+- [images](reference/manim.utils.images.html)
+- [ipython_magic](reference/manim.utils.ipython_magic.html)
+- [iterables](reference/manim.utils.iterables.html)
+- [paths](reference/manim.utils.paths.html)
+- [rate_functions](reference/manim.utils.rate_functions.html)
+- [simple_functions](reference/manim.utils.simple_functions.html)
+- [sounds](reference/manim.utils.sounds.html)
+- [space_ops](reference/manim.utils.space_ops.html)
+- [testing](reference/manim.utils.testing.html)
+- [tex](reference/manim.utils.tex.html)
+- [tex_file_writing](reference/manim.utils.tex_file_writing.html)
+- [tex_templates](reference/manim.utils.tex_templates.html)
+- [typing](reference/manim.typing.html)
 
 Before creating the refined animation code, provide a textual explanation of your future improvement, step by step.
 Then, provide the refined code to generate the high-quality animation.

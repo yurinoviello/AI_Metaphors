@@ -39,7 +39,7 @@ The following is an example of the code:
 from manim import *
 from math import *
 
-class GenScene(VoiceoverScene):
+class GenScene(Scene):
 def construct(self):
 # Create a circle of color BLUE
 c = Circle(color=BLUE)

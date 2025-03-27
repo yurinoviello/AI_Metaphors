@@ -105,7 +105,7 @@ def metaphor_generation(
     generate_metaphor_text: bool,
     bin_directory: Path,
     working_dir: Path,
-):
+) -> str:
     load_dotenv()
     client = GrazieApiGatewayClient(
         grazie_agent=GrazieAgent(name="grazie-api-gateway-client-readme", version="dev"),
@@ -114,7 +114,11 @@ def metaphor_generation(
         auth_type=AuthType.USER,
     )
 
-    grazie_provider = GrazieProvider(client, model="openai-gpt-4o")
+    # model = "anthropic-claude-3.7-sonnet"
+    # model = "openai-gpt-4o"
+    # model= "openai-gpt4.5"
+    model = "openai-o1"
+    grazie_provider = GrazieProvider(client, model=model, temperature=0.1)
 
     logging.info("Term Name: %s", term_name)
     logging.info("Term Definition: %s", term_definition)
@@ -130,7 +134,10 @@ def metaphor_generation(
     manim_provider = ManimProvider(grazie_provider, term, bin_directory, working_dir)
     animate_term(manim_provider, term, metaphor, one_line_metaphor)
 
-    if manim_provider.validate_video() == 1:
+    logging.info("Current token usage: %d", grazie_provider.num_tokens)
+    logging.info("Current token usage: %f $", 5 / 1_000_000 * grazie_provider.num_tokens)
+
+    if os.getenv("DISABLE_VIDEO_VAL") != "1" and manim_provider.validate_video() == 1:
         video_analysis = manim_provider.evaluate_video()
         logging.info("Evaluation complete")
         logging.info("Video Evaluation: %s", video_analysis)
@@ -145,12 +152,14 @@ def metaphor_generation(
         logging.info("Execution...")
         manim_provider.write_and_run_python(video_refined_code)
 
+    return manim_provider.script_path
 
-def main():
+
+def main() -> str:
     args = parse_arguments()
     if args.debug:
         logging.basicConfig(level=logging.INFO)
-    metaphor_generation(
+    return metaphor_generation(
         term_name=args.term_name,
         term_definition=args.term_definition,
         metaphor=args.metaphor,
@@ -158,7 +167,6 @@ def main():
         bin_directory=args.bin_directory,
         working_dir=args.working_dir,
     )
-
 
 if __name__ == "__main__":
     main()

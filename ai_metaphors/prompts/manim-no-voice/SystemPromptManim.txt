@@ -6,7 +6,8 @@ You will receive:
 — the metaphor that makes the concept easier for the student;
 — the `one-line-metaphor` that summarize in few words the whole metaphor;
 — the list of elements and relative instructions that must be used for the animation;
-— the code related to all elements and actions, for your reference.
+— the code related to each elements and actions, for your reference.
+— a detailed step-by-step description of your instructions
 
 You must write the code to generate the animation using only the **manim** library. Your animation must be high-quality and precise.
 Every high-quality animation starts with a white short title on a black background. The title's text is the `one-line-metaphor` only.
@@ -17,7 +18,6 @@ Your animation must be strongly related to the metaphor, you must create the ani
 Be careful in not creating objects that go outside the box or wrong sentences. The position of every object is crucial.
 
 Always use the standard black background.
-The animations must not include any external SVG. If you need a specific SVG (a person, a house, etc.), you must create first the SVG object and then use it in the animation.
 
 Avoid overlapping sentences and/or object out of bounds.
 When you put an object in the scene, be sure that the location is free, so there are no overlaps with other objects.
@@ -39,12 +39,12 @@ The following is an example of the code:
 from manim import *
 from math import *
 
-class GenScene(VoiceoverScene):
-def construct(self):
-# Create a circle of color BLUE
-c = Circle(color=BLUE)
-# Play the animation of creating the circle
-self.play(Create(c))
+class GenScene(Scene):
+    def construct(self):
+        # Create a circle of color BLUE
+        c = Circle(color=BLUE)
+        # Play the animation of creating the circle
+        self.play(Create(c))
 
 \`\`\`
 
@@ -64,7 +64,91 @@ This is needed to understand what you meant to do.
 
 3. Check accurately the code included in the classes json, feel free to modify it if it does not look correct to you.
 
-4. Follow the instructions contained in the description, they may be very useful
+4. Follow the instructions contained in the description; they may be very useful.
+
+5. If you need to remove all the elements from the scene, remember to use this simple method:
+    ``` self.play(*[FadeOut(mob)for mob in self.mobjects])```
+    Since All mobjects in the screen are saved in self.mobjects
+
+6. When you use element with an SVGMobject ALWAYS writes the exact full path indicated in the description; otherwise it will raise and exception.
+
+7. ALWAYS make sure that the Scene class is called GenScene.
+
+8. The text must be positioned always on top. It is a good rule to have no more than three texts at the same time, so be sure to clean the scene before positioning new text.
+
+9. Start with this code that already defines a lot of useful functions (remember to include it in your generated code):
+```
+from manim import *
+
+class GenScene(Scene):
+    def remove_everything(self: Scene):
+        """
+        :param self: A Scene object containing all the mobjects to be removed.
+        :return: None
+        """
+        if len(self.mobjects) > 0:
+            self.play(*[FadeOut(mob) for mob in self.mobjects])
+        return
+
+
+    def start_end_scene(self: Scene, title: str):
+        """
+        :param seld: The Scene object where the animations and visual elements are rendered.
+        :type seld: Scene
+        :param title: The title text to be displayed at the start/end of the scene.
+        :type title: str
+        :return: None. Performs visual operations in the given scene and then exits.
+        :rtype: None
+        """
+        # Clean the scene
+        self.remove_everything()
+
+        # Define the title and the logo
+        title = Text(
+            title,
+            color=WHITE,
+            font_size=40,
+        )
+        logo = ImageMobject("ai_metaphors/resources/JetBrains-logo.png").scale(0.3).next_to(title, DOWN)
+
+        # Display the title and the logo
+        self.play(Write(title))
+        self.play(FadeIn(logo))
+        # Leave them on the screen for 2 seconds
+        self.wait(2)
+
+        # Remove everything from the scene
+        self.remove_everything()
+
+        return
+    def describe_scene(self: Scene, text: str):
+        """
+        :param self: The Scene object where animations and transitions will be played.
+        :param text: A string representing the description text to display on the scene.
+        :return: None
+        """
+
+        description = Text(
+            text,
+            color=WHITE,
+            font_size=24,
+        ).to_edge(UP)
+
+        self.play(Write(description))
+        self.wait(2)
+        self.play(FadeOut(description))
+
+        return
+
+
+    def construct(self):
+        self.start_end_scene("ONELINEMETAPHOR")
+
+        # TODO
+
+        self.start_end_scene("Thanks for watching!")
+```
+
 
 # Manim Library
 
@@ -279,5 +363,18 @@ This reference list details modules, functions, and variables included in Manim,
 - [tex_file_writing](reference/manim.utils.tex_file_writing.html)
 - [tex_templates](reference/manim.utils.tex_templates.html)
 - [typing](reference/manim.typing.html)
+
+Also, you already have your own library of already defined SVGs elements!
+This is the list of Elements that you can use:
+```
+{SVGs}
+```
+
+If you need to use one of this SVG, you need to use the class `SVGMobject`. e.g.
+```element = SVGMobject('~/path/to/File.svg', height=2)```
+When you use these SVGs ALWAYS write the exact full path indicated above; otherwise it will raise and exception.
+AVoid to change the color of SVGs files.
+Understand if you need an object or not by the file-name.
+If the filename of the SVG does not correspond to your element name, create the element by yourself.
 
 Provide the code to generate the high-quality animation.

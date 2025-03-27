@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-
+import tiktoken
 import attrs
 from grazie.api.client.chat.prompt import ChatPrompt
 from grazie.api.client.gateway import GrazieApiGatewayClient
@@ -10,24 +10,26 @@ from openai import OpenAI
 
 from ai_metaphors.utils.text_utils import wrap_keyword
 
-SYSTEM_PROMPT_CLASSES = "ai_metaphors/prompts/manim/SystemPromptClasses.txt"
-USER_PROMPT_CLASSES = "ai_metaphors/prompts/manim/UserPromptClasses.txt"
-
-SYSTEM_PROMPT_DESCRIPTION = "ai_metaphors/prompts/manim/SystemPromptDescription.txt"
-USER_PROMPT_DESCRIPTION = "ai_metaphors/prompts/manim/UserPromptDescription.txt"
-
 SYSTEM_PROMPT_METAPHOR = "ai_metaphors/prompts/metaphors/SystemPromptMetaphor.txt"
 USER_PROMPT_METAPHOR = "ai_metaphors/prompts/metaphors/UserPromptMetaphor.txt"
 
 SYSTEM_PROMPT_ONE_LINE_METAPHOR = "ai_metaphors/prompts/metaphors/SystemPromptOneLineMetaphor.txt"
 USER_PROMPT_ONE_LINE_METAPHOR = "ai_metaphors/prompts/metaphors/UserPromptOneLineMetaphor.txt"
 
-SYSTEM_PROMPT_MANIM = "ai_metaphors/prompts/manim/SystemPromptManim.txt"
-SYSTEM_PROMPT_MANIM_NO_DESC = "ai_metaphors/prompts/manim/SystemPromptManimNoDesc.txt"
-USER_PROMPT_MANIM = "ai_metaphors/prompts/manim/UserPromptManim.txt"
 
-SYSTEM_PROMPT_REFINE = "ai_metaphors/prompts/manim/SystemPromptRefineManim.txt"
-USER_PROMPT_REFINE = "ai_metaphors/prompts/manim/UserPromptRefineManim.txt"
+SYSTEM_PROMPT_CLASSES = "ai_metaphors/prompts/manim-no-voice/SystemPromptClasses.txt"
+USER_PROMPT_CLASSES = "ai_metaphors/prompts/manim-no-voice/UserPromptClasses.txt"
+
+SYSTEM_PROMPT_DESCRIPTION = "ai_metaphors/prompts/manim-no-voice/SystemPromptDescription.txt"
+USER_PROMPT_DESCRIPTION = "ai_metaphors/prompts/manim-no-voice/UserPromptDescription.txt"
+
+SYSTEM_PROMPT_MANIM = "ai_metaphors/prompts/manim-no-voice/SystemPromptManim.txt"
+SYSTEM_PROMPT_MANIM_NO_DESC = "ai_metaphors/prompts/manim-no-voice/SystemPromptManimNoDesc.txt"
+USER_PROMPT_MANIM = "ai_metaphors/prompts/manim-no-voice/UserPromptManim.txt"
+
+SYSTEM_PROMPT_REFINE = "ai_metaphors/prompts/manim-no-voice/SystemPromptRefineManim.txt"
+USER_PROMPT_REFINE = "ai_metaphors/prompts/manim-no-voice/UserPromptRefineManim.txt"
+
 
 SYSTEM_EVALUATE_VIDEO_PROMPT = "ai_metaphors/prompts/validate/SystemEvaluateVideo.txt"
 USER_EVALUATE_VIDEO_PROMPT = "ai_metaphors/prompts/validate/UserEvaluateVideo.txt"
@@ -50,6 +52,8 @@ class GrazieProvider:
         self.client = client
         self.model = model
         self.temperature = temperature
+        self.tokenizer = tiktoken.encoding_for_model("gpt-4o")
+        self.num_tokens = 0
 
     def __safe_call(self, system_prompt: str, user_prompt: str) -> str:
         @attrs.define(auto_attribs=True, frozen=True)
@@ -62,13 +66,16 @@ class GrazieProvider:
                 profile=MyProfile(),
             ).content
 
-        return self.client.chat(
+        response = self.client.chat(
             chat=ChatPrompt().add_system(system_prompt).add_user(user_prompt),
             profile=MyProfile(),
-            parameters={
+            parameters={} if "o3" in self.model else {
                 LLMParameters.Temperature: Parameters.FloatValue(self.temperature),
             },
         ).content
+
+        self.num_tokens += len(self.tokenizer.encode(system_prompt + user_prompt + response))
+        return response
 
     def get_metaphor(self, term: dict) -> str:
         return self.__safe_call(

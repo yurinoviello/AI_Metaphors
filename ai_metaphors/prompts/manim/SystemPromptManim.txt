@@ -39,7 +39,7 @@ The following is an example of the code:
 from manim import *
 from math import *
 
-class GenScene(Scene):
+class GenScene(VoiceoverScene):
     def construct(self):
         # Create a circle of color BLUE
         c = Circle(color=BLUE)
@@ -74,7 +74,83 @@ This is needed to understand what you meant to do.
 
 7. ALWAYS make sure that the Scene class is called GenScene.
 
-8. The text must be positioned always on top (except for text that describes an element, it should be positioned near the element). It is a good rule to have no more than three texts at the same time, so be sure to clean the scene before positioning new text.
+8. The text must be positioned always on top. It is a good rule to have no more than three texts at the same time, so be sure to clean the scene before positioning new text.
+
+9. Start with this code that already defines a lot of useful functions (remember to include it in your generated code):
+```
+from manim import *
+
+class GenScene(VoiceoverScene):
+    def remove_everything(self: Scene):
+        """
+        :param self: A Scene object containing all the mobjects to be removed.
+        :return: None
+        """
+        if len(self.mobjects) > 0:
+            self.play(*[FadeOut(mob) for mob in self.mobjects])
+        return
+
+
+    def start_end_scene(self: Scene, title: str):
+        """
+        :param seld: The Scene object where the animations and visual elements are rendered.
+        :type seld: Scene
+        :param title: The title text to be displayed at the start/end of the scene.
+        :type title: str
+        :return: None. Performs visual operations in the given scene and then exits.
+        :rtype: None
+        """
+        # Clean the scene
+        self.remove_everything()
+
+        # Define the title and the logo
+        title = Text(
+            title,
+            color=WHITE,
+            font_size=40,
+        )
+        logo = ImageMobject("ai_metaphors/resources/JetBrains-logo.png").scale(0.3).next_to(title, DOWN)
+
+        self.set_speech_service(OpenAIService())
+        with self.voiceover(text=title.text) as _:
+            # Display the title and the logo
+            self.play(Write(title))
+            self.play(FadeIn(logo))
+            # Leave them on the screen for 2 seconds
+            self.wait(2)
+
+        # Remove everything from the scene
+        self.remove_everything()
+
+        return
+    def describe_scene(self: Scene, text: str):
+        """
+        :param self: The Scene object where animations and transitions will be played.
+        :param text: A string representing the description text to display on the scene.
+        :return: None
+        """
+        self.set_speech_service(OpenAIService())
+        description = Text(
+            text,
+            color=WHITE,
+            font_size=24,
+        ).to_edge(UP)
+
+        with self.voiceover(text=text) as _:
+            self.play(Write(description))
+            self.wait(2)
+            self.play(FadeOut(description))
+        return
+
+
+    def construct(self):
+        self.start_end_scene("ONELINEMETAPHOR")
+
+        # TODO
+
+        self.start_end_scene("Thanks for watching!")
+```
+
 
 # Manim Library
 
@@ -299,6 +375,8 @@ This is the list of Elements that you can use:
 If you need to use one of this SVG, you need to use the class `SVGMobject`. e.g.
 ```element = SVGMobject('~/path/to/File.svg', height=2)```
 When you use these SVGs ALWAYS write the exact full path indicated above; otherwise it will raise and exception.
-Understand if you need an object or not by the file-name. If you are not sure, then build the element by yourself.
+AVoid to change the color of SVGs files.
+Understand if you need an object or not by the file-name.
+If the filename of the SVG does not correspond to your element name, create the element by yourself.
 
 Provide the code to generate the high-quality animation.

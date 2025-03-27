@@ -24,7 +24,7 @@ def create_partial_movies_file_dict(partial_movies_file: Path) -> dict:
     return file_dict
 
 
-def extract_key_frames(file_dict: dict) -> list[str]:
+def extract_key_frames_old(file_dict: dict) -> list[str]:
     key_frames = []
     with tempfile.TemporaryDirectory() as frames_dir:
         for index, value in file_dict.items():
@@ -40,4 +40,13 @@ def extract_key_frames(file_dict: dict) -> list[str]:
             ]
             subprocess.run(command_first_frame, capture_output=True, text=True, check=False)
             key_frames.append(encode_image(Path(frames_dir) / f"{index}_first.jpg"))
+    return key_frames
+
+def extract_key_frames(frames_dir: Path) -> list[str]:
+    key_frames = []
+    # Iterate over the directory to find files
+    for image_file in frames_dir.iterdir():
+        if image_file.is_file():
+            # Call the encode_image method and append the result to the list
+            key_frames.append(encode_image(image_file))
     return key_frames

@@ -1,0 +1,14 @@
+Topic to explain:
+```{topic}````: ````{definition}```
+
+Metaphor to animate:
+```{metaphor}```
+
+One line metaphor:
+```{one_line_metaphor}```
+
+Elements:
+```{classes}```
+
+Detailed instructions:
+```{instructions}```

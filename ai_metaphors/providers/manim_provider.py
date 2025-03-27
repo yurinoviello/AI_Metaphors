@@ -46,15 +46,6 @@ class ManimProvider:
 
         self.movie_file = self.media_dir / "videos" / f"{term['value'].replace(' ', '_')}" / "480p15" / "GenScene.mp4"
 
-        self.partial_movies = (
-            self.media_dir
-            / "videos"
-            / f"{term['value'].replace(' ', '_')}"
-            / "480p15"
-            / "partial_movie_files"
-            / "GenScene"
-        )
-
         self.log_dir = self.working_dir / "logs"
         self.log_dir.mkdir(parents=True, exist_ok=True)
 
@@ -68,37 +59,30 @@ class ManimProvider:
 
         self.classes_file = self.classes_dir / f"{term['value'].replace(' ', '_')}.json"
 
+        self.frames_dir = self.working_dir / "frames" / f"{term['value'].replace(' ', '_')}"
+        self.frames_dir.mkdir(parents=True, exist_ok=True)
+
         self.script_path = self.scripts_dir / f"{term['value'].replace(' ', '_')}.py"
 
-    def write_python(self, text: str, font_path: str = "ai_metaphors/resources/JetBrainsSans-Regular.ttf"):
-        # Check the font path
-        if not Path(font_path).is_file():
-            msg = f"The specified font path does not exist or is not a file: {font_path}"
-            raise FileNotFoundError(msg)
-
+    def write_python(self, text: str):
         code = extract_python_code(text)
+
         script_path = Path(self.script_path)
         if code:
             try:
                 with script_path.open("w") as file:
-                    file.write(
-                        f"import manimpango\nmanimpango.register_font('{font_path}')\n"
-                        f"from manim import DARK_BROWN as BROWN\n{code}",
-                    )
+                    file.write(code)
             except FileNotFoundError as e:
                 raise RuntimeError("Cannot write manim code") from e
         else:
             try:
                 with script_path.open("w") as file:
-                    file.write(
-                        f"import manimpango\nmanimpango.register_font('{font_path}')\n"
-                        f"from manim import DARK_BROWN as BROWN\n{text}",
-                    )
+                    file.write(text)
             except FileNotFoundError as e:
                 raise RuntimeError("Cannot write manim text") from e
 
-    def write_and_run_python(self, text: str, font_path: str = "ai_metaphors/resources/JetBrainsSans-Regular.ttf"):
-        self.write_python(text, font_path)
+    def write_and_run_python(self, text: str):
+        self.write_python(text)
 
         error = self.execute_manim_script()
         if error == "success":
@@ -114,7 +98,8 @@ class ManimProvider:
     def execute_manim_script(self) -> str:
         command = [
             self.bin_directory / "manim",
-            "-pql",
+            # "-pql",
+            "-ql",
             self.script_path,
             "--media_dir",
             self.media_dir,
@@ -169,8 +154,8 @@ class ManimProvider:
         return int(refine_video_quality)
 
     def evaluate_video(self) -> str:
-        frames_dict = create_partial_movies_file_dict(Path(self.partial_movies) / "partial_movie_file_list.txt")
-        key_frames = extract_key_frames(frames_dict)
+        # frames_dict = create_partial_movies_file_dict(Path(self.partial_movies) / "partial_movie_file_list.txt")
+        key_frames = extract_key_frames(self.frames_dir)
 
         return self.grazie_provider.request_video_evaluation(
             code=self.script_path.read_text(),

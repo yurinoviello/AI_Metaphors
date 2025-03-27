@@ -97,3 +97,4 @@ __pycache__
 **/.venv/
 **/animations/
 notebook.ipynb
+**/ai_metaphors/prompts-science/
