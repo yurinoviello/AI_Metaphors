@@ -11,7 +11,7 @@ from grazie.api.client.gateway import AuthType, GrazieAgent, GrazieApiGatewayCli
 
 from ai_metaphors.providers.grazie_provider import GrazieProvider
 from ai_metaphors.providers.manim_provider import ManimProvider
-from ai_metaphors.utils.path_utils import process_bin_directory, process_working_dir
+from ai_metaphors.utils.path_utils import process_bin_directory, process_temperature, process_working_dir
 from ai_metaphors.utils.text_utils import extract_content, extract_json
 
 
@@ -27,6 +27,7 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--term-definition", help="Definition of the term")
     parser.add_argument("--metaphor", help="Metaphor associated with the term")
     parser.add_argument("--generate-metaphor-text", action="store_true", help="Flag to generate the metaphor")
+    parser.add_argument("--add-voice", action="store_true", help="Flag to add voice feature to the animation")
     parser.add_argument(
         "--bin-directory",
         type=process_bin_directory,
@@ -39,6 +40,40 @@ def parse_arguments() -> argparse.Namespace:
         type=process_working_dir,
         default="./animations",
         help="Working directory for ManimProvider",
+    )
+    parser.add_argument(
+        "--model",
+        type=str,
+        choices=[
+            "openai-gpt-4o",
+            "openai-gpt4.5",
+            "openai-o1",
+            "anthropic-claude-3.5-sonnet",
+            "anthropic-claude-3.7-sonnet",
+        ],
+        default="openai-gpt-4o",
+        help="LLM to be used for processing.",
+    )
+    parser.add_argument(
+        "--temperature",
+        type=process_temperature,
+        default=0.1,
+        help="Temperature value to be used for the LLM.",
+    )
+    parser.add_argument(
+        "--vllm-fix",
+        action="store_true",
+        help="**Experimental** Perform an automatic vllm analysis and code correction.",
+    )
+    parser.add_argument(
+        "--auto-play",
+        action="store_true",
+        help="Automatically play the animation at the end of the execution.",
+    )
+    parser.add_argument(
+        "--high-quality",
+        action="store_true",
+        help="Generate an high quality animation (1080p60p). If not set, the default is 480p15.",
     )
     parser.add_argument(
         "--debug",
@@ -103,8 +138,14 @@ def metaphor_generation(
     term_definition: str,
     metaphor: str,
     generate_metaphor_text: bool,
+    add_voice: bool,
     bin_directory: Path,
     working_dir: Path,
+    model: str,
+    temperature: float,
+    vllm_fix: bool,
+    auto_play: bool,
+    high_quality: bool,
 ) -> str:
     load_dotenv()
     client = GrazieApiGatewayClient(
@@ -114,11 +155,7 @@ def metaphor_generation(
         auth_type=AuthType.USER,
     )
 
-    # model = "anthropic-claude-3.7-sonnet"
-    # model = "openai-gpt-4o"
-    # model= "openai-gpt4.5"
-    model = "openai-o1"
-    grazie_provider = GrazieProvider(client, model=model, temperature=0.1)
+    grazie_provider = GrazieProvider(client, model=model, temperature=temperature, add_voice=add_voice)
 
     logging.info("Term Name: %s", term_name)
     logging.info("Term Definition: %s", term_definition)
@@ -130,14 +167,20 @@ def metaphor_generation(
 
     one_line_metaphor = extract_content(grazie_provider.get_one_line_metaphor(term, metaphor))
     logging.info("One-line Metaphor: %s", one_line_metaphor)
-
-    manim_provider = ManimProvider(grazie_provider, term, bin_directory, working_dir)
+    manim_provider = ManimProvider(
+        grazie_provider=grazie_provider,
+        term=term,
+        bin_directory=bin_directory,
+        working_dir=working_dir,
+        high_quality=high_quality,
+        auto_play=auto_play,
+    )
     animate_term(manim_provider, term, metaphor, one_line_metaphor)
 
     logging.info("Current token usage: %d", grazie_provider.num_tokens)
     logging.info("Current token usage: %f $", 5 / 1_000_000 * grazie_provider.num_tokens)
 
-    if os.getenv("DISABLE_VIDEO_VAL") != "1" and manim_provider.validate_video() == 1:
+    if vllm_fix and manim_provider.validate_video():
         video_analysis = manim_provider.evaluate_video()
         logging.info("Evaluation complete")
         logging.info("Video Evaluation: %s", video_analysis)
@@ -164,9 +207,16 @@ def main() -> str:
         term_definition=args.term_definition,
         metaphor=args.metaphor,
         generate_metaphor_text=args.generate_metaphor_text,
+        add_voice=args.add_voice,
         bin_directory=args.bin_directory,
         working_dir=args.working_dir,
+        model=args.model,
+        temperature=args.temperature,
+        vllm_fix=args.vllm_fix,
+        auto_play=args.auto_play,
+        high_quality=args.high_quality,
     )
+
 
 if __name__ == "__main__":
     main()

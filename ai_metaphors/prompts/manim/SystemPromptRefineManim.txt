@@ -54,7 +54,7 @@ This is needed to understand what you meant to do.
 ```
 from manim import *
 
-class GenScene(VoiceoverScene):
+class GenScene(Scene):
     def remove_everything(self: Scene):
         """
         :param self: A Scene object containing all the mobjects to be removed.
@@ -85,13 +85,12 @@ class GenScene(VoiceoverScene):
         )
         logo = ImageMobject("ai_metaphors/resources/JetBrains-logo.png").scale(0.3).next_to(title, DOWN)
 
-        self.set_speech_service(OpenAIService())
-        with self.voiceover(text=title.text) as _:
-            # Display the title and the logo
-            self.play(Write(title))
-            self.play(FadeIn(logo))
-            # Leave them on the screen for 2 seconds
-            self.wait(2)
+
+        # Display the title and the logo
+        self.play(Write(title))
+        self.play(FadeIn(logo))
+        # Leave them on the screen for 2 seconds
+        self.wait(2)
 
         # Remove everything from the scene
         self.remove_everything()
@@ -104,17 +103,17 @@ class GenScene(VoiceoverScene):
         :param text: A string representing the description text to display on the scene.
         :return: None
         """
-        self.set_speech_service(OpenAIService())
+
         description = Text(
             text,
             color=WHITE,
             font_size=24,
         ).to_edge(UP)
 
-        with self.voiceover(text=text) as _:
-            self.play(Write(description))
-            self.wait(2)
-            self.play(FadeOut(description))
+
+        self.play(Write(description))
+        self.wait(2)
+        self.play(FadeOut(description))
         return
 
 

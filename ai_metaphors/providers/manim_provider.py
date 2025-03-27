@@ -3,7 +3,7 @@ from pathlib import Path
 import subprocess
 
 from ai_metaphors.providers.grazie_provider import GrazieProvider
-from ai_metaphors.utils.image_utils import create_partial_movies_file_dict, extract_key_frames
+from ai_metaphors.utils.image_utils import extract_key_frames
 from ai_metaphors.utils.text_utils import extract_python_code
 
 MAX_TRIES = 10
@@ -31,11 +31,16 @@ class ManimProvider:
         term: dict,
         bin_directory: Path,
         working_dir: Path,
+        auto_play: bool,
+        high_quality: bool,
     ) -> None:
         self.grazie_provider = grazie_provider
         self.term = term
         self.bin_directory = bin_directory
         self.working_dir = working_dir
+        self.auto_play = auto_play
+        self.high_quality = high_quality
+
         self.svg = "\n".join([f"'{svg.as_posix()}'" for svg in Path("ai_metaphors/resources/SVGs").iterdir()])
 
         self.scripts_dir = self.working_dir / "scripts"
@@ -98,8 +103,8 @@ class ManimProvider:
     def execute_manim_script(self) -> str:
         command = [
             self.bin_directory / "manim",
-            # "-pql",
-            "-ql",
+            "-p" if self.auto_play else None,
+            "-qh" if self.high_quality else "-ql",
             self.script_path,
             "--media_dir",
             self.media_dir,
@@ -108,7 +113,7 @@ class ManimProvider:
         ]
 
         try:
-            process = subprocess.run(command, capture_output=True, text=True, check=False)
+            process = subprocess.run([c for c in command if c], capture_output=True, text=True, check=False)
         except FileNotFoundError as e:
             raise RuntimeError("Manim executable not found") from e
 
@@ -120,7 +125,7 @@ class ManimProvider:
 
     def refine_code_with_static_analysis(self, error: str) -> str:
         logging.warning("There was an error during execution.")
-
+        print(error)
         command = [
             self.bin_directory / "pylint",
             "-E",
@@ -151,10 +156,9 @@ class ManimProvider:
         while refine_video_quality not in ["0", "1"]:
             logging.warning("Invalid input. Please enter 0 for NO or 1 for YES.")
             refine_video_quality = input("Do you want to refine the video quality? Enter 0 for NO or 1 for YES:")
-        return int(refine_video_quality)
+        return refine_video_quality == 1
 
     def evaluate_video(self) -> str:
-        # frames_dict = create_partial_movies_file_dict(Path(self.partial_movies) / "partial_movie_file_list.txt")
         key_frames = extract_key_frames(self.frames_dir)
 
         return self.grazie_provider.request_video_evaluation(

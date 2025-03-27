@@ -42,11 +42,6 @@ def extract_key_frames_old(file_dict: dict) -> list[str]:
             key_frames.append(encode_image(Path(frames_dir) / f"{index}_first.jpg"))
     return key_frames
 
+
 def extract_key_frames(frames_dir: Path) -> list[str]:
-    key_frames = []
-    # Iterate over the directory to find files
-    for image_file in frames_dir.iterdir():
-        if image_file.is_file():
-            # Call the encode_image method and append the result to the list
-            key_frames.append(encode_image(image_file))
-    return key_frames
+    return [encode_image(image_file) for image_file in frames_dir.iterdir() if image_file.is_file()]

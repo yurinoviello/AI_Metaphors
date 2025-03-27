@@ -1,12 +1,13 @@
 import os
 from pathlib import Path
-import tiktoken
+
 import attrs
 from grazie.api.client.chat.prompt import ChatPrompt
 from grazie.api.client.gateway import GrazieApiGatewayClient
 from grazie.api.client.llm_parameters import LLMParameters, Parameters
 from grazie.api.client.profiles import LLMProfile
 from openai import OpenAI
+import tiktoken
 
 from ai_metaphors.utils.text_utils import wrap_keyword
 
@@ -16,20 +17,22 @@ USER_PROMPT_METAPHOR = "ai_metaphors/prompts/metaphors/UserPromptMetaphor.txt"
 SYSTEM_PROMPT_ONE_LINE_METAPHOR = "ai_metaphors/prompts/metaphors/SystemPromptOneLineMetaphor.txt"
 USER_PROMPT_ONE_LINE_METAPHOR = "ai_metaphors/prompts/metaphors/UserPromptOneLineMetaphor.txt"
 
+SYSTEM_PROMPT_CLASSES = "ai_metaphors/prompts/manim/SystemPromptClasses.txt"
+SYSTEM_PROMPT_CLASSES_VOICE = "ai_metaphors/prompts/manim-voice/SystemPromptClasses.txt"
+USER_PROMPT_CLASSES = "ai_metaphors/prompts/manim/UserPromptClasses.txt"
 
-SYSTEM_PROMPT_CLASSES = "ai_metaphors/prompts/manim-no-voice/SystemPromptClasses.txt"
-USER_PROMPT_CLASSES = "ai_metaphors/prompts/manim-no-voice/UserPromptClasses.txt"
+SYSTEM_PROMPT_DESCRIPTION = "ai_metaphors/prompts/manim/SystemPromptDescription.txt"
+USER_PROMPT_DESCRIPTION = "ai_metaphors/prompts/manim/UserPromptDescription.txt"
 
-SYSTEM_PROMPT_DESCRIPTION = "ai_metaphors/prompts/manim-no-voice/SystemPromptDescription.txt"
-USER_PROMPT_DESCRIPTION = "ai_metaphors/prompts/manim-no-voice/UserPromptDescription.txt"
+SYSTEM_PROMPT_MANIM = "ai_metaphors/prompts/manim/SystemPromptManim.txt"
+SYSTEM_PROMPT_MANIM_VOICE = "ai_metaphors/prompts/manim-voice/SystemPromptManim.txt"
+SYSTEM_PROMPT_MANIM_NO_DESC = "ai_metaphors/prompts/manim/SystemPromptManimNoDesc.txt"
+SYSTEM_PROMPT_MANIM_NO_DESC_VOICE = "ai_metaphors/prompts/manim-voice/SystemPromptManimNoDesc.txt"
+USER_PROMPT_MANIM = "ai_metaphors/prompts/manim/UserPromptManim.txt"
 
-SYSTEM_PROMPT_MANIM = "ai_metaphors/prompts/manim-no-voice/SystemPromptManim.txt"
-SYSTEM_PROMPT_MANIM_NO_DESC = "ai_metaphors/prompts/manim-no-voice/SystemPromptManimNoDesc.txt"
-USER_PROMPT_MANIM = "ai_metaphors/prompts/manim-no-voice/UserPromptManim.txt"
-
-SYSTEM_PROMPT_REFINE = "ai_metaphors/prompts/manim-no-voice/SystemPromptRefineManim.txt"
-USER_PROMPT_REFINE = "ai_metaphors/prompts/manim-no-voice/UserPromptRefineManim.txt"
-
+SYSTEM_PROMPT_REFINE = "ai_metaphors/prompts/manim/SystemPromptRefineManim.txt"
+SYSTEM_PROMPT_REFINE_VOICE = "ai_metaphors/prompts/manim-voice/SystemPromptRefineManim.txt"
+USER_PROMPT_REFINE = "ai_metaphors/prompts/manim/UserPromptRefineManim.txt"
 
 SYSTEM_EVALUATE_VIDEO_PROMPT = "ai_metaphors/prompts/validate/SystemEvaluateVideo.txt"
 USER_EVALUATE_VIDEO_PROMPT = "ai_metaphors/prompts/validate/UserEvaluateVideo.txt"
@@ -48,10 +51,11 @@ class GrazieProvider:
     :param temperature: A float that determines the randomness of the model's output. Defaults to 0.0.
     """
 
-    def __init__(self, client: GrazieApiGatewayClient, model: str = "openai-gpt-4o", temperature: float = 0.0) -> None:
+    def __init__(self, client: GrazieApiGatewayClient, model: str, temperature: float, add_voice: bool) -> None:
         self.client = client
         self.model = model
         self.temperature = temperature
+        self.add_voice = add_voice
         self.tokenizer = tiktoken.encoding_for_model("gpt-4o")
         self.num_tokens = 0
 
@@ -69,7 +73,9 @@ class GrazieProvider:
         response = self.client.chat(
             chat=ChatPrompt().add_system(system_prompt).add_user(user_prompt),
             profile=MyProfile(),
-            parameters={} if "o3" in self.model else {
+            parameters={}
+            if "o3" in self.model
+            else {
                 LLMParameters.Temperature: Parameters.FloatValue(self.temperature),
             },
         ).content
@@ -105,8 +111,9 @@ class GrazieProvider:
         )
 
     def get_classes(self, term: dict, metaphor: str, svg: str) -> str:
+        sys_prompt = SYSTEM_PROMPT_CLASSES_VOICE if self.add_voice else SYSTEM_PROMPT_CLASSES
         return self.__safe_call(
-            system_prompt=wrap_keyword(Path(SYSTEM_PROMPT_CLASSES).read_text(), "SVGs").format(
+            system_prompt=wrap_keyword(Path(sys_prompt).read_text(), "SVGs").format(
                 SVGs=svg,
             ),
             user_prompt=Path(USER_PROMPT_CLASSES)
@@ -146,8 +153,9 @@ class GrazieProvider:
         instructions: str = "",
     ) -> str:
         if instructions != "":
+            sys_prompt = SYSTEM_PROMPT_MANIM_VOICE if self.add_voice else SYSTEM_PROMPT_MANIM
             return self.__safe_call(
-                system_prompt=Path(SYSTEM_PROMPT_MANIM)
+                system_prompt=Path(sys_prompt)
                 .read_text()
                 .format(
                     SVGs=svg,
@@ -165,8 +173,9 @@ class GrazieProvider:
                     },
                 ),
             )
+        sys_prompt = SYSTEM_PROMPT_MANIM_NO_DESC_VOICE if self.add_voice else SYSTEM_PROMPT_MANIM_NO_DESC
         return self.__safe_call(
-            system_prompt=Path(SYSTEM_PROMPT_MANIM_NO_DESC).read_text(),
+            system_prompt=Path(sys_prompt).read_text(),
             user_prompt=Path(USER_PROMPT_DESCRIPTION)
             .read_text()
             .format_map(
@@ -181,8 +190,9 @@ class GrazieProvider:
         )
 
     def request_static_refinement(self, code: str, runtime_error: str, static_error: str, svg: str) -> str:
+        sys_prompt = SYSTEM_PROMPT_REFINE_VOICE if self.add_voice else SYSTEM_PROMPT_REFINE
         return self.__safe_call(
-            system_prompt=Path(SYSTEM_PROMPT_REFINE)
+            system_prompt=Path(sys_prompt)
             .read_text()
             .format(
                 SVGs=svg,
