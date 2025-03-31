@@ -96,9 +96,9 @@ To set up the project and install all dependencies using **Poetry**, follow thes
    ```bash
    poetry run python ai_metaphors/main.py --help
    ```
-   or
+   or simply
    ```bash
-   python ai_metaphors/main.py --help
+   ai-metaphors --help
    ```
 
 ---
@@ -110,7 +110,7 @@ Run the script with the following arguments:
 ### Command-Line Options
 
 ```bash
-python main.py [OPTIONS]
+ai-metaphors [OPTIONS]
 ```
 
 | **Option**                 | **Type** | **Description**                                                                                 |
@@ -133,17 +133,17 @@ python main.py [OPTIONS]
 
 1. **With Manually Provided Inputs**:
    ```bash
-   python ai_metaphors/main.py --term-name Boolean --term-definition 'A data type that has one of two possible values (usually denoted true and false) intended to represent the two truth values of logic and Boolean algebra.' --metaphor "Imagine a light switch in your house. The switch can only be in one of two positions: ON or OFF.\n\n- When the switch is ON, it represents "true" – the light is working.\n- When the switch is OFF, it represents "false" – the light is not working.\n\nA Boolean is like this light switch. It can only hold one of two states: true (ON) or false (OFF)."
+   ai-metaphors --term-name Boolean --term-definition 'A data type that has one of two possible values (usually denoted true and false) intended to represent the two truth values of logic and Boolean algebra.' --metaphor "Imagine a light switch in your house. The switch can only be in one of two positions: ON or OFF.\n\n- When the switch is ON, it represents "true" – the light is working.\n- When the switch is OFF, it represents "false" – the light is not working.\n\nA Boolean is like this light switch. It can only hold one of two states: true (ON) or false (OFF)."
    ```
 
 2. **Generating a Metaphor**:
    ```bash
-   python ai_metaphors/main.py --term-name Boolean --term-definition 'A data type that has one of two possible values (usually denoted true and false) intended to represent the two truth values of logic and Boolean algebra.' --generate-metaphor
+   ai-metaphors --term-name Boolean --term-definition 'A data type that has one of two possible values (usually denoted true and false) intended to represent the two truth values of logic and Boolean algebra.' --generate-metaphor
    ```
 
 3. **Using a Dataset Example**:
    ```bash
-   python ai_metaphors/main.py --use-dataset-example 0
+   ai-metaphors --use-dataset-example 0
    ```
    You can use terms, metaphors, and definitions from this dataset:
    

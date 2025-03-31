@@ -56,7 +56,7 @@ class GrazieProvider:
         self.model = model
         self.temperature = temperature
         self.add_voice = add_voice
-        self.tokenizer = tiktoken.encoding_for_model("gpt-4o")
+        self.tokenizer = tiktoken.get_encoding("cl100k_base")
         self.num_tokens = 0
 
     def __safe_call(self, system_prompt: str, user_prompt: str) -> str:
