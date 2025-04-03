@@ -33,7 +33,7 @@ Ensure the following tools and libraries are installed:
    - `GRAZIE_JWT_TOKEN`: it will be used to authenticate via the `GrazieApiGatewayClient`
    - `POETRY_HTTP_BASIC_SPACE_GRAZIE_ML_USERNAME`
    - `POETRY_HTTP_BASIC_SPACE_GRAZIE_ML_PASSWORD`
-   - `OPENAI_API_KEY`: it will be used to execute the video evaluation
+   - `OPENAI_API_KEY`: it will be used to execute the video evaluation and text-to-speech feature
 
    You can rename the example file `.env.example` to `.env` and add your tokens inside it.
 
