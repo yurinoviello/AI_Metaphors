@@ -93,6 +93,8 @@ def parse_arguments() -> argparse.Namespace:
             raise ValueError("Definition must not be empty when no example is used.")
         if not args.generate_metaphor_text and args.metaphor is None:
             raise ValueError("Metaphor must not be empty if not generating it.")
+    if args.vllm_fix:
+        args.high_quality = False
     return args
 
 
