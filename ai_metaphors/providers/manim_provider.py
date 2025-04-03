@@ -125,7 +125,6 @@ class ManimProvider:
 
     def refine_code_with_static_analysis(self, error: str) -> str:
         logging.warning("There was an error during execution.")
-        print(error)
         command = [
             self.bin_directory / "pylint",
             "-E",
