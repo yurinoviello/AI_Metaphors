@@ -83,6 +83,9 @@ class GrazieProvider:
         self.num_tokens += len(self.tokenizer.encode(system_prompt + user_prompt + response))
         return response
 
+    def change_model(self, model: str) -> None:
+        self.model = model
+
     def get_metaphor(self, term: dict) -> str:
         return self.__safe_call(
             system_prompt=Path(SYSTEM_PROMPT_METAPHOR).read_text(),

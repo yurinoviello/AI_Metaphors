@@ -55,6 +55,20 @@ def parse_arguments() -> argparse.Namespace:
         help="LLM to be used for processing.",
     )
     parser.add_argument(
+        "--model-manim",
+        type=str,
+        choices=[
+            "default",
+            "openai-gpt-4o",
+            "openai-gpt4.5",
+            "openai-o1",
+            "anthropic-claude-3.5-sonnet",
+            "anthropic-claude-3.7-sonnet",
+        ],
+        default="default",
+        help="LLM to be used to process only the manim script",
+    )
+    parser.add_argument(
         "--temperature",
         type=process_temperature,
         default=0.1,
@@ -103,6 +117,7 @@ def animate_term(
     term: dict,
     metaphor: str,
     one_line_metaphor: str,
+    model_manim: str,
 ):
     grazie_provider = manim_provider.grazie_provider
     # Creating classes
@@ -119,6 +134,8 @@ def animate_term(
         text_file.write(desc)
     logging.info("Description created")
 
+    if model_manim != "default":
+        grazie_provider.change_model(model_manim)
     # Creating code
     manim_code = grazie_provider.get_manim(
         term,
@@ -144,6 +161,7 @@ def metaphor_generation(
     bin_directory: Path,
     working_dir: Path,
     model: str,
+    model_manim: str,
     temperature: float,
     vllm_fix: bool,
     auto_play: bool,
@@ -177,7 +195,7 @@ def metaphor_generation(
         high_quality=high_quality,
         auto_play=auto_play,
     )
-    animate_term(manim_provider, term, metaphor, one_line_metaphor)
+    animate_term(manim_provider, term, metaphor, one_line_metaphor, model_manim)
 
     logging.info("Current token usage: %d", grazie_provider.num_tokens)
     logging.info("Current token usage: %f $", 5 / 1_000_000 * grazie_provider.num_tokens)
@@ -213,6 +231,7 @@ def main() -> str:
         bin_directory=args.bin_directory,
         working_dir=args.working_dir,
         model=args.model,
+        model_manim=args.model_manim,
         temperature=args.temperature,
         vllm_fix=args.vllm_fix,
         auto_play=args.auto_play,
