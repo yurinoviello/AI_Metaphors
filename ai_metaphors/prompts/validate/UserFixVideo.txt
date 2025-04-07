@@ -1,3 +1,6 @@
+Descriptions:
+{instructions}
+
 Errors explanation:
 {errors_explanation}
 

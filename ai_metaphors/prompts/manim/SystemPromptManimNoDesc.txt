@@ -63,19 +63,17 @@ This is needed to understand what you meant to do.
 
 3. Check accurately the code included in the classes json, feel free to modify it if it does not look correct to you.
 
-4. Follow the instructions contained in the description; they may be very useful.
-
-5. If you need to remove all the elements from the scene, remember to use this simple method:
+4. If you need to remove all the elements from the scene, remember to use this simple method:
     ``` self.play(*[FadeOut(mob)for mob in self.mobjects])```
     Since All mobjects in the screen are saved in self.mobjects
 
-6. When you use element with an SVGMobject ALWAYS writes the exact full path indicated in the description; otherwise it will raise and exception.
+5. When you use element with an SVGMobject ALWAYS writes the exact full path indicated in the description; otherwise it will raise and exception.
 
-7. ALWAYS make sure that the Scene class is called GenScene.
+6. ALWAYS make sure that the Scene class is called GenScene.
 
-8. The text must be positioned always on top. It is a good rule to have no more than three texts at the same time, so be sure to clean the scene before positioning new text.
+7. The text must be positioned always on top. It is a good rule to have no more than three texts at the same time, so be sure to clean the scene before positioning new text.
 
-9. Start with this code that already defines a lot of useful functions (remember to include it in your generated code):
+8. Start with this code that already defines a lot of useful functions (remember to include it in your generated code):
 ```
 from manim import *
 

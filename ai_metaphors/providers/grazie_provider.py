@@ -18,7 +18,6 @@ SYSTEM_PROMPT_ONE_LINE_METAPHOR = "ai_metaphors/prompts/metaphors/SystemPromptOn
 USER_PROMPT_ONE_LINE_METAPHOR = "ai_metaphors/prompts/metaphors/UserPromptOneLineMetaphor.txt"
 
 SYSTEM_PROMPT_CLASSES = "ai_metaphors/prompts/manim/SystemPromptClasses.txt"
-SYSTEM_PROMPT_CLASSES_VOICE = "ai_metaphors/prompts/manim-voice/SystemPromptClasses.txt"
 USER_PROMPT_CLASSES = "ai_metaphors/prompts/manim/UserPromptClasses.txt"
 
 SYSTEM_PROMPT_DESCRIPTION = "ai_metaphors/prompts/manim/SystemPromptDescription.txt"
@@ -114,9 +113,8 @@ class GrazieProvider:
         )
 
     def get_classes(self, term: dict, metaphor: str, svg: str) -> str:
-        sys_prompt = SYSTEM_PROMPT_CLASSES_VOICE if self.add_voice else SYSTEM_PROMPT_CLASSES
         return self.__safe_call(
-            system_prompt=wrap_keyword(Path(sys_prompt).read_text(), "SVGs").format(
+            system_prompt=wrap_keyword(Path(SYSTEM_PROMPT_CLASSES).read_text(), "SVGs").format(
                 SVGs=svg,
             ),
             user_prompt=Path(USER_PROMPT_CLASSES)
@@ -212,7 +210,7 @@ class GrazieProvider:
         )
 
     def request_video_evaluation(self, code: str, instructions: str, images: list[str]) -> str:
-        # This should be done by ManimProvider, for now it is devoted to OPENAI
+        # This should be done by GrazieProvider, for now it is devoted to OPENAI
         client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         messages = [
             {

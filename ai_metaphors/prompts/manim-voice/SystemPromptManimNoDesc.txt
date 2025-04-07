@@ -64,8 +64,6 @@ This is needed to understand what you meant to do.
 
 3. Check accurately the code included in the classes json, feel free to modify it if it does not look correct to you.
 
-4. Follow the instructions contained in the description, they may be very useful
-
 # Manim Library
 
 ## Manim Index Documentation
