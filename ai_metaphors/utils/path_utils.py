@@ -36,16 +36,3 @@ def process_temperature(temperature: str) -> float:
         return temperature
     msg = f"Wrong value {temperature}. Temperature must be between 0.0 and 1.0."
     raise ArgumentTypeError(msg)
-
-
-def process_temperature(temperature: str) -> float:
-    try:
-        temperature = float(temperature)
-    except ValueError as err:
-        msg = f"Wrong type {temperature}. Temperature must be a float."
-        raise ArgumentTypeError(msg) from err
-
-    if 0.0 <= temperature <= 1.0:
-        return temperature
-    msg = f"Wrong value {temperature}. Temperature must be between 0.0 and 1.0."
-    raise ArgumentTypeError(msg)
