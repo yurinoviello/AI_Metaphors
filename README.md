@@ -103,6 +103,30 @@ To set up the project and install all dependencies using **Poetry**, follow thes
 
 ---
 
+## Alternative Installation with `pip`
+
+1. **Add Tokens**
+You can add the access token to the [pip config file](https://pip.pypa.io/en/stable/topics/configuration/).
+
+2. **Install dependencies**
+```bash
+   pip install -r requirements.txt
+```
+
+3. **Additional Dependencies** (if needed)
+```bash
+   brew install cairo pkg-config
+```
+```bash
+   brew install portaudio
+```
+
+4. **Run**
+```bash
+   python3 -m ai_metaphors.main --help
+```
+---
+
 ## **Usage**
 
 Run the script with the following arguments:
