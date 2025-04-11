@@ -217,3 +217,48 @@ The script checks for:
    If `--generate-metaphor` is **not** used, a metaphor must be provided.
 
 ---
+
+## Usage with Docker Compose
+
+1. **Set up environment variables**:
+   ```bash
+   cp .env.example .env
+   ```
+   You can find example configurations in `.env.example` file.
+
+2. **Configure your `.env` file**:
+
+   Add _one of these_ LLM provider tokens (required):
+   - `GRAZIE_JWT_TOKEN` or
+   - `OPENAI_API_KEY`
+
+   Note: Poetry authentication tokens are not needed for Docker setup.
+
+3. **Run with Docker Compose**:
+   ```bash
+   docker compose run ai-metaphors -- [OPTIONS]
+   ```
+
+   For example, to see available options:
+   ```bash
+   docker compose run ai-metaphors -- --help
+   ```
+
+   > ⚠️ **Important:**
+   > - Don't forget the `--` separator between Docker Compose commands and arguments for the app
+   > - The `--auto-play` flag is not supported when running with Docker Compose
+
+4. **Access Generated Content**:
+   - Generated animations will be available in the `/animations` folder
+   - This folder is mapped as a volume in [`docker-compose.yml`](docker-compose.yml)
+
+Notes:
+- Make sure Docker and Docker Compose are installed on your system
+- The first run will take longer as it needs to build the container
+- All dependencies will be automatically installed in the container
+
+**Development Notes**:
+- When making changes to the code, rebuild the container to ensure changes are included:
+  ```bash
+  docker compose build --no-cache
+  ```

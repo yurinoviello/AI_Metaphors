@@ -1,0 +1,22 @@
+services:
+  ai-metaphors:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./animations:/app/animations
+    entrypoint: >
+      sh -c '
+      if echo "$$*" | grep -q -- "--auto-play"; then
+        echo "\033[1;31mError: --auto-play flag is not supported in containerized environment\033[0m" >&2;
+        echo "\033[1;33mPlease access the generated video directly from the specified animations directory\033[0m" >&2;
+        exit 1;
+      else
+        python -m ai_metaphors.main --bin-directory /usr/local/bin "$@";
+      fi'
+    env_file:
+      - .env
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app
