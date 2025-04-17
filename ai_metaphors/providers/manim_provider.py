@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 import subprocess
 
-from ai_metaphors.providers.grazie_provider import GrazieProvider
+from ai_metaphors.providers.assistant.llm_assistant import LlmAssistant
 from ai_metaphors.utils.image_utils import extract_key_frames
 from ai_metaphors.utils.text_utils import extract_python_code
 
@@ -14,9 +14,9 @@ class ManimProvider:
     ManimProvider is a class that provides functionality to handle and execute
     Manim scripts. It manages the directories used for storing scripts, media,
     and logs, and provides methods to write Python code to a file, execute it
-    with Manim, and handle any errors by using the GrazieProvider.
+    with Manim, and handle any errors by using the LlmAssistant.
 
-    :param grazie_provider: An instance of GrazieProvider used for refining Manim
+    :param llm_assistant: An instance of LlmAssistant used for refining and generating Manim
                      code.
     :param term: A dictionary containing keyword information, specifically a
                  'value' key for naming purposes.
@@ -27,14 +27,14 @@ class ManimProvider:
 
     def __init__(
         self,
-        grazie_provider: GrazieProvider,
+        llm_assistant: LlmAssistant,
         term: dict,
         bin_directory: Path,
         working_dir: Path,
         auto_play: bool,
         high_quality: bool,
-    ) -> None:
-        self.grazie_provider = grazie_provider
+    ):
+        self.llm_assistant = llm_assistant
         self.term = term
         self.bin_directory = bin_directory
         self.working_dir = working_dir
@@ -138,7 +138,7 @@ class ManimProvider:
         static_errors = process.stdout
 
         with Path(self.script_path).open() as f:
-            manim_script = self.grazie_provider.request_static_refinement(
+            manim_script = self.llm_assistant.request_static_refinement(
                 term=self.term,
                 code=f.read(),
                 runtime_error=error,
@@ -161,7 +161,7 @@ class ManimProvider:
     def evaluate_video(self) -> str:
         key_frames = extract_key_frames(self.frames_dir)
 
-        return self.grazie_provider.request_video_evaluation(
+        return self.llm_assistant.request_video_evaluation(
             code=self.script_path.read_text(),
             instructions=self.description_file.read_text(),
             images=key_frames,

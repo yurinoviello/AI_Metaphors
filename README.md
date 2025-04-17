@@ -147,6 +147,7 @@ ai-metaphors [OPTIONS]
 | `--animation-type`         | `str`    | Type of animation to generate: `basic` (default, simple animation), `voice` (adds voice-over), or `avatar` (adds animated avatar with voice-over). |
 | `--bin-directory`          | `str`    | Path to the executable for Manim. Default is `.venv/bin`.                                                                                          |
 | `--working-dir`            | `str`    | Working directory for Manim output. Default: `./animations`.                                                                                       |
+| `--llm-provider`           | `str`    | LLM provider service. Default: `grazie`.                                                                                                           |
 | `--model`                  | `str`    | Language model to process with. Default: `openai-gpt-4o`.                                                                                          |
 | `--model-manim`            | `str`    | LLM to process only the Manim script. Default: `default`.                                                                                          |
 | `--temperature`            | `float`  | Temperature value to be used by the chosen language model. Default: `0.1`.                                                                         |
@@ -154,7 +155,7 @@ ai-metaphors [OPTIONS]
 | `--auto-play`              | `flag`   | Automatically play the animation at the end of the execution.                                                                                      |
 | `--high-quality`           | `flag`   | Generate a high-quality animation (1080p60). If not set, the default is 480p15.                                                                    |
 | `--debug`                  | `flag`   | Activate debug mode.                                                                                                                               |
-| `--config`                 | `str`    | Path to the config file from which other arguments will be read. If not provided, the arguments will be read from the command line.                 |
+| `--config`                 | `str`    | Path to the config file from which other arguments will be read. If not provided, the arguments will be read from the command line.                |
 ### Example Usage
 
 1. **With Manually Provided Inputs**:

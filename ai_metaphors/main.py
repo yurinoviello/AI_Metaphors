@@ -1,19 +1,17 @@
 import argparse
-import ast
 import json
 import logging
-import os
 import re
 from pathlib import Path
 
 import datasets
 from dotenv import load_dotenv
-from grazie.api.client.endpoints import GrazieApiGatewayUrls
-from grazie.api.client.gateway import AuthType, GrazieAgent, GrazieApiGatewayClient
 
 from ai_metaphors.config_arg_parser import ConfigArgumentParser
 from ai_metaphors.providers.avatar_provider import AvatarProvider
-from ai_metaphors.providers.grazie_provider import GrazieProvider
+from ai_metaphors.providers.assistant.grazie_assistant import GrazieAssistant
+from ai_metaphors.providers.assistant.llm_assistant import LlmAssistant
+from ai_metaphors.providers.assistant.openai_assistant import OpenAIAssistant
 from ai_metaphors.providers.manim_provider import ManimProvider
 from ai_metaphors.utils.manim_type import ManimType
 from ai_metaphors.utils.path_utils import process_bin_directory, process_temperature, process_working_dir
@@ -59,6 +57,16 @@ def parse_arguments() -> argparse.Namespace:
         type=process_working_dir,
         default="./animations",
         help="Working directory for ManimProvider",
+    )
+    parser.add_argument(
+        "--llm-provider",
+        type=str,
+        choices=[
+            "grazie",
+            "openai",
+        ],
+        default="grazie",
+        help="LLM client provider.",
     )
     parser.add_argument(
         "--model",
@@ -149,9 +157,9 @@ def animate_term(
     manim_type: ManimType,
     working_dir: Path
 ):
-    grazie_provider = manim_provider.grazie_provider
+    llm_assistant = manim_provider.llm_assistant
     # Creating classes
-    classes = grazie_provider.get_classes(term, metaphor, manim_provider.svg)
+    classes = llm_assistant.get_classes(term, metaphor, manim_provider.svg)
     logging.info("Classes created")
     classes_dict = extract_json(classes)
     with manim_provider.classes_file.open(mode="w", encoding="utf-8") as json_file:
@@ -159,16 +167,19 @@ def animate_term(
     logging.info("Classes extracted")
 
     # Creating description
-    desc = grazie_provider.get_description(term, metaphor, one_line_metaphor, str(classes_dict))
+    desc = llm_assistant.get_description(term, metaphor, one_line_metaphor, str(classes_dict))
     with manim_provider.description_file.open(mode="w", encoding="utf-8") as text_file:
         text_file.write(desc)
     logging.info("Description created")
 
     if model_manim != "default":
-        grazie_provider.change_model(model_manim)
+        llm_assistant.change_model(model_manim)
 
+    # Creating avatar
+    if manim_type == ManimType.AVATAR:
+        AvatarProvider(working_dir=working_dir, description=desc, term_name=term["value"]).generate_avatar_and_break_into_frames()
     # Creating code
-    manim_code = grazie_provider.get_manim(
+    manim_code = llm_assistant.get_manim(
         term,
         metaphor,
         one_line_metaphor,
@@ -192,6 +203,13 @@ def animate_term(
     logging.info("Execution...")
     manim_provider.write_and_run_python(manim_code)
 
+def get_llm_assistant(llm_provider: str, model: str, temperature: float, manim_type: ManimType) -> LlmAssistant:
+    if llm_provider == "grazie":
+        return GrazieAssistant(model=model, temperature=temperature, manim_type=manim_type)
+    elif llm_provider == "openai":
+        return OpenAIAssistant(model=model, temperature=temperature, manim_type=manim_type)
+    else:
+        raise ValueError("Received illegal llm_provider value")
 
 def get_narration_text(description: str) -> list[str]:
     return re.findall(r'\*\*Narrator\*\*:\s*```(.*?)```', description, re.DOTALL)
@@ -205,6 +223,7 @@ def metaphor_generation(
     manim_type: ManimType,
     bin_directory: Path,
     working_dir: Path,
+    llm_provider: str,
     model: str,
     model_manim: str,
     temperature: float,
@@ -213,44 +232,41 @@ def metaphor_generation(
     high_quality: bool,
 ) -> str:
     load_dotenv()
-    client = GrazieApiGatewayClient(
-        grazie_agent=GrazieAgent(name="grazie-api-gateway-client-readme", version="dev"),
-        url=GrazieApiGatewayUrls.STAGING,
-        grazie_jwt_token=os.getenv("GRAZIE_JWT_TOKEN"),
-        auth_type=AuthType.USER,
-    )
 
-    grazie_provider = GrazieProvider(client, model=model, temperature=temperature, manim_type=manim_type)
-
-    logging.info("Term Name: %s", term_name)
-    logging.info("Term Definition: %s", term_definition)
     term = {"value": term_name, "definition": term_definition}
 
-    if generate_metaphor_text:
-        metaphor = extract_content(grazie_provider.get_metaphor(term))
-    logging.info("Metaphor: %s", metaphor)
-
-    one_line_metaphor = extract_content(grazie_provider.get_one_line_metaphor(term, metaphor))
-    logging.info("One-line Metaphor: %s", one_line_metaphor)
     manim_provider = ManimProvider(
-        grazie_provider=grazie_provider,
+        llm_assistant=get_llm_assistant(llm_provider, model, temperature, manim_type),
         term=term,
         bin_directory=bin_directory,
         working_dir=working_dir,
         high_quality=high_quality,
         auto_play=auto_play,
     )
+
+    llm_assistant = manim_provider.llm_assistant
+
+    logging.info("Term Name: %s", term_name)
+    logging.info("Term Definition: %s", term_definition)
+
+    if generate_metaphor_text:
+        metaphor = extract_content(llm_assistant.get_metaphor(term))
+    logging.info("Metaphor: %s", metaphor)
+
+    one_line_metaphor = extract_content(llm_assistant.get_one_line_metaphor(term, metaphor))
+    logging.info("One-line Metaphor: %s", one_line_metaphor)
+
     animate_term(manim_provider, term, metaphor, one_line_metaphor, model_manim, manim_type, working_dir)
 
-    logging.info("Current token usage: %d", grazie_provider.num_tokens)
-    logging.info("Current token usage: %f $", 5 / 1_000_000 * grazie_provider.num_tokens)
+    logging.info("Current token usage: %d", llm_assistant.num_tokens)
+    logging.info("Current token usage: %f $", 5 / 1_000_000 * llm_assistant.num_tokens)
 
     if vllm_fix and manim_provider.validate_video():
         video_analysis = manim_provider.evaluate_video()
         logging.info("Evaluation complete")
         logging.info("Video Evaluation: %s", video_analysis)
 
-        video_refined_code = grazie_provider.request_video_refinement(
+        video_refined_code = llm_assistant.request_video_refinement(
             instructions=manim_provider.description_file.read_text(),
             code=manim_provider.script_path.read_text(),
             errors_explanation=video_analysis,
@@ -275,6 +291,7 @@ def main() -> str:
         manim_type=args.manim_type,
         bin_directory=args.bin_directory,
         working_dir=args.working_dir,
+        llm_provider=args.llm_provider,
         model=args.model,
         model_manim=args.model_manim,
         temperature=args.temperature,
@@ -282,7 +299,6 @@ def main() -> str:
         auto_play=args.auto_play,
         high_quality=args.high_quality,
     )
-
 
 if __name__ == "__main__":
     main()
