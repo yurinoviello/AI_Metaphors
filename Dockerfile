@@ -7,6 +7,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     libpango1.0-dev \
     portaudio19-dev \
+    sox \
+    ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt ./
