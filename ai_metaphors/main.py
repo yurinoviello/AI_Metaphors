@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from grazie.api.client.endpoints import GrazieApiGatewayUrls
 from grazie.api.client.gateway import AuthType, GrazieAgent, GrazieApiGatewayClient
 
+from ai_metaphors.config_arg_parser import ConfigArgumentParser
 from ai_metaphors.providers.avatar_provider import AvatarProvider
 from ai_metaphors.providers.grazie_provider import GrazieProvider
 from ai_metaphors.providers.manim_provider import ManimProvider
@@ -18,7 +19,12 @@ from ai_metaphors.utils.text_utils import extract_content, extract_json
 
 
 def parse_arguments() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Process term name, term definition, and metaphor.")
+    parser = ConfigArgumentParser(description="Process term name, term definition, and metaphor.")
+    parser.add_argument(
+        "--config",
+        type=str,
+        help="Config file from which other arguments will be read. If not set, the arguments will be read from the command line."
+    )
     parser.add_argument(
         "--use-dataset-example",
         type=int,

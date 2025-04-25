@@ -137,23 +137,24 @@ Run the script with the following arguments:
 ai-metaphors [OPTIONS]
 ```
 
-| **Option**                 | **Type** | **Description**                                                                                                                                     |
-|----------------------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
-| `--use-dataset-example`    | `int`    | Use an example from the dataset (index between 0 and 13). Set `-1` to disable. Default is `-1`.                                                     |
-| `--term-name`              | `str`    | The name of the term (required if `use-dataset-example` is not set).                                                                                |
-| `--term-definition`        | `str`    | Definition of the term (required).                                                                                                                  |
-| `--metaphor`               | `str`    | The metaphor associated with the term. If `--generate-metaphor` is set, this will be ignored.                                                       |
-| `--generate-metaphor-text` | `flag`   | Flag to generate the metaphor automatically.                                                                                                        |
-| `--animation-type`         | `str`    | Type of animation to generate: `basic` (default, simple animation), `voice` (adds voice-over), or `avatar` (adds animated avatar with voice-over).  |
-| `--bin-directory`          | `str`    | Path to the executable for Manim. Default is `.venv/bin`.                                                                                           |
-| `--working-dir`            | `str`    | Working directory for Manim output. Default: `./animations`.                                                                                        |
-| `--model`                  | `str`    | Language model to process with. Default: `openai-gpt-4o`.                                                                                           |
-| `--model-manim`            | `str`    | LLM to process only the Manim script. Default: `default`.                                                                                           |
-| `--temperature`            | `float`  | Temperature value to be used by the chosen language model. Default: `0.1`.                                                                          |
-| `--vllm-fix`               | `flag`   | **Experimental** Perform an automatic vLLM analysis and code correction.                                                                            |
-| `--auto-play`              | `flag`   | Automatically play the animation at the end of the execution.                                                                                       |
-| `--high-quality`           | `flag`   | Generate a high-quality animation (1080p60). If not set, the default is 480p15.                                                                     |
-| `--debug`                  | `flag`   | Activate debug mode.                                                                                                                                |
+| **Option**                 | **Type** | **Description**                                                                                                                                    |
+|----------------------------|----------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `--use-dataset-example`    | `int`    | Use an example from the dataset (index between 0 and 13). Set `-1` to disable. Default is `-1`.                                                    |
+| `--term-name`              | `str`    | The name of the term (required if `use-dataset-example` is not set).                                                                               |
+| `--term-definition`        | `str`    | Definition of the term (required).                                                                                                                 |
+| `--metaphor`               | `str`    | The metaphor associated with the term. If `--generate-metaphor` is set, this will be ignored.                                                      |
+| `--generate-metaphor-text` | `flag`   | Flag to generate the metaphor automatically.                                                                                                       |
+| `--animation-type`         | `str`    | Type of animation to generate: `basic` (default, simple animation), `voice` (adds voice-over), or `avatar` (adds animated avatar with voice-over). |
+| `--bin-directory`          | `str`    | Path to the executable for Manim. Default is `.venv/bin`.                                                                                          |
+| `--working-dir`            | `str`    | Working directory for Manim output. Default: `./animations`.                                                                                       |
+| `--model`                  | `str`    | Language model to process with. Default: `openai-gpt-4o`.                                                                                          |
+| `--model-manim`            | `str`    | LLM to process only the Manim script. Default: `default`.                                                                                          |
+| `--temperature`            | `float`  | Temperature value to be used by the chosen language model. Default: `0.1`.                                                                         |
+| `--vllm-fix`               | `flag`   | **Experimental** Perform an automatic vLLM analysis and code correction.                                                                           |
+| `--auto-play`              | `flag`   | Automatically play the animation at the end of the execution.                                                                                      |
+| `--high-quality`           | `flag`   | Generate a high-quality animation (1080p60). If not set, the default is 480p15.                                                                    |
+| `--debug`                  | `flag`   | Activate debug mode.                                                                                                                               |
+| `--config`                 | `str`    | Path to the config file from which other arguments will be read. If not provided, the arguments will be read from the command line.                 |
 ### Example Usage
 
 1. **With Manually Provided Inputs**:
@@ -189,7 +190,20 @@ ai-metaphors [OPTIONS]
    | 12    | `reversed`            |
    | 13    | `shuffled`            |
 
+### Configuration File
 
+You can use a YAML configuration file to set default values for command-line arguments. This is useful for:
+- Saving commonly used settings
+- Setting up different configurations for different use cases
+- Sharing configurations with others
+
+A sample configuration file is provided at `config/config.yaml` in the project directory.
+
+**Usage with Configuration File**:
+```bash
+# Use a specific configuration file
+ai-metaphors --config config/config.yaml
+```
 ---
 
 ## **Output**
