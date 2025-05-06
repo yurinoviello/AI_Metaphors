@@ -9,8 +9,10 @@ from dotenv import load_dotenv
 from grazie.api.client.endpoints import GrazieApiGatewayUrls
 from grazie.api.client.gateway import AuthType, GrazieAgent, GrazieApiGatewayClient
 
+from ai_metaphors.providers.avatar_provider import AvatarProvider
 from ai_metaphors.providers.grazie_provider import GrazieProvider
 from ai_metaphors.providers.manim_provider import ManimProvider
+from ai_metaphors.utils.manim_type import ManimType
 from ai_metaphors.utils.path_utils import process_bin_directory, process_temperature, process_working_dir
 from ai_metaphors.utils.text_utils import extract_content, extract_json
 
@@ -27,7 +29,15 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--term-definition", help="Definition of the term")
     parser.add_argument("--metaphor", help="Metaphor associated with the term")
     parser.add_argument("--generate-metaphor-text", action="store_true", help="Flag to generate the metaphor")
-    parser.add_argument("--add-voice", action="store_true", help="Flag to add voice feature to the animation")
+    parser.add_argument(
+        "--animation-type",
+        choices=['basic', 'voice', 'avatar'],
+        default='basic',
+        help="""Type of animation to generate:
+            basic  - generates simple animation without voice or avatar
+            voice  - adds voice-over to the animation
+            avatar - adds animated avatar with voice-over""",
+    )
     parser.add_argument(
         "--bin-directory",
         type=process_bin_directory,
@@ -109,6 +119,15 @@ def parse_arguments() -> argparse.Namespace:
             raise ValueError("Metaphor must not be empty if not generating it.")
     if args.vllm_fix:
         args.high_quality = False
+    match args.animation_type:
+        case "basic":
+            args.manim_type = ManimType.DEFAULT
+        case "voice":
+            args.manim_type = ManimType.VOICE
+        case "avatar":
+            args.manim_type = ManimType.AVATAR
+        case _:
+            raise ValueError("Invalid animation type")
     return args
 
 
@@ -118,6 +137,8 @@ def animate_term(
     metaphor: str,
     one_line_metaphor: str,
     model_manim: str,
+    manim_type: ManimType,
+    working_dir: Path
 ):
     grazie_provider = manim_provider.grazie_provider
     # Creating classes
@@ -136,6 +157,11 @@ def animate_term(
 
     if model_manim != "default":
         grazie_provider.change_model(model_manim)
+
+    # Creating avatar
+    if manim_type == ManimType.AVATAR:
+        AvatarProvider(working_dir=working_dir, description=desc, term_name=term["value"]).generate_avatar_and_break_into_frames()
+
     # Creating code
     manim_code = grazie_provider.get_manim(
         term,
@@ -157,7 +183,7 @@ def metaphor_generation(
     term_definition: str,
     metaphor: str,
     generate_metaphor_text: bool,
-    add_voice: bool,
+    manim_type: ManimType,
     bin_directory: Path,
     working_dir: Path,
     model: str,
@@ -175,7 +201,7 @@ def metaphor_generation(
         auth_type=AuthType.USER,
     )
 
-    grazie_provider = GrazieProvider(client, model=model, temperature=temperature, add_voice=add_voice)
+    grazie_provider = GrazieProvider(client, model=model, temperature=temperature, manim_type=manim_type)
 
     logging.info("Term Name: %s", term_name)
     logging.info("Term Definition: %s", term_definition)
@@ -195,7 +221,7 @@ def metaphor_generation(
         high_quality=high_quality,
         auto_play=auto_play,
     )
-    animate_term(manim_provider, term, metaphor, one_line_metaphor, model_manim)
+    animate_term(manim_provider, term, metaphor, one_line_metaphor, model_manim, manim_type, working_dir)
 
     logging.info("Current token usage: %d", grazie_provider.num_tokens)
     logging.info("Current token usage: %f $", 5 / 1_000_000 * grazie_provider.num_tokens)
@@ -227,7 +253,7 @@ def main() -> str:
         term_definition=args.term_definition,
         metaphor=args.metaphor,
         generate_metaphor_text=args.generate_metaphor_text,
-        add_voice=args.add_voice,
+        manim_type=args.manim_type,
         bin_directory=args.bin_directory,
         working_dir=args.working_dir,
         model=args.model,

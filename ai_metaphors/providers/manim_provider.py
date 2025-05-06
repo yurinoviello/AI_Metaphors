@@ -139,6 +139,7 @@ class ManimProvider:
 
         with Path(self.script_path).open() as f:
             manim_script = self.grazie_provider.request_static_refinement(
+                term=self.term,
                 code=f.read(),
                 runtime_error=error,
                 static_error=static_errors,

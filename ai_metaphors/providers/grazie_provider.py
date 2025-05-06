@@ -9,6 +9,7 @@ from grazie.api.client.profiles import LLMProfile
 from openai import OpenAI
 import tiktoken
 
+from ai_metaphors.utils.manim_type import ManimType
 from ai_metaphors.utils.text_utils import wrap_keyword
 
 SYSTEM_PROMPT_METAPHOR = "ai_metaphors/prompts/metaphors/SystemPromptMetaphor.txt"
@@ -24,13 +25,10 @@ SYSTEM_PROMPT_DESCRIPTION = "ai_metaphors/prompts/manim/SystemPromptDescription.
 USER_PROMPT_DESCRIPTION = "ai_metaphors/prompts/manim/UserPromptDescription.txt"
 
 SYSTEM_PROMPT_MANIM = "ai_metaphors/prompts/manim/SystemPromptManim.txt"
-SYSTEM_PROMPT_MANIM_VOICE = "ai_metaphors/prompts/manim-voice/SystemPromptManim.txt"
 SYSTEM_PROMPT_MANIM_NO_DESC = "ai_metaphors/prompts/manim/SystemPromptManimNoDesc.txt"
-SYSTEM_PROMPT_MANIM_NO_DESC_VOICE = "ai_metaphors/prompts/manim-voice/SystemPromptManimNoDesc.txt"
 USER_PROMPT_MANIM = "ai_metaphors/prompts/manim/UserPromptManim.txt"
 
 SYSTEM_PROMPT_REFINE = "ai_metaphors/prompts/manim/SystemPromptRefineManim.txt"
-SYSTEM_PROMPT_REFINE_VOICE = "ai_metaphors/prompts/manim-voice/SystemPromptRefineManim.txt"
 USER_PROMPT_REFINE = "ai_metaphors/prompts/manim/UserPromptRefineManim.txt"
 
 SYSTEM_EVALUATE_VIDEO_PROMPT = "ai_metaphors/prompts/validate/SystemEvaluateVideo.txt"
@@ -50,11 +48,11 @@ class GrazieProvider:
     :param temperature: A float that determines the randomness of the model's output. Defaults to 0.0.
     """
 
-    def __init__(self, client: GrazieApiGatewayClient, model: str, temperature: float, add_voice: bool) -> None:
+    def __init__(self, client: GrazieApiGatewayClient, model: str, temperature: float, manim_type: ManimType) -> None:
         self.client = client
         self.model = model
         self.temperature = temperature
-        self.add_voice = add_voice
+        self.manim_type = manim_type
         self.tokenizer = tiktoken.get_encoding("cl100k_base")
         self.num_tokens = 0
 
@@ -154,11 +152,12 @@ class GrazieProvider:
         instructions: str = "",
     ) -> str:
         if instructions != "":
-            sys_prompt = SYSTEM_PROMPT_MANIM_VOICE if self.add_voice else SYSTEM_PROMPT_MANIM
             return self.__safe_call(
-                system_prompt=Path(sys_prompt)
+                system_prompt=Path(SYSTEM_PROMPT_MANIM)
                 .read_text()
                 .format(
+                    example_code=self.manim_type.value.get_example_code(),
+                    start_code=self.manim_type.value.get_start_code(term["value"]),
                     SVGs=svg,
                 ),
                 user_prompt=Path(USER_PROMPT_MANIM)
@@ -174,9 +173,14 @@ class GrazieProvider:
                     },
                 ),
             )
-        sys_prompt = SYSTEM_PROMPT_MANIM_NO_DESC_VOICE if self.add_voice else SYSTEM_PROMPT_MANIM_NO_DESC
         return self.__safe_call(
-            system_prompt=Path(sys_prompt).read_text(),
+            system_prompt=Path(SYSTEM_PROMPT_MANIM_NO_DESC)
+            .read_text()
+            .format(
+                example_code=self.manim_type.value.get_example_code(),
+                start_code=self.manim_type.value.get_start_code(term["value"]),
+                SVGs=svg,
+            ),
             user_prompt=Path(USER_PROMPT_DESCRIPTION)
             .read_text()
             .format_map(
@@ -190,12 +194,12 @@ class GrazieProvider:
             ),
         )
 
-    def request_static_refinement(self, code: str, runtime_error: str, static_error: str, svg: str) -> str:
-        sys_prompt = SYSTEM_PROMPT_REFINE_VOICE if self.add_voice else SYSTEM_PROMPT_REFINE
+    def request_static_refinement(self, term: dict, code: str, runtime_error: str, static_error: str, svg: str) -> str:
         return self.__safe_call(
-            system_prompt=Path(sys_prompt)
+            system_prompt=Path(SYSTEM_PROMPT_REFINE)
             .read_text()
             .format(
+                start_code=self.manim_type.value.get_start_code(term["value"]),
                 SVGs=svg,
             ),
             user_prompt=Path(USER_PROMPT_REFINE)

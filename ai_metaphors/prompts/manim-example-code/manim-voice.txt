@@ -1,0 +1,10 @@
+from manim import *
+from manim_voiceover import *
+from math import *
+
+class GenScene(VoiceoverScene):
+    def construct(self):
+        # Create a circle of color BLUE
+        c = Circle(color=BLUE)
+        # Play the animation of creating the circle
+        self.play(Create(c))

@@ -35,18 +35,9 @@ The animation must be very detailed, more complex animations are always better
 # Code Context
 
 The following is an example of the code:
-\`\`\`
-from manim import *
-from math import *
-
-class GenScene(Scene):
-    def construct(self):
-        # Create a circle of color BLUE
-        c = Circle(color=BLUE)
-        # Play the animation of creating the circle
-        self.play(Create(c))
-
-\`\`\`
+```
+{example_code}
+```
 
 ## Rules of programming
 
@@ -78,75 +69,7 @@ This is needed to understand what you meant to do.
 
 9. Start with this code that already defines a lot of useful functions (remember to include it in your generated code):
 ```
-from manim import *
-
-class GenScene(Scene):
-    def remove_everything(self: Scene):
-        """
-        :param self: A Scene object containing all the mobjects to be removed.
-        :return: None
-        """
-        if len(self.mobjects) > 0:
-            self.play(*[FadeOut(mob) for mob in self.mobjects])
-        return
-
-
-    def start_end_scene(self: Scene, title: str):
-        """
-        :param seld: The Scene object where the animations and visual elements are rendered.
-        :type seld: Scene
-        :param title: The title text to be displayed at the start/end of the scene.
-        :type title: str
-        :return: None. Performs visual operations in the given scene and then exits.
-        :rtype: None
-        """
-        # Clean the scene
-        self.remove_everything()
-
-        # Define the title and the logo
-        title = Text(
-            title,
-            color=WHITE,
-            font_size=40,
-        )
-        logo = ImageMobject("ai_metaphors/resources/JetBrains-logo.png").scale(0.3).next_to(title, DOWN)
-
-        # Display the title and the logo
-        self.play(Write(title))
-        self.play(FadeIn(logo))
-        # Leave them on the screen for 2 seconds
-        self.wait(2)
-
-        # Remove everything from the scene
-        self.remove_everything()
-
-        return
-    def describe_scene(self: Scene, text: str):
-        """
-        :param self: The Scene object where animations and transitions will be played.
-        :param text: A string representing the description text to display on the scene.
-        :return: None
-        """
-
-        description = Text(
-            text,
-            color=WHITE,
-            font_size=24,
-        ).to_edge(UP)
-
-        self.play(Write(description))
-        self.wait(2)
-        self.play(FadeOut(description))
-
-        return
-
-
-    def construct(self):
-        self.start_end_scene("ONELINEMETAPHOR")
-
-        # TODO
-
-        self.start_end_scene("Thanks for watching!")
+{start_code}
 ```
 
 

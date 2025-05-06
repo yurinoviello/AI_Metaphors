@@ -1,0 +1,32 @@
+from dataclasses import dataclass
+from enum import Enum
+from pathlib import Path
+
+@dataclass
+class ManimConfig:
+    _start_code: Path
+    _example_code: Path
+
+    def __init__(self, start_code: str, example_code: str):
+        self._start_code = Path(start_code)
+        self._example_code = Path(example_code)
+
+    def get_start_code(self, term_name: str) -> str:
+        return self._start_code.read_text().format_map(SafeDict(term_name=term_name))
+
+    def get_example_code(self) -> str:
+        return self._example_code.read_text()
+
+
+class ManimType(Enum):
+    DEFAULT = ManimConfig("ai_metaphors/prompts/manim-start-code/manim.txt",
+                          "ai_metaphors/prompts/manim-example-code/manim.txt")
+    VOICE = ManimConfig("ai_metaphors/prompts/manim-start-code/manim-voice.txt",
+                        "ai_metaphors/prompts/manim-example-code/manim-voice.txt")
+    AVATAR = ManimConfig("ai_metaphors/prompts/manim-start-code/manim-avatar.txt",
+                         "ai_metaphors/prompts/manim-example-code/manim.txt")
+
+
+class SafeDict(dict):
+    def __missing__(self, key):
+        return '{' + key + '}'
