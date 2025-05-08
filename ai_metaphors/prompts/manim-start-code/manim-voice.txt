@@ -1,6 +1,16 @@
 from manim import *
 from manim_voiceover import *
 
+"""This file already contains helpers that keep the narrator speaking for the entire duration of each scene.
+
+1. Create one (or more) *scene‑builder* functions inside ``construct``.
+   Each function receives the ``scene`` object (``self``) and must call Manim ``play``/``wait``/``add`` commands that build that part of the animation.
+2. Call ``self.narrate(<voice‑over text>, <builder>)`` for each scene in the desired order.
+3. Use ``self.say_caption(text, wait_time)`` for short on‑screen explanations.
+
+Intro and outro titles are handled automatically by ``start_end_scene``.
+"""
+
 class GenScene(VoiceoverScene):
     def remove_everything(self):
         """
@@ -45,29 +55,75 @@ class GenScene(VoiceoverScene):
 
         return
 
-    def describe_scene(self, text: str):
+    def describe_scene(self, caption: str):
         """
         :param self: The Scene object where animations and transitions will be played.
-        :param text: A string representing the description text to display on the scene.
+        :param caption: A string representing the description text to display on the scene.
         :return: None
         """
         self.set_speech_service(OpenAIService())
         description = Text(
-            text,
+            caption,
             color=WHITE,
             font_size=24,
         ).to_edge(UP)
 
-        with self.voiceover(text=text) as _:
-            self.play(Write(description))
-            self.wait(2)
-            self.play(FadeOut(description))
+        self.play(Write(description))
+        self.wait(2)
+        self.play(FadeOut(description))
         return
 
+    def narrate(self, narration_text: str, builder):
+        """Speak *narration_text* while *builder* builds the visuals.
+        Parameters
+        ----------
+        self : GenScene
+            The current Manim scene in which animations are rendered.
+        narration_text : str
+            The exact text the narrator will read **during** the animations defined in *builder*. Extract it from the description as it is.
+        builder : Callable[["GenScene"], None]
+            A function that receives the scene as its only argument and issues Manim commands (``play``, ``wait``, etc.) to build the part of the animation that corresponds to *narration_text*.
+            The *voice‑over* context is kept open for the whole duration of this function, so the narration spans all its animations.
 
+        Returns
+        -------
+        Any
+            Whatever *builder* returned (often a mobject or a tuple/dict of
+            mobjects).
+
+        Example
+        -------
+        >>> mailboxes = self.narrate("voice‑over", build_map)
+        >>> # *mailboxes* can now be reused in later scenes
+        """
+
+        self.set_speech_service(OpenAIService())
+        with self.voiceover(text=narration_text):
+            result = builder(self)
+        self.wait(2)
+        return result
+
+    # ------------------------------------------------------------------
+    # Entry point for the LLM‑generated content
+    # ------------------------------------------------------------------
     def construct(self):
+        # Intro title (one‑line metaphor) -------------------------------
         self.start_end_scene("ONELINEMETAPHOR")
 
-        # TODO
+        # ---------------- Example scaffold ----------------------------
+        # The LLM should replace / extend the following placeholders.
 
+        def scene1(scene: "GenScene"):
+            """Builder for the first part of the animation."""
+            # TODO: generated Manim commands (scene.play, scene.add, …)
+            # Use scene.say_caption("short explanation") when needed.
+            pass
+
+        mobjects_names = self.narrate("VOICEOVER FOR SCENE 1", scene1)
+
+        # -- Add further scenes in the same pattern --------------------
+        # def scene2(scene): ...
+        # self.narrate("VOICEOVER FOR SCENE 2", scene2)
+
+        # Outro --------------------------------------------------------
         self.start_end_scene("Thanks for watching!")
