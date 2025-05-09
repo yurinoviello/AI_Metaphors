@@ -35,13 +35,11 @@ class GenScene(VoiceoverScene):
         )
         logo = ImageMobject("ai_metaphors/resources/JetBrains-logo.png").scale(0.3).next_to(title, DOWN)
 
-        self.set_speech_service(OpenAIService())
-        with self.voiceover(text=title.text) as _:
-            # Display the title and the logo
-            self.play(Write(title))
-            self.play(FadeIn(logo))
-            # Leave them on the screen for 2 seconds
-            self.wait(2)
+        # Display the title and the logo
+        self.play(Write(title))
+        self.play(FadeIn(logo))
+        # Leave them on the screen for 2 seconds
+        self.wait(2)
 
         # Remove everything from the scene
         self.remove_everything()
@@ -49,20 +47,35 @@ class GenScene(VoiceoverScene):
         return
 
 
-    def play_with_avatar(self, text: str, *animations: Animation | Mobject):
-        self.set_speech_service(OpenAIService())
+    def play_scene_with_voice(self, text: str, *animations):
+        """
+        Plays the given animations while narrating the provided text and displaying an animated avatar.
 
+        Parameters
+        ----------
+        self : GenScene
+            The current Manim scene in which animations are rendered.
+        text : str
+            The narration text to be spoken using a voiceover and accompanied by avatar animation.
+        *animations
+            A sequence of Manim animations to play in sync with the narration.
+
+        """
         with open("animations/avatar/{term_name}/phrases.json", "r", encoding="utf-8") as f:
             data = json.load(f)
-            text_dir = data.get(text)
+            text_index = data.get(text)
 
-        frames_folder = f"animations/avatar/{term_name}/{{text_dir}}/avatar_frames"
+        # Exit if no matching avatar is found for the text
+        if text_index is None:
+            return
+
+        frames_folder = f"animations/avatar/{term_name}/avatar_video_{{text_index}}/avatar_frames"
         frame_files = sorted([
             os.path.join(frames_folder, f)
             for f in os.listdir(frames_folder)
             if f.endswith(".png")
         ])
-        frame_images = [ImageMobject(f).scale(0.2).to_corner(DL, 0) for f in frame_files]
+        frame_images = [ImageMobject(f).to_corner(DL, 0) for f in frame_files]
         frames_count = len(frame_images)
         avatar = frame_images[0]
         self.add(avatar)
@@ -74,10 +87,11 @@ class GenScene(VoiceoverScene):
 
         avatar.add_updater(update_avatar)
 
+        self.set_speech_service(OpenAIService())
         with self.voiceover(text=text) as vt:
             self.play(
                 frame_tracker.animate.increment_value(frames_count),
-                *animations,
+                Succession(*animations),
                 run_time=vt.duration,
                 rate_func=linear
             )
@@ -86,8 +100,7 @@ class GenScene(VoiceoverScene):
         self.play(FadeOut(avatar))
         return
 
-
-    def describe_scene(self, text: str):
+    def build_scene_description(self, text: str) -> list[Animation]:
         """
         :param self: The Scene object where animations and transitions will be played.
         :param text: A string representing the description text to display on the scene.
@@ -98,15 +111,32 @@ class GenScene(VoiceoverScene):
             color=WHITE,
             font_size=24,
         ).to_edge(UP)
+        return [
+            Write(description),
+            Wait(2),
+            FadeOut(description)
+        ]
 
-        self.play_with_avatar(text, Write(description))
-        self.play(FadeOut(description))
-        return
-
-
+    # ------------------------------------------------------------------
+    # Entry point for the LLM‑generated content
+    # ------------------------------------------------------------------
     def construct(self):
+        # Intro title (one‑line metaphor) -------------------------------
         self.start_end_scene("ONELINEMETAPHOR")
 
-        # TODO
+        # ---------------- Example ----------------------------
+        # The LLM should replace / extend the following placeholders.
 
+        def scene1(scene: "GenScene") -> list[Animation]:
+            """Builder for the first part of the animation."""
+            # TODO: return list of Manim animations (Create, Write, …)
+            pass
+
+        self.play_scene_with_voice("VOICEOVER FOR SCENE 1", *scene1(self))
+
+        # -- Add further scenes in the same pattern --------------------
+        # def scene2(scene): ...
+        # self.play_scene_with_voice("VOICEOVER FOR SCENE 2", *scene2(self))
+
+        # Outro --------------------------------------------------------
         self.start_end_scene("Thanks for watching!")

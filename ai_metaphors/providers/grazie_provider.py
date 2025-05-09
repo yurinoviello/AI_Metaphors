@@ -157,7 +157,7 @@ class GrazieProvider:
                 .read_text()
                 .format(
                     example_code=self.manim_type.value.get_example_code(),
-                    start_code=self.manim_type.value.get_start_code(term["value"]),
+                    start_code=self.manim_type.value.get_start_code(term["value"].replace(' ', '_')),
                     SVGs=svg,
                 ),
                 user_prompt=Path(USER_PROMPT_MANIM)
@@ -283,3 +283,12 @@ class GrazieProvider:
                 },
             ),
         )
+
+    def get_narration_audio(self, text: str, narration_audio_file: Path):
+        client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+        with client.audio.speech.with_streaming_response.create(
+            model="gpt-4o-mini-tts",
+            voice="coral",
+            input=text,
+        ) as response:
+            response.stream_to_file(narration_audio_file)
