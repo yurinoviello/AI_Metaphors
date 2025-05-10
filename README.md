@@ -61,7 +61,7 @@ To set up the project and install all dependencies using **Poetry**, follow thes
    git clone https://git.jetbrains.team/edu-research/AI_Metaphors.git
    cd AI_Metaphors
    ```
-   
+
 2. **Add the tokens to the local environment**
 
    Execute the following command to export the tokens in your shell.
@@ -172,7 +172,7 @@ ai-metaphors [OPTIONS]
    ai-metaphors --use-dataset-example 0
    ```
    You can use terms, metaphors, and definitions from this dataset:
-   
+
    | index | term                  |
    |-------|-----------------------|
    | 0     | `Boolean`             |
@@ -248,21 +248,19 @@ The script checks for:
 
    Note: Poetry authentication tokens are not needed for Docker setup.
 
-3. **Run with Docker Compose**:
+3. **Configure the application**:
+   Edit the `config/config.yaml` file to set your desired parameters.
+
+4. **Build and run with Docker Compose**:
    ```bash
-   docker compose run ai-metaphors -- [OPTIONS]
+   # Build the container
+   docker-compose build
+
+   # Run the application
+   docker-compose up
    ```
 
-   For example, to see available options:
-   ```bash
-   docker compose run ai-metaphors -- --help
-   ```
-
-   > ⚠️ **Important:**
-   > - Don't forget the `--` separator between Docker Compose commands and arguments for the app
-   > - The `--auto-play` flag is not supported when running with Docker Compose
-
-4. **Access Generated Content**:
+5. **Access Generated Content**:
    - Generated animations will be available in the `/animations` folder
    - This folder is mapped as a volume in [`docker-compose.yml`](docker-compose.yml)
 
@@ -270,9 +268,10 @@ Notes:
 - Make sure Docker and Docker Compose are installed on your system
 - The first run will take longer as it needs to build the container
 - All dependencies will be automatically installed in the container
+- All configuration is now done through the `config/config.yaml` file instead of command-line arguments
 
 **Development Notes**:
-- When making changes to the code, rebuild the container to ensure changes are included:
+- When making changes to the configuration or dependencies:
   ```bash
-  docker compose build --no-cache
+  docker-compose build --no-cache
   ```
