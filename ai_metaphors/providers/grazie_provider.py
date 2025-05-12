@@ -288,7 +288,7 @@ class GrazieProvider:
         client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         with client.audio.speech.with_streaming_response.create(
             model="gpt-4o-mini-tts",
-            voice="coral",
+            voice="sage",
             input=text,
         ) as response:
             response.stream_to_file(narration_audio_file)

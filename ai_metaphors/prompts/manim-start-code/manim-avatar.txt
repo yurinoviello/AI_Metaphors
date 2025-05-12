@@ -1,8 +1,44 @@
 import json
 import os
+import shutil
+from pathlib import Path
 
 from manim import *
 from manim_voiceover import *
+from manim_voiceover.services.base import SpeechService
+
+class PreGeneratedSpeechService(SpeechService):
+    """A SpeechService that retrieves pre-generated audio files instead of generating them."""
+
+    def generate_from_text(self, text: str, cache_dir: str = None, path: str = None) -> dict:
+        if cache_dir is None:
+            cache_dir = self.cache_dir
+
+        with open("animations/avatar/{term_name}/phrases.json", "r", encoding="utf-8") as f:
+            data = json.load(f)
+            text_index = data.get(text)
+
+        if text_index is None:
+            raise ValueError("Text not found in phrases.json")
+
+        audio_path = Path(f"animations/avatar/{term_name}/narration_audio/{{text_index}}.mp3")
+        if not audio_path.exists():
+            raise FileNotFoundError(f"Audio file not found: {{audio_path}}")
+
+        media_path = Path(cache_dir) / audio_path
+        media_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(audio_path, media_path)
+
+        return {{
+            "input_text": text,
+            "original_audio": str(audio_path),
+        }}
+
+    def _wrap_generate_from_text(self, text, **kwargs):
+        dict_ = self.generate_from_text(text, **kwargs)
+        dict_["final_audio"] = dict_["original_audio"]
+        return dict_
+
 
 class GenScene(VoiceoverScene):
     def remove_everything(self):
@@ -75,7 +111,7 @@ class GenScene(VoiceoverScene):
             for f in os.listdir(frames_folder)
             if f.endswith(".png")
         ])
-        frame_images = [ImageMobject(f).to_corner(DL, 0) for f in frame_files]
+        frame_images = [ImageMobject(f).scale(0.6).to_corner(DL, 0) for f in frame_files]
         frames_count = len(frame_images)
         avatar = frame_images[0]
         self.add(avatar)
@@ -87,7 +123,7 @@ class GenScene(VoiceoverScene):
 
         avatar.add_updater(update_avatar)
 
-        self.set_speech_service(OpenAIService())
+        self.set_speech_service(PreGeneratedSpeechService())
         with self.voiceover(text=text) as vt:
             self.play(
                 frame_tracker.animate.increment_value(frames_count),
@@ -132,11 +168,11 @@ class GenScene(VoiceoverScene):
             # TODO: return list of Manim animations (Create, Write, …)
             pass
 
-        self.play_scene_with_voice("VOICEOVER FOR SCENE 1", *scene1(self))
+        self.play_scene_with_voice("NARRATION TEXT FOR SCENE 1", *scene1(self))
 
         # -- Add further scenes in the same pattern --------------------
         # def scene2(scene): ...
-        # self.play_scene_with_voice("VOICEOVER FOR SCENE 2", *scene2(self))
+        # self.play_scene_with_voice("NARRATION TEXT FOR SCENE 2", *scene2(self))
 
         # Outro --------------------------------------------------------
         self.start_end_scene("Thanks for watching!")
