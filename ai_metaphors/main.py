@@ -22,6 +22,7 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument(
         "--use-dataset-example",
         type=int,
+        default=-1,
         choices=range(14),
         help="Index of the example in the dataset to use directly (0-13)",
     )
@@ -105,7 +106,7 @@ def parse_arguments() -> argparse.Namespace:
         help="Activate debug mode",
     )
     args = parser.parse_args()
-    if args.use_dataset_example is not None:
+    if args.use_dataset_example != -1:
         ds = datasets.load_from_disk("ai_metaphors/resources/subset")
         args.term_name = ds[args.use_dataset_example]["value"]
         args.term_definition = ds[args.use_dataset_example]["definition"]
