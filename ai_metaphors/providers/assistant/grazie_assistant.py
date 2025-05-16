@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from typing import List
 
 import attrs
@@ -27,6 +28,9 @@ class GrazieAssistant(LlmAssistant):
             grazie_jwt_token=os.getenv("GRAZIE_JWT_TOKEN"),
             auth_type=AuthType.USER,
         )
+
+    def get_narration_audio(self, text: str, narration_audio_file: Path):
+        raise NotImplementedError
 
     def _chat_message_list(self, messages: List[LlmAssistant.Message]):
         chat = ChatPrompt()

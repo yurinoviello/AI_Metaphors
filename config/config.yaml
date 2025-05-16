@@ -8,11 +8,11 @@ term_definition: null  # Uncomment and set to provide a default term definition
 metaphor: null  # Uncomment and set to provide a default metaphor
 
 # Dataset example (0-13), null to ignore
-use_dataset_example: -1
+use_dataset_example: 0
 
 # Generation options
 generate_metaphor_text: true
-animation_type: "basic"
+animation_type: "voice"
 
 # Directory settings
 bin_directory: "/usr/local/bin"
@@ -27,4 +27,4 @@ temperature: 0.1
 vllm_fix: false  # Perform automatic vllm analysis and code correction
 auto_play: false  # Automatically play the animation at the end of execution
 high_quality: false  # Generate high quality animation (1080p60p)
-debug: false  # Activate debug mode
+debug: true  # Activate debug mode

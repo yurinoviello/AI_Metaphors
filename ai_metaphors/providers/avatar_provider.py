@@ -5,7 +5,7 @@ import subprocess
 import shutil
 from pathlib import Path
 
-from ai_metaphors.providers.grazie_provider import GrazieProvider
+from ai_metaphors.providers.assistant.llm_assistant import LlmAssistant
 
 
 class AvatarProvider:
@@ -16,7 +16,7 @@ class AvatarProvider:
 
     _working_dir: Path
     _description: str
-    _grazie_provider: GrazieProvider
+    _llm_assistant: LlmAssistant
 
     _avatar_dir: Path
     _output_prefix: str = _AVATAR
@@ -28,10 +28,9 @@ class AvatarProvider:
     _float_model_dir: Path
     _phrases_mapping_dir: Path
 
-    def __init__(self, working_dir: Path, description: str, term: dict, grazie_provider: GrazieProvider):
+    def __init__(self, working_dir: Path, description: str, term: dict):
         self._working_dir = working_dir
         self._description = description
-        self._grazie_provider = grazie_provider
         self._avatar_dir = self._working_dir / self._AVATAR / term['value'].replace(' ', '_')
         if self._avatar_dir.exists():
             shutil.rmtree(self._avatar_dir)
@@ -56,7 +55,7 @@ class AvatarProvider:
 
     def _generate_narration_audio(self, step: str, text: str) -> Path:
         file = self._narration_audio_dir / f"{step}.mp3"
-        self._grazie_provider.get_narration_audio(text, file)
+        self._llm_assistant.get_narration_audio(text, file)
         logging.info("Narration audio created for %s step", step)
         return file
 
