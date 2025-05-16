@@ -1,5 +1,4 @@
 import argparse
-import ast
 import json
 import logging
 import os
@@ -148,7 +147,7 @@ def animate_term(
     model_manim: str,
     manim_type: ManimType,
     working_dir: Path
-):
+) -> Path:
     grazie_provider = manim_provider.grazie_provider
     # Creating classes
     classes = grazie_provider.get_classes(term, metaphor, manim_provider.svg)
@@ -178,19 +177,19 @@ def animate_term(
     )
     logging.info("Manim code created")
 
-    # Creating avatar
-    if manim_type == ManimType.AVATAR:
-        narration_text = get_narration_text(desc)
-        AvatarProvider(
-            working_dir=working_dir,
-            description=desc,
-            term=term,
-            grazie_provider=grazie_provider,
-        ).generate_avatar_and_break_into_frames(narration_text)
-
     # Execution
     logging.info("Execution...")
-    manim_provider.write_and_run_python(manim_code)
+    movie_path = manim_provider.write_and_run_python(manim_code)
+
+    # Creating avatar
+    if manim_type == ManimType.AVATAR:
+        movie_path = AvatarProvider(
+            working_dir=working_dir,
+            narration_audio_dir=manim_provider.movie_dir,
+            term=term,
+            grazie_provider=grazie_provider,
+        ).generate_avatar_and_attach_to_movie()
+    return movie_path
 
 
 def get_narration_text(description: str) -> list[str]:
@@ -240,7 +239,7 @@ def metaphor_generation(
         high_quality=high_quality,
         auto_play=auto_play,
     )
-    animate_term(manim_provider, term, metaphor, one_line_metaphor, model_manim, manim_type, working_dir)
+    movie_path = animate_term(manim_provider, term, metaphor, one_line_metaphor, model_manim, manim_type, working_dir)
 
     logging.info("Current token usage: %d", grazie_provider.num_tokens)
     logging.info("Current token usage: %f $", 5 / 1_000_000 * grazie_provider.num_tokens)
@@ -260,7 +259,7 @@ def metaphor_generation(
         logging.info("Execution...")
         manim_provider.write_and_run_python(video_refined_code)
 
-    return manim_provider.script_path
+    return str(movie_path)
 
 
 def main() -> str:

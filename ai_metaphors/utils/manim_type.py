@@ -23,8 +23,8 @@ class ManimType(Enum):
                           "ai_metaphors/prompts/manim-example-code/manim.txt")
     VOICE = ManimConfig("ai_metaphors/prompts/manim-start-code/manim-voice.txt",
                         "ai_metaphors/prompts/manim-example-code/manim-voice.txt")
-    AVATAR = ManimConfig("ai_metaphors/prompts/manim-start-code/manim-avatar.txt",
-                         "ai_metaphors/prompts/manim-example-code/manim.txt")
+    AVATAR = ManimConfig("ai_metaphors/prompts/manim-start-code/manim-voice.txt",
+                        "ai_metaphors/prompts/manim-example-code/manim-voice.txt")
 
 
 class SafeDict(dict):

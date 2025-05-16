@@ -49,7 +49,8 @@ class ManimProvider:
         self.media_dir = self.working_dir / "media"
         self.media_dir.mkdir(parents=True, exist_ok=True)
 
-        self.movie_file = self.media_dir / "videos" / f"{term['value'].replace(' ', '_')}" / "480p15" / "GenScene.mp4"
+        video_quality_folder = "480p15" if high_quality else "1080p60"
+        self.movie_dir = self.media_dir / "videos" / f"{term['value'].replace(' ', '_')}" / video_quality_folder
 
         self.log_dir = self.working_dir / "logs"
         self.log_dir.mkdir(parents=True, exist_ok=True)
@@ -91,13 +92,13 @@ class ManimProvider:
 
         error = self.execute_manim_script()
         if error == "success":
-            return
+            return self.movie_dir / "GenScene.mp4"
 
         for _ in range(MAX_TRIES):
             logging.info("Execution...")
             error = self.refine_code_with_static_analysis(error)
             if error == "success":
-                return
+                return self.movie_dir / "GenScene.mp4"
         raise RuntimeError("Cannot execute Manim script")
 
     def execute_manim_script(self) -> str:

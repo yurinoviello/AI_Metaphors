@@ -22,7 +22,7 @@ class GenScene(VoiceoverScene):
         return
 
 
-    def start_end_scene(self, title: str):
+    def start_end_scene(self, title_text: str):
         """
         :param self: The Scene object where the animations and visual elements are rendered.
         :type self: Scene
@@ -35,11 +35,24 @@ class GenScene(VoiceoverScene):
         self.remove_everything()
 
         # Define the title and the logo
-        title = Text(
-            title,
-            color=WHITE,
-            font_size=40,
-        )
+        if len(title_text) > 49:
+            words = title_text.split()
+            half_string_len = len(words) // 2
+            first_half =  words[:half_string_len]
+            second_half = words[half_string_len:]
+            title = Paragraph(
+                ' '.join(first_half) + "\n" + " ".join(second_half),
+                color=WHITE,
+                font_size=40,
+                line_spacing=1,
+                alignment='center'
+            )
+        else:
+            title = Text(
+                title_text,
+                color=WHITE,
+                font_size=40,
+            )
         logo = ImageMobject("ai_metaphors/resources/JetBrains-logo.png").scale(0.3).next_to(title, DOWN)
 
         self.set_speech_service(OpenAIService())
