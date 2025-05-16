@@ -182,7 +182,7 @@ def animate_term(
     movie_path = manim_provider.write_and_run_python(manim_code)
 
     # Creating avatar
-    if manim_type == ManimType.AVATAR:
+    if manim_type is ManimType.AVATAR:
         movie_path = AvatarProvider(
             working_dir=working_dir,
             narration_audio_dir=manim_provider.movie_dir,

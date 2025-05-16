@@ -54,13 +54,13 @@ class AvatarProvider:
 
     def _attach_avatar_to_movie(self):
         movie_file = self._narration_audio_dir / "GenScene.mp4"
-        audio_file = self._narration_audio_dir / "GenScene.wav"
+        avatar_file = self._avatar_dir / f"Avatar.mp4"
         output_path = self._narration_audio_dir / "GenScene_with_avatar.mp4"
         try:
             subprocess.run([
                 "ffmpeg",
                 "-i", str(movie_file),
-                "-i", str(audio_file),
+                "-i", str(avatar_file),
                 "-filter_complex", "[1:v]scale=300:300[overlay]; [0:v][overlay]overlay=1:main_h-300-1[out]",
                 "-map", "[out]",
                 "-map", "0:a",

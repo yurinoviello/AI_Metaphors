@@ -65,7 +65,9 @@ class ConfigArgumentParser(argparse.ArgumentParser):
         """
         parsed_args = super().parse_args(args, namespace)
 
-        if self._config_flag_attr in parsed_args:
+
+        config_flag_attr = getattr(parsed_args, self._config_flag_attr, None)
+        if config_flag_attr is not None:
             self._config_path = Path(getattr(parsed_args, self._config_flag_attr))
 
         if self._config_path is not None:

@@ -49,8 +49,9 @@ class ManimProvider:
         self.media_dir = self.working_dir / "media"
         self.media_dir.mkdir(parents=True, exist_ok=True)
 
-        video_quality_folder = "480p15" if high_quality else "1080p60"
+        video_quality_folder = "480p15" if not high_quality else "1080p60"
         self.movie_dir = self.media_dir / "videos" / f"{term['value'].replace(' ', '_')}" / video_quality_folder
+        print(self.movie_dir)
 
         self.log_dir = self.working_dir / "logs"
         self.log_dir.mkdir(parents=True, exist_ok=True)
