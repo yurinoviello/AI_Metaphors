@@ -1,5 +1,0 @@
-Topic to explain:
-```{topic}``` : ```{definition}```
-
-Metaphor to animate:
-```{metaphor}```

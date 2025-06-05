@@ -1,23 +1,12 @@
 import argparse
-import ast
-import json
 import logging
-import os
-import re
-from pathlib import Path
-
 import datasets
-from dotenv import load_dotenv
-from grazie.api.client.endpoints import GrazieApiGatewayUrls
-from grazie.api.client.gateway import AuthType, GrazieAgent, GrazieApiGatewayClient
 
 from ai_metaphors.config_arg_parser import ConfigArgumentParser
-from ai_metaphors.providers.avatar_provider import AvatarProvider
-from ai_metaphors.providers.grazie_provider import GrazieProvider
-from ai_metaphors.providers.manim_provider import ManimProvider
-from ai_metaphors.utils.manim_type import ManimType
-from ai_metaphors.utils.path_utils import process_bin_directory, process_temperature, process_working_dir
-from ai_metaphors.utils.text_utils import extract_content, extract_json
+from ai_metaphors.core.processors.metaphor_processor import MetaphorProcessor
+from ai_metaphors.core.utils.manim_type import ManimType
+from ai_metaphors.video_from_term.providers.term_prompt_provider import TermPromptProvider
+from ai_metaphors.core.utils.path_utils import process_bin_directory, process_temperature, process_working_dir
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -140,138 +129,20 @@ def parse_arguments() -> argparse.Namespace:
     return args
 
 
-def animate_term(
-    manim_provider: ManimProvider,
-    term: dict,
-    metaphor: str,
-    one_line_metaphor: str,
-    model_manim: str,
-    manim_type: ManimType,
-    working_dir: Path
-):
-    grazie_provider = manim_provider.grazie_provider
-    # Creating classes
-    classes = grazie_provider.get_classes(term, metaphor, manim_provider.svg)
-    logging.info("Classes created")
-    classes_dict = extract_json(classes)
-    with manim_provider.classes_file.open(mode="w", encoding="utf-8") as json_file:
-        json.dump(classes_dict, json_file, indent=4)
-    logging.info("Classes extracted")
-
-    # Creating description
-    desc = grazie_provider.get_description(term, metaphor, one_line_metaphor, str(classes_dict))
-    with manim_provider.description_file.open(mode="w", encoding="utf-8") as text_file:
-        text_file.write(desc)
-    logging.info("Description created")
-
-    if model_manim != "default":
-        grazie_provider.change_model(model_manim)
-
-    # Creating code
-    manim_code = grazie_provider.get_manim(
-        term,
-        metaphor,
-        one_line_metaphor,
-        str(classes_dict),
-        manim_provider.svg,
-        desc,
-    )
-    logging.info("Manim code created")
-
-    # Creating avatar
-    if manim_type == ManimType.AVATAR:
-        narration_text = get_narration_text(desc)
-        AvatarProvider(
-            working_dir=working_dir,
-            description=desc,
-            term=term,
-            grazie_provider=grazie_provider,
-        ).generate_avatar_and_break_into_frames(narration_text)
-
-    # Execution
-    logging.info("Execution...")
-    manim_provider.write_and_run_python(manim_code)
-
-
-def get_narration_text(description: str) -> list[str]:
-    return re.findall(r'\*\*Narrator\*\*:\s*```(.*?)```', description, re.DOTALL)
-
-
-def metaphor_generation(
-    term_name: str,
-    term_definition: str,
-    metaphor: str,
-    generate_metaphor_text: bool,
-    manim_type: ManimType,
-    bin_directory: Path,
-    working_dir: Path,
-    model: str,
-    model_manim: str,
-    temperature: float,
-    vllm_fix: bool,
-    auto_play: bool,
-    high_quality: bool,
-) -> str:
-    load_dotenv()
-    client = GrazieApiGatewayClient(
-        grazie_agent=GrazieAgent(name="grazie-api-gateway-client-readme", version="dev"),
-        url=GrazieApiGatewayUrls.STAGING,
-        grazie_jwt_token=os.getenv("GRAZIE_JWT_TOKEN"),
-        auth_type=AuthType.USER,
-    )
-
-    grazie_provider = GrazieProvider(client, model=model, temperature=temperature, manim_type=manim_type)
-
-    logging.info("Term Name: %s", term_name)
-    logging.info("Term Definition: %s", term_definition)
-    term = {"value": term_name, "definition": term_definition}
-
-    if generate_metaphor_text:
-        metaphor = extract_content(grazie_provider.get_metaphor(term))
-    logging.info("Metaphor: %s", metaphor)
-
-    one_line_metaphor = extract_content(grazie_provider.get_one_line_metaphor(term, metaphor))
-    logging.info("One-line Metaphor: %s", one_line_metaphor)
-    manim_provider = ManimProvider(
-        grazie_provider=grazie_provider,
-        term=term,
-        bin_directory=bin_directory,
-        working_dir=working_dir,
-        high_quality=high_quality,
-        auto_play=auto_play,
-    )
-    animate_term(manim_provider, term, metaphor, one_line_metaphor, model_manim, manim_type, working_dir)
-
-    logging.info("Current token usage: %d", grazie_provider.num_tokens)
-    logging.info("Current token usage: %f $", 5 / 1_000_000 * grazie_provider.num_tokens)
-
-    if vllm_fix and manim_provider.validate_video():
-        video_analysis = manim_provider.evaluate_video()
-        logging.info("Evaluation complete")
-        logging.info("Video Evaluation: %s", video_analysis)
-
-        video_refined_code = grazie_provider.request_video_refinement(
-            instructions=manim_provider.description_file.read_text(),
-            code=manim_provider.script_path.read_text(),
-            errors_explanation=video_analysis,
-            svg=manim_provider.svg,
-        )
-
-        logging.info("Execution...")
-        manim_provider.write_and_run_python(video_refined_code)
-
-    return manim_provider.script_path
-
-
-def main() -> str:
+def main():
     args = parse_arguments()
     if args.debug:
         logging.basicConfig(level=logging.INFO)
-    return metaphor_generation(
-        term_name=args.term_name,
-        term_definition=args.term_definition,
+    if args.term_name is not None:
+        term = {"value": args.term_name, "definition": args.term_definition}
+        prompt_provider = TermPromptProvider(term, args.manim_type)
+        subject_id = args.term_name.replace(' ', '_')
+    else:
+        raise ValueError("No matching pipeline")
+    MetaphorProcessor(
+        subject_id=subject_id,
+        prompt_provider=prompt_provider,
         metaphor=args.metaphor,
-        generate_metaphor_text=args.generate_metaphor_text,
         manim_type=args.manim_type,
         bin_directory=args.bin_directory,
         working_dir=args.working_dir,
@@ -281,7 +152,7 @@ def main() -> str:
         vllm_fix=args.vllm_fix,
         auto_play=args.auto_play,
         high_quality=args.high_quality,
-    )
+    ).generate_video()
 
 
 if __name__ == "__main__":

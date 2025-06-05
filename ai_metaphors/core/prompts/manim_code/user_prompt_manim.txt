@@ -1,0 +1,13 @@
+{input_data}
+
+Metaphor to animate:
+```{metaphor}```
+
+One line metaphor:
+```{one_line_metaphor}```
+
+Elements:
+```{classes}```
+
+Detailed instructions:
+```{instructions}```

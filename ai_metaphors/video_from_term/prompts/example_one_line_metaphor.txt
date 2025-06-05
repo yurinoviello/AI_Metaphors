@@ -1,0 +1,10 @@
+Example input:
+Computer Science Topic:
+```Boolean```
+Description:
+```A data type that has one of two possible values (usually denoted true and false) intended to represent the two truth values of logic and Boolean algebra.```
+Detailed Metaphor:
+```Imagine a light switch in your room. This switch can only be in one of two positions: ON or OFF. - When the switch is ON, the light is shining (true). - When the switch is OFF, the light is not shining (false). In programming, a Boolean is like this light switch. It can only be in one of two states: true (ON) or false (OFF). Just as the light switch controls whether the light is on or off, a Boolean controls whether a condition is true or false.```
+
+Example output:
+```Boolean is a Light Switch.```

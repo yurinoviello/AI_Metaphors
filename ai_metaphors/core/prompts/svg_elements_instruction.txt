@@ -1,0 +1,12 @@
+Also, you already have your own library of already defined SVGs elements!
+This is the list of Elements that you can use:
+```
+{SVGs}
+```
+
+If you need to use one of this SVG, you need to use the class `SVGMobject`. e.g.
+```element = SVGMobject('~/path/to/File.svg', height=2)```
+When you use these SVGs ALWAYS write the exact full path indicated above; otherwise it will raise and exception.
+AVoid to change the color of SVGs files.
+Understand if you need an object or not by the file-name.
+If the filename of the SVG does not correspond to your element name, create the element by yourself.

@@ -1,6 +1,6 @@
 import unittest
 
-from ai_metaphors.utils import text_utils
+from ai_metaphors.core.utils import text_utils
 
 
 class TestUtilsExtractContent(unittest.TestCase):

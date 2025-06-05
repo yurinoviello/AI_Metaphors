@@ -1,0 +1,7 @@
+Small sentences are better, long sentences usually go out of the box.
+Avoid creating a lot of text, dialogue must be short and concise.
+Few words sentences are better than a lot of words.
+
+NEVER use Code manim object, we do not to display any code snippet.
+
+The animation must be very detailed, more complex animations are always better

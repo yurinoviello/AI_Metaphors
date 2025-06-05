@@ -1,0 +1,22 @@
+Given {input_description} and a metaphor associated with it, perform the following tasks:
+
+**Element Extraction and Manim Class Implementation**: For each element or character involved in the metaphor:
+
+   - **Name**: Provide the name of the element.
+   - **Role**: Describe the role of the element in the metaphor.
+   - **Actions**: List the actions performed by the element.
+   - **Code**: Write a Python class using Manim that visually represents the element, including necessary attributes and methods corresponding to their described actions.
+
+**Output Format:**
+
+{output_format}
+
+**Consider the following example:**
+
+{example}
+
+** Additional instructions: **
+
+{svg_instructions}
+
+Escape any special characters like backslashes (\) and double quotes (").

@@ -1,0 +1,17 @@
+Present the extracted elements in a single JSON format with the following structure:
+
+```json
+{
+  "elements": [
+    {
+      "name": "ElementName",
+      "role": "Description of the role",
+      "actions": ["Action 1", "Action 2", "..."],
+      "code": "Python code for the element"
+    }
+    // ... additional elements
+  ]
+}
+```
+
+Your response should include the JSON-formatted output with each element's details and its corresponding Python code.
