@@ -1,0 +1,16 @@
+You must manage all SVG graphics as follows:
+
+1. Primary source — predefined assets
+   • Inspect the list of existing SVG filenames given by {SVGs}.
+   • The “concept keyword” is the topic string received from the user prompt (case‐insensitive).
+   • A file is suitable only if its name (without “.svg”) is very related to the concept keyword.
+   • If one or more suitable filenames are found, pick the best match (typically `<keyword>_icon.svg`) and load it.
+     ```python
+     element = SVGMobject(f"{SVG_directory}/chosen_filename.svg", height=desired_height)
+     ```
+
+2. Fallback source — new SVG creation
+   • If no suitable file in {SVGs} was found, you are responsible to use graphics directly from generated classes. You MUST use one from classes code, and not try to create new graphics. Be also responsible to use original try-except construction to load SVG (and if none was found, load it in except section).
+
+Escape backslashes (`\`) and double quotes (`"`). Ensure every SVG loads without errors via `SVGMobject`.
+The resulting illustration should be immediately **recognizable** (no guesswork) yet visually **clean and balanced**.
