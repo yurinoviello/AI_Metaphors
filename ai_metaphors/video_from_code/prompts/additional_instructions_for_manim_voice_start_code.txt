@@ -1,0 +1,10 @@
+    def get_code(self, code_text: str):
+       """To highlight a line, you can access to the line i with code.code_lines[i].
+       then set color YELLOW to highlight and WHITE to reset it back."""
+
+       return Code(
+                    code_string=code_text,
+                    tab_width=4,
+                    background="rectangle",
+                    language="Python",
+                    ).scale(0.8).to_edge(LEFT, buff=0.75)

@@ -1,6 +1,8 @@
 import logging
 from pathlib import Path
 import subprocess
+import re
+import json
 
 from ai_metaphors.core.providers.grazie_provider import GrazieProvider
 from ai_metaphors.core.utils.image_utils import extract_key_frames
@@ -54,6 +56,11 @@ class ManimProcessor:
 
         self._media_dir = working_dir / "media"
         self._media_dir.mkdir(parents=True, exist_ok=True)
+
+        video_resolution = "1080p60" if self._high_quality else "480p15"
+        self.movie_dir = self._media_dir / "videos" / subject_id / video_resolution
+        self._movie_file = self.movie_dir / "GenScene.mp4"
+        self._section_file = self.movie_dir / "sections" / "GenScene.json"
 
         self._log_dir = working_dir / "logs"
         self._log_dir.mkdir(parents=True, exist_ok=True)
@@ -110,6 +117,7 @@ class ManimProcessor:
             "-p" if self._auto_play else None,
             "-qh" if self._high_quality else "-ql",
             self.script_path,
+            "--save_sections",
             "--media_dir",
             self._media_dir,
             "--log_dir",
@@ -124,6 +132,7 @@ class ManimProcessor:
         errors = process.stderr
 
         if process.returncode == 0:
+            self.split_animation()
             return "success"
         return errors
 
@@ -170,3 +179,70 @@ class ManimProcessor:
             instructions=self.description_file.read_text(),
             images=key_frames,
         )
+
+    def split_animation(self) -> None:
+        if not self._section_file.exists():
+            logging.error("Section file %s not found - skipping split.", self._section_file)
+            return
+
+        if not self._movie_file.exists():
+            logging.error("Movie file %s not found - cannot split.", self._movie_file)
+            return
+
+        # Helper: turn an arbitrary section title into a safe file-name
+        def _sanitize(name: str) -> str:
+            return re.sub(r"[^0-9A-Za-z._-]+", "_", name.strip()) or "section"
+
+        try:
+            sections = json.loads(self._section_file.read_text(encoding="utf-8"))
+        except Exception as exc:                             # noqa: BLE001
+            logging.error("Cannot read sections JSON: %s - cannot split.", exc)
+            return
+
+        sections_dir = self._section_file.parent
+        sections_dir.mkdir(parents=True, exist_ok=True)
+
+        # Remove all .mp4 files in the output directory
+        for file in sections_dir.glob("*.mp4"):
+            try:
+                file.unlink()
+                logging.info("Deleted %s", file.name)
+            except Exception as exc:
+                logging.error("Failed to delete %s: %s - cannot split.", file.name, exc)
+
+        width = max(2, len(str(len(sections) - 1)))
+
+        start_time = 0.0
+        for index, section in enumerate(sections):
+            try:
+                duration = float(section["duration"])
+            except (KeyError, ValueError):
+                logging.error("Section %s has no valid duration – skipping.", section)
+                continue
+
+            title = section.get("name", f"sec_{index}")
+            safe_title = _sanitize(title)
+            target = sections_dir / f"{index:0{width}d}_{safe_title}.mp4"
+
+            ffmpeg_cmd = [
+                "ffmpeg",
+                "-y",                                   # overwrite if exists
+                "-ss", f"{start_time:.3f}",             # seek to start time
+                "-i", str(self._movie_file),
+                "-t",  f"{duration:.3f}",               # exact length
+                "-c",  "copy",                          # stream copy
+                str(target),
+            ]
+
+            try:
+                subprocess.run(
+                    ffmpeg_cmd,
+                    check=True,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.STDOUT,
+                )
+                logging.info("Wrote %s", target.name)
+            except subprocess.CalledProcessError as exc:
+                logging.error("FFmpeg failed for section %s (%s): %s", index, title, exc)
+
+            start_time += duration

@@ -1,0 +1,485 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+    flex-direction: column;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 20px;
+    width: 80%;
+}
+
+h1 {
+    grid-column: span 2;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.iteration-control {
+    grid-column: span 2;
+    text-align: center;
+}
+
+.iteration-control button {
+    margin: 5px;
+}
+
+.input-control {
+    grid-column: span 2;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.input-control label {
+    margin-right: 10px;
+}
+
+.input-control input {
+    padding: 5px;
+    font-size: 16px;
+    width: 60px;
+    text-align: center;
+}
+
+.code-window, .visual-window, .memory-window {
+    flex: 1;
+    margin: 10px;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    height: 450px;
+    
+}
+
+
+.code-window h3, .visual-window h3, .memory-window h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.code-window pre {
+    text-align: left;
+    margin: 0;
+}
+
+.code-window span {
+    display: inline;
+    padding: 0 0;
+}
+
+.highlight-arrow {
+    stroke: red !important;
+}
+
+.highlight-text {
+    fill: red !important;
+    color: red !important;
+}
+
+
+.highlight {
+    background-color: yellow;
+    border: 3px solid #ff6a00;
+    
+}
+
+pre, code {
+    font-size: 18px; /* Increase font size as needed */
+    line-height: 2; /* Optional: Improve readability with increased line height */
+    font-family: 'Courier New', Courier, monospace; /* Ensure it's a monospaced font */
+}
+
+pre {
+    text-align: left; /* Aligns text to the left */
+    margin: 0; /* Removes default margin */
+    padding: 10px 0; /* Removes default padding */
+}
+
+.visual-window {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.memory-window {
+    grid-column: span 2;
+    text-align: center;
+}
+
+.memory-block {
+    display: flex;
+    align-items: center;
+    margin: 10px;
+}
+
+.variable-name {
+    background-color: lightblue;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #000000; /* Yellow border */
+}
+
+.variable-name-hl {
+    background-color: yellow;
+    outline: 3px solid #ff6a00;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.pointer {
+    width: 30px;
+    height: 2px;
+    background-color: black;
+    margin: 0 10px;
+    position: relative;
+}
+
+.pointer::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent transparent black;
+}
+
+.memory-value {
+    background-color: #e8e8e8;
+    border: 1px solid rgb(0, 0, 0);
+    border-radius: 5px;
+    padding: 10px;
+    min-width: 40px;
+    text-align: center;
+}
+
+button {
+    margin-left: 5px;
+    padding: 2px 5px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none;
+}
+
+#interactive-element {
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+.light-blue {
+    background-color: lightblue !important;
+}
+
+.visual-window {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#visual {
+    display: grid;
+    grid-template-columns: repeat(12, 50px);
+    grid-gap: 5px;
+}
+
+.visual-box {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #ccc;
+    background-color: #ffe;
+    border-radius: 5px;
+    position: relative;
+}
+
+.visual-box.light-blue {
+    background-color: lightblue;
+}
+
+.nested-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.inner-list {
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+}
+
+.list-index {
+    background-color: lightblue;
+    padding: 5px;
+    border-radius: 5px;
+    margin-right: 5px;
+}
+.index-value {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: small;
+    color: gray;
+}
+
+.visual-box {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #ccc;
+    background-color: #ffe;
+    border-radius: 5px;
+    position: relative;
+    margin: 5px;
+}
+
+
+.visual-title {
+    text-align: center; /* Center the title horizontally */
+    margin: 0; /* Remove any default margin */
+    position: absolute;
+    top: 20px; /* Pin the title to the top */
+    width: 100%;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.highlight-box {
+    background-color: lightblue;
+}
+
+.index-value {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: small;
+    color: gray;
+}
+
+.visual-window {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    
+    
+   
+}
+
+.arrow {
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 20px solid black; /* Changed from border-top to border-bottom */
+    position: absolute;
+    bottom: -25px; /* Position the arrow outside the box */
+}
+
+
+
+
+
+
+
+.nested-list {
+    display: flex;
+    align-items: center;
+}
+
+.variable-name {
+    background-color: #e8e8e8;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-right: 10px;
+    position: relative;
+}
+
+.arrow-right {
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 10px solid black;
+    margin-right: 10px;
+    position: relative;
+}
+
+.list-container {
+    display: flex;
+    align-items: center;
+    background-color: rgb(255, 255, 255);
+    border: 3px solid #cc0;
+    padding: 5px 10px;
+    border-radius: 5px;
+    position: relative;
+}
+
+.index-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 5px;
+    position: relative;
+}
+
+.list-index {
+    background-color: #c9c9c9;
+    border: 1px solid #000000;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.arrow-down {
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 10px solid black;
+    margin: 5px 0;
+}
+
+.list-value {
+    background-color: #e8e8e8;
+    padding: 5px 10px;
+    border: 1px solid rgb(0, 0, 0);
+    border-radius: 5px;
+    position: relative;
+    margin-top: 5px;
+}
+
+
+
+
+
+
+
+.highlight-item {
+    background-color: #ffff99; /* Light yellow highlight */
+    border: 3px solid #ff6a00;
+}
+
+
+
+
+
+
+.highlight-item-index {
+    background-color: yellow; /* Light yellow highlight */
+    border: 3px solid #ff6a00; /* Yellow border */
+}
+
+
+
+
+
+.variable {
+    font-family: 'Courier New', Courier, monospace; /* Example font */
+    color:#ff6a00
+}
+
+.step-explanation {
+    background-color: #e4edef;
+    color: #000000;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+button {
+    background-color: #ffffff; /* Green background */
+    border: none; /* Remove borders */
+    color: rgb(0, 0, 0); /* White text */
+    padding: 10px 20px; /* Add some padding */
+    text-align: center; /* Center the text */
+    text-decoration: none; /* Remove underline */
+    display: inline-block; /* Get the buttons to align properly */
+    font-size: 16px; /* Increase font size */
+    font-weight: bold;
+    margin: 4px 2px; /* Add some margin */
+    cursor: pointer; /* Pointer/hand icon */
+    border-radius: 12px; /* Rounded corners */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    transition: 0.3s; /* Smooth transitions */
+    outline: 2px solid rgba(0, 0, 0, 0.2); /* Add outline */
+}
+
+button:hover {
+    background-color: #bdd5d7; /* Darker green on hover */
+}
+
+button:active {
+    background-color: #e4edef; /* Even darker when clicked */
+    box-shadow: 0 2px #666; /* Reduce shadow when clicked */
+    transform: translateY(2px); /* Move button down on click */
+}
+
+
+#table-container {
+    position: absolute;
+    bottom: 0px; /* Adjust the distance from the bottom */
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+#table-image {
+    width: 700px; /* Adjust the size of the table image */
+    height: 100px;
+    bottom: 0px;
+}
+
+#hats-container {
+    position: absolute;
+    bottom: 20px; /* Distance from the bottom of the window */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Space between the hats */
+}
+
+#hats-container img {
+    width: 110px; /* Adjust the size of each hat */
+    height: auto;
+}
+
+.hat-item {
+    display: flex;
+    flex-direction: column; /* Stack the image and text vertically */
+    align-items: center; /* Center the text under the image */
+    gap: 15px;
+}
+

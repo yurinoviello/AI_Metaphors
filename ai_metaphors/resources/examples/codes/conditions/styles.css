@@ -1,0 +1,131 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+    flex-direction: column;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+h1 {
+    grid-column: span 2;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.iteration-control {
+    grid-column: span 2;
+    text-align: center;
+}
+
+.iteration-control button {
+    margin: 5px;
+}
+
+.code-window, .visual-window, .memory-window {
+    flex: 1;
+    margin: 10px;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.code-window h3, .visual-window h3, .memory-window h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.highlight {
+    background-color: yellow;
+    outline: 3px solid #ff6a00;
+    outline-offset: 3px;
+}
+
+.step-explanation {
+    background-color: #e4edef;
+    color: #000000;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+.variable {
+    font-family: 'Courier New', Courier, monospace; /* Example font */
+    color:#ff6a00
+}
+
+
+pre, code {
+    font-size: 18px; /* Increase font size as needed */
+    line-height: 1.5; /* Optional: Improve readability with increased line height */
+    font-family: 'Courier New', Courier, monospace; /* Ensure it's a monospaced font */
+}
+
+pre {
+    text-align: left; /* Aligns text to the left */
+    margin: 0; /* Removes default margin */
+    padding: 0; /* Removes default padding */
+}
+
+#analogy-description {
+    /* background-color: #f9f9f9; */
+    background-color: #eef7f9;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    max-width: 300px;
+    max-height: 450px;
+    
+    font-size: 14px;
+    line-height: 1.6;
+    
+    /* Center vertically */
+   /*position: absolute;*/
+    position: relative;
+    /* top: 50%;
+    left: 50%; */
+    transform: translate(0%, 10%);
+}
+
+button {
+    background-color: #ffffff; /* Green background */
+    border: none; /* Remove borders */
+    color: rgb(0, 0, 0); /* White text */
+    padding: 10px 20px; /* Add some padding */
+    text-align: center; /* Center the text */
+    text-decoration: none; /* Remove underline */
+    display: inline-block; /* Get the buttons to align properly */
+    font-size: 16px; /* Increase font size */
+    font-weight: bold;
+    margin: 4px 2px; /* Add some margin */
+    cursor: pointer; /* Pointer/hand icon */
+    border-radius: 12px; /* Rounded corners */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    transition: 0.3s; /* Smooth transitions */
+    outline: 2px solid rgba(0, 0, 0, 0.2); /* Add outline */
+}
+
+button:hover {
+    background-color: #bdd5d7; /* Darker green on hover */
+}
+
+button:active {
+    background-color: #e4edef; /* Even darker when clicked */
+    box-shadow: 0 2px #666; /* Reduce shadow when clicked */
+    transform: translateY(2px); /* Move button down on click */
+}

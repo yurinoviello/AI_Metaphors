@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summing 1D List</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Summing 1D List</h1>
+    <div class="step-explanation" id="step-explanation"></div>
+    <div class="container">
+        <div class="code-window">
+            <h3>Code</h3>
+            <pre id="code">
+                <code><span id="line1">total = 0</span>
+                <span id="line2">lst = [2, 4, 6, 8]</span>
+                <span id="line3">for i in range(len(lst)): <button onclick="showQuestion('range')">?</button></span>
+                <span id="line4">    total += lst[i] <button onclick="showQuestion('increment')">?</button></span></code>
+            </pre>
+        </div>
+        <div class="memory-window">
+            <h3>Memory</h3>
+            <div id="memory">
+                <div class="memory-block" id="memory-total">
+                    <div class="variable-name">total <button onclick="showInfo('total')">i</button></div>
+                    <div class="pointer"></div>
+                    <div class="memory-value" id="memory-total-value">0</div>
+                </div>
+                <div class="memory-block" id="memory-i">
+                    <div class="variable-name">i <button onclick="showInfo('i')">i</button></div>
+                    <div class="pointer"></div>
+                    <div class="memory-value" id="memory-i-value">0</div>
+                </div>
+                <div class="memory-block" id="memory-lst">
+                    <div class="variable-name">lst <button onclick="showInfo('lst')">i</button></div>
+                    <div class="pointer"></div>
+                    <div class="nested-list" id="memory-lst-value">
+                        <div class="inner-list">
+                                <div>[2, 4, 6, 8]</div>
+                        </div>
+                    </div>
+                </div>                
+            </div>
+        </div>
+        <div class="visual-window">
+            <h3>Visual</h3>
+            <div id="visual"></div>
+        </div>
+    </div>
+    <div class="visual-box">
+    <div class="lined-paper">
+      <div class="list-item">
+        <div class="index">1.</div>
+        <div class="value">2</div>
+      </div>
+      <div class="list-item">
+        <div class="index">2.</div>
+        <div class="value">4</div>
+      </div>
+      <div class="list-item">
+        <div class="index">3.</div>
+        <div class="value">6</div>
+      </div>
+      <div class="list-item">
+        <div class="index">4.</div>
+        <div class="value">8</div>
+      </div>
+    </div>
+  </div>
+    <div id="interactive-element" class="hidden">
+        <div id="question"></div>
+        <button onclick="hideInteractive()">Close</button>
+    </div>
+    <div class="iteration-control">
+        <button onclick="decrementLoop()">Previous Iteration</button>
+        <span id="iteration-info">Iteration i = 0</span>
+        <button onclick="incrementLoop()">Next Iteration</button>
+        <button onclick="runAllIterations()">Run All Iterations</button>
+        <button onclick="resetLoop()">Reset</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -79,9 +79,13 @@ class PromptProvider(ABC):
     def get_system_prompt_description(self) -> str:
         return self._SYSTEM_PROMPT_DESCRIPTION_TEMPLATE.read_text().format_map(
             SafeDict(
-                input_explanation=self._get_input_explanation()
+                input_explanation=self._get_input_explanation(),
+                additional_guidelines=self._get_additional_guidelines_for_description()
             )
         )
+
+    def _get_additional_guidelines_for_description(self) -> str:
+        return ""
 
     def get_user_prompt_description(self, metaphor: str, one_line_metaphor: str, classes: str) -> str:
         return self._USER_PROMPT_DESCRIPTION_TEMPLATE.read_text().format_map(
@@ -99,13 +103,19 @@ class PromptProvider(ABC):
                 input_explanation=self._get_input_explanation(),
                 additional_instructions=self._get_additional_instructions_for_manim_code(),
                 example_code=self._manim_type.value.get_example_code(),
-                start_code=self._manim_type.value.get_start_code(self._get_subject_name()),
+                start_code=self._manim_type.value.get_start_code(
+                    self._get_subject_name(),
+                    self._get_additional_methods_for_manim_voice_start_code()
+                ),
                 manim_library=self._get_manim_library_documentation(),
                 svg_instructions=self._get_svg_elements_instructions(svg)
             )
         )
 
     def _get_additional_instructions_for_manim_code(self) -> str:
+        return ""
+
+    def _get_additional_methods_for_manim_voice_start_code(self) -> str:
         return ""
 
     def get_user_prompt_manim(self, metaphor: str, one_line_metaphor: str, classes: str, instructions: str = "") -> str:
@@ -124,7 +134,10 @@ class PromptProvider(ABC):
             SafeDict(
                 SVGs=svg,
                 additional_instructions=self._get_additional_instructions_for_refine_manim(),
-                start_code=self._manim_type.value.get_start_code(self._get_subject_name()),
+                start_code=self._manim_type.value.get_start_code(
+                    self._get_subject_name(),
+                    self._get_additional_methods_for_manim_voice_start_code()
+                ),
                 manim_library=self._get_manim_library_documentation()
             )
         )

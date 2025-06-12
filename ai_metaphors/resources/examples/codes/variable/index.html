@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Assignment Visualization</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="script.js"></script>
+</head>
+<body>
+    <div class="step-explanation" id="step-explanation"></div>
+    <div class="container">
+        <div class="code-window">
+            <h3>Code</h3>
+            <pre id="code">
+    <code>
+<span id="line1">a = 5</span>
+<span id="line2">b = 6</span>
+<span id="line3">c = 7</span>
+<span id="line4">temp = a <button onclick="showQuestion('Why do we store \'a\' in temp?')">?</button></span>
+<span id="line5">a = b <button onclick="showQuestion('What if temp was not used here?')">?</button></span>
+<span id="line6">b = c</span>
+<span id="line7">c = temp</span></code>
+            </pre>
+        </div>
+        <div class="memory-window">
+            <h3>Memory Analogy</h3>
+            <svg id="memory" width="400" height="300"></svg>
+        </div>
+        <div class="visual-window">
+            <h3>Visual Analogy</h3>
+            <svg id="visual" width="400" height="300"></svg>
+        </div>
+    </div>
+    <div class="iteration-control">
+        <button onclick="decrementStep()">Previous Line</button>
+        <span id="step-info">Step 0</span>
+        <button onclick="incrementStep()">Next Line</button>
+        <button onclick="runAllSteps()">Run All Lines</button>
+        <button onclick="resetSteps()">Reset</button>
+    </div>
+    <div id="interactive-element" class="hidden">
+        <div id="question"></div>
+        <button onclick="hideInteractive()">Close</button>
+    </div>
+</body>
+</html>
