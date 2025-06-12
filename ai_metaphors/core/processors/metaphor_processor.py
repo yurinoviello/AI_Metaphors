@@ -101,11 +101,13 @@ class MetaphorProcessor:
             logging.info("One-line Metaphor: %s", self._one_line_story)
 
     def _generate_classes(self):
+        self._grazie_provider.change_model("anthropic-claude-4-sonnet")
         classes = self._grazie_provider.get_classes(self._story, self._manim_provider.svg)
         logging.info("Classes created")
         self._classes_dict = extract_json(classes)
         with self._manim_provider.classes_file.open(mode="w", encoding="utf-8") as json_file:
             json.dump(self._classes_dict, json_file, indent=4)
+        self._grazie_provider.change_model(self._model)
         logging.info("Classes extracted")
 
     def _generate_description(self):
