@@ -70,9 +70,25 @@ def parse_arguments() -> argparse.Namespace:
             "openai-o1",
             "anthropic-claude-3.5-sonnet",
             "anthropic-claude-3.7-sonnet",
+            "anthropic-claude-4-sonnet",
         ],
         default="openai-gpt-4o",
         help="LLM to be used for processing.",
+    )
+    parser.add_argument(
+        "--model-classes",
+        type=str,
+        choices=[
+            "default",
+            "openai-gpt-4o",
+            "openai-gpt4.5",
+            "openai-o1",
+            "anthropic-claude-3.5-sonnet",
+            "anthropic-claude-3.7-sonnet",
+            "anthropic-claude-4-sonnet",
+        ],
+        default="anthropic-claude-3.7-sonnet",
+        help="LLM to be used to create classes code, SVG graphics in particular",
     )
     parser.add_argument(
         "--model-manim",
@@ -84,6 +100,7 @@ def parse_arguments() -> argparse.Namespace:
             "openai-o1",
             "anthropic-claude-3.5-sonnet",
             "anthropic-claude-3.7-sonnet",
+            "anthropic-claude-4-sonnet",
         ],
         default="default",
         help="LLM to be used to process only the manim script",
@@ -194,6 +211,7 @@ def main():
         bin_directory=args.bin_directory,
         working_dir=args.working_dir,
         model=args.model,
+        model_classes=args.model_classes,
         model_manim=args.model_manim,
         temperature=args.temperature,
         vllm_fix=args.vllm_fix,
