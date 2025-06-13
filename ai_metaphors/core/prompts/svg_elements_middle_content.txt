@@ -1,25 +1,14 @@
-You must manage all SVG graphics as follows:
-
-Brand cues:
-	• Purple (30% usage): #654bff
-	• Light Green (30% usage): #00db81
-	• White (15% usage): #ffffff
-	• Black (15% usage): #000000
-	• You can also add other colors, but they should not dominate the image.
-
-PLEASE NOTE: You have to assign size for used SVGs dynamically. For example, during class generation you also have to realize what is the approximate size of the SVG will be in the animation!
-
-1. Primary source — predefined assets
-   • Before creating a new image, inspect the list of existing SVG filenames given by {SVGs}.
-   • The “concept keyword” is the topic string received from the user prompt (case‐insensitive).
-   • A file is suitable only if its name (without “.svg”) is very related to that concept keyword.
-   • If one or more suitable filenames are found, pick the best match (typically `<keyword>_icon.svg`) and load it:
-     ```python
-     element = SVGMobject(f"{SVG_directory}/chosen_filename.svg", height=desired_height)
-     ```
-
 2. Fallback — generate and save a new SVG asset.
   You are a top-tier IT company designer. You must generate SVG assets for animation.
+  Brand cues:
+	• Purple (30% usage): #654bff
+	• Light Green (30% usage): #00db81
+	• White (20% usage): #ffffff
+	• Black (10% usage): #000000 -- only as a supporting color, not as a main one in the element.
+	• You can also add other colors, but they should not dominate the image.
+
+  PLEASE NOTE: You have to assign size for used SVGs dynamically. For example, during class generation you also have to realize what is the approximate size of the SVG will be in the animation!
+
 
   # Your tasks:
     - Task 1: **Expand the Text Prompt**. The given prompt is terse and abstract. First, imagine what the final image should contain and rewrite the prompt in rich visual detail.
@@ -89,6 +78,3 @@ PLEASE NOTE: You have to assign size for used SVGs dynamically. For example, dur
 5. Directory hygiene
    • Re‐use existing files whenever they truly match to avoid duplicates.
    • Name new files concisely as `<concept>.svg` (lowercase, unique).
-
-Escape backslashes (`\`) and double quotes (`"`). Ensure every SVG loads without errors via `SVGMobject`.
-The resulting illustration should be immediately **recognizable** (no guesswork) yet visually **clean and balanced**.

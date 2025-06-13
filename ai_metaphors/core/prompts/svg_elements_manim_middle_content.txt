@@ -1,0 +1,2 @@
+2. Fallback source — new SVG creation
+   • If no suitable file in {SVGs} was found, you are responsible to use graphics directly from generated classes. You MUST use one from classes code, and not try to create new graphics. Be also responsible to use original try-except construction to load SVG (and if none was found, load it in except section).
