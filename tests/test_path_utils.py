@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from ai_metaphors.utils import path_utils
+from ai_metaphors.core.utils import path_utils
 
 
 class TestProcessExecutablePath(unittest.TestCase):
@@ -71,7 +71,7 @@ class TestProcessWorkingDir(unittest.TestCase):
 
             with (
                 self.subTest(non_existing_dir=non_existing_dir),
-                patch("ai_metaphors.utils.path_utils.logging.warning") as mock_warning,
+                patch("ai_metaphors.core.utils.path_utils.logging.warning") as mock_warning,
             ):
                 result = path_utils.process_working_dir(non_existing_dir)
 
