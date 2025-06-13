@@ -42,6 +42,7 @@ class MetaphorProcessor:
             bin_directory: Path,
             working_dir: Path,
             model: str,
+            model_classes: str,
             model_manim: str,
             temperature: float,
             vllm_fix: bool,
@@ -58,6 +59,8 @@ class MetaphorProcessor:
         self._story = metaphor
         self._term_type = term_type
         self._working_dir = working_dir
+        self._model = model
+        self._model_classes = model_classes
         self._model_manim = model_manim
         self._vllm_fix = vllm_fix
 
@@ -101,7 +104,7 @@ class MetaphorProcessor:
             logging.info("One-line Metaphor: %s", self._one_line_story)
 
     def _generate_classes(self):
-        self._grazie_provider.change_model("anthropic-claude-4-sonnet")
+        self._grazie_provider.change_model(self._model_classes)
         classes = self._grazie_provider.get_classes(self._story, self._manim_provider.svg)
         logging.info("Classes created")
         self._classes_dict = extract_json(classes)
