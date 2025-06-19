@@ -4,6 +4,8 @@ from pathlib import Path
 import re
 
 from ai_metaphors.avatar.processors.avatar_processor import AvatarProcessor
+from ai_metaphors.avatar.processors.cartoon_avatar_processor import CartoonAvatarProcessor
+from ai_metaphors.core.output_structure.output_structure import OutputStructure
 from ai_metaphors.core.providers.prompt_provider import PromptProvider
 from ai_metaphors.core.providers.grazie_provider import GrazieProvider
 from ai_metaphors.core.processors.manim_processor import ManimProcessor
@@ -12,7 +14,6 @@ from ai_metaphors.core.utils.text_utils import extract_json, extract_content
 
 
 class MetaphorProcessor:
-
     _subject_id: str
     _manim_type: ManimType
     _working_dir: Path
@@ -26,6 +27,8 @@ class MetaphorProcessor:
 
     _grazie_provider: GrazieProvider
     _manim_provider: ManimProcessor
+
+    _output_structure: OutputStructure
 
     def __init__(
             self,
@@ -67,6 +70,12 @@ class MetaphorProcessor:
             working_dir=self._working_dir,
             high_quality=high_quality,
             auto_play=auto_play,
+        )
+
+        self._output_structure = OutputStructure(
+            working_dir,
+            subject_id,
+            high_quality
         )
 
     def _generate_metaphor(self):
@@ -130,6 +139,16 @@ class MetaphorProcessor:
 
             self._manim_provider.write_and_run_python(video_refined_code)
 
+    def _add_cartoon_avatar(self):
+        if not self._manim_type == ManimType.CARTOON_AVATAR:
+            return
+        logging.info("Adding cartoon avatar...")
+        CartoonAvatarProcessor(
+            description=self._description,
+            one_line_metaphor=self._one_line_metaphor,
+            output_structure=self._output_structure
+        ).generate_video_with_avatar()
+
     def generate_video(self):
         self._generate_metaphor()
         self._generate_one_line_metaphor()
@@ -143,3 +162,4 @@ class MetaphorProcessor:
         logging.info("Current token usage: %f $", 5 / 1_000_000 * self._grazie_provider.num_tokens)
 
         self._refine_video()
+        self._add_cartoon_avatar()

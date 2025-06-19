@@ -25,7 +25,8 @@ class ManimType(Enum):
                         "ai_metaphors/core/prompts/manim_example_code/manim_voice.txt")
     AVATAR = ManimConfig("ai_metaphors/core/prompts/manim_start_code/manim_avatar.txt",
                          "ai_metaphors/core/prompts/manim_example_code/manim.txt")
-
+    CARTOON_AVATAR = ManimConfig("ai_metaphors/core/prompts/manim_start_code/manim_voice.txt",
+                                 "ai_metaphors/core/prompts/manim_example_code/manim_voice.txt")
 
 class SafeDict(dict):
     def __missing__(self, key):

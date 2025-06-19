@@ -15,4 +15,8 @@ COPY requirements.txt ./
 
 RUN pip install -r requirements.txt
 
+ENV NLTK_DATA=/usr/share/nltk_data
+RUN mkdir -p $NLTK_DATA && chmod -R 777 $NLTK_DATA
+RUN python -m nltk.downloader -d $NLTK_DATA averaged_perceptron_tagger_eng
+
 RUN mkdir -p /app/animations

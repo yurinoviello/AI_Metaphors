@@ -29,12 +29,13 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--generate-metaphor-text", action="store_true", help="Flag to generate the metaphor")
     parser.add_argument(
         "--animation-type",
-        choices=['basic', 'voice', 'avatar'],
+        choices=['basic', 'voice', 'avatar', 'cartoon-avatar'],
         default='basic',
         help="""Type of animation to generate:
             basic  - generates simple animation without voice or avatar
             voice  - adds voice-over to the animation
-            avatar - adds animated avatar with voice-over""",
+            avatar - adds animated avatar with voice-over
+            cartoon-avatar - adds animated avatar with voice-over and cartoon style""",
     )
     parser.add_argument(
         "--bin-directory",
@@ -124,8 +125,8 @@ def parse_arguments() -> argparse.Namespace:
             args.manim_type = ManimType.VOICE
         case "avatar":
             args.manim_type = ManimType.AVATAR
-        case _:
-            raise ValueError("Invalid animation type")
+        case "cartoon-avatar":
+            args.manim_type  = ManimType.CARTOON_AVATAR
     return args
 
 

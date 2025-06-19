@@ -53,6 +53,11 @@ You will receive the following information:
 * Include a **narrator text** in every scene. This text is read by a narrator during the animation execution, it helps to make clear the content of the animation.
   * It should be more descriptive of the **textual description**, but not too long. Ideally, the duration of the scene should coincide with the reading time of it.
   * Never create the narrator for the Start and End scenes, only in the middle ones.
+* Include *emotion tagged narrator text** in every scene. It's content is exactly the same as **narrator text**, but it also adds emotion tags. Always start the scene with an emotion.
+  * Supported emotions are: <happy>, <explain>, <rhetorical>, <sad>, <angry>, <confused>
+  * You can use the same emotions multiple times, example: ```<rhetorical> I wonder if this can be improved... <happy> It can be! <happy> This is how! <explain> For example, imagine...```
+  * Write the emotions wrapped in angle brackets.
+
 * Never use:
   * `Bubble`, `SpeechBubbles`, `ThoughtBubble`, or similar unsupported elements.
   * Zoom techniques or camera transitions — **focus on small, detailed, clear actions**.
@@ -80,5 +85,6 @@ Each step must follow this format:
 * **Exact positioning** (e.g., "top center", "left side", "below the box", etc.).
 * **Description text** with clear placement and timing.
 * **Narrator text** in this format: **Narrator**: ```text to read```
+* **Emotion tagged narrator text** in this format: **Narrator Emotions**: ```text with emotions tag to read```
 
 Use scene headers (like `#### Scene 1: ...`) to group related steps for clarity.
