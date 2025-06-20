@@ -27,12 +27,12 @@ class ManimProcessor:
     _grazie_provider: GrazieProvider
     _bin_directory: Path
     _auto_play: bool
-    _high_quality: bool
     _media_dir: Path
     _log_dir: Path
     _frames_dir: Path
     _MAX_TRIES = 10
 
+    high_quality: bool
     svg: str
     description_file: Path
     classes_file: Path
@@ -50,14 +50,14 @@ class ManimProcessor:
         self._grazie_provider = grazie_provider
         self._bin_directory = bin_directory
         self._auto_play = auto_play
-        self._high_quality = high_quality
+        self.high_quality = high_quality
 
         self.svg = "\n".join([f"'{svg.as_posix()}'" for svg in Path("ai_metaphors/resources/SVGs").iterdir()])
 
         self._media_dir = working_dir / "media"
         self._media_dir.mkdir(parents=True, exist_ok=True)
 
-        video_resolution = "1080p60" if self._high_quality else "480p15"
+        video_resolution = "1080p60" if self.high_quality else "480p15"
         self.movie_dir = self._media_dir / "videos" / subject_id / video_resolution
         self._movie_file = self.movie_dir / "GenScene.mp4"
         self._section_file = self.movie_dir / "sections" / "GenScene.json"
@@ -115,7 +115,7 @@ class ManimProcessor:
         command = [
             self._bin_directory / "manim",
             "-p" if self._auto_play else None,
-            "-qh" if self._high_quality else "-ql",
+            "-qh" if self.high_quality else "-ql",
             self.script_path,
             "--save_sections",
             "--media_dir",

@@ -37,12 +37,13 @@ def parse_arguments() -> argparse.Namespace:
     )
     parser.add_argument(
         "--animation-type",
-        choices=['basic', 'voice', 'avatar'],
+        choices=['basic', 'voice', 'avatar', 'postprocessing'],
         default='basic',
         help="""Type of animation to generate:
             basic  - generates simple animation without voice or avatar
             voice  - adds voice-over to the animation
-            avatar - adds animated avatar with voice-over""",
+            avatar - adds animated avatar with voice-over
+            postprocessing - adds animated avatar with voice-over with postprocessing (**Experimental**)""",
     )
     parser.add_argument(
         "--bin-directory",
@@ -134,10 +135,12 @@ def parse_arguments() -> argparse.Namespace:
     match args.animation_type:
         case "basic":
             args.manim_type = ManimType.DEFAULT
-        case "voice":
+        case "voice" | "postprocessing":
             args.manim_type = ManimType.VOICE
         case "avatar":
             args.manim_type = ManimType.AVATAR
+        case _:
+            raise ValueError(f"Unknown animation type: {args.animation_type}")
     return args
 
 
@@ -160,6 +163,7 @@ def main() -> None:
             prompt_provider = CodePromptProvider(term, args.manim_type)
     subject_id = args.term_name.replace(' ', '_')
 
+    is_post_processing_enabled = args.animation_type == 'postprocessing'
     MetaphorProcessor(
         subject_id=subject_id,
         prompt_provider=prompt_provider,
@@ -173,7 +177,9 @@ def main() -> None:
         vllm_fix=args.vllm_fix,
         auto_play=args.auto_play,
         high_quality=args.high_quality,
+        enable_post_processing=is_post_processing_enabled,
     ).generate_video()
+
 
 
 if __name__ == "__main__":

@@ -4,6 +4,7 @@ from pathlib import Path
 import re
 
 from ai_metaphors.avatar.processors.avatar_processor import AvatarProcessor
+from ai_metaphors.avatar.processors.avatar_postprocessor import AvatarPostProcessor
 from ai_metaphors.core.providers.prompt_provider import PromptProvider
 from ai_metaphors.core.providers.grazie_provider import GrazieProvider
 from ai_metaphors.core.processors.manim_processor import ManimProcessor
@@ -40,7 +41,8 @@ class MetaphorProcessor:
             temperature: float,
             vllm_fix: bool,
             auto_play: bool,
-            high_quality: bool
+            high_quality: bool,
+            enable_post_processing: bool
     ) -> None:
         if not bin_directory.exists():
             raise ValueError(f"bin_directory does not exist: {bin_directory}")
@@ -53,6 +55,7 @@ class MetaphorProcessor:
         self._working_dir = working_dir
         self._model_manim = model_manim
         self._vllm_fix = vllm_fix
+        self._enable_post_processing = enable_post_processing
 
         self._grazie_provider = GrazieProvider(
             model=model,
@@ -130,6 +133,18 @@ class MetaphorProcessor:
 
             self._manim_provider.write_and_run_python(video_refined_code)
 
+
+    def _post_process(self):
+        if self._enable_post_processing:
+            logging.info("Post-processing...")
+            AvatarPostProcessor(
+                self._working_dir,
+                self._manim_provider.movie_dir,
+                self._subject_id,
+                self._manim_provider.high_quality
+            ).generate_avatar_and_attach_to_movie()
+            logging.info("Post-processing complete")
+
     def generate_video(self):
         self._generate_metaphor()
         self._generate_one_line_metaphor()
@@ -143,3 +158,5 @@ class MetaphorProcessor:
         logging.info("Current token usage: %f $", 5 / 1_000_000 * self._grazie_provider.num_tokens)
 
         self._refine_video()
+
+        self._post_process()
