@@ -5,15 +5,14 @@ from ai_metaphors.core.utils.manim_type import ManimType, SafeDict
 
 
 class PromptProvider(ABC):
-
-    _LANGUAGE="Python"
+    _LANGUAGE = "Python"
     _BASE_PATH: Path = Path("ai_metaphors/core/prompts")
     _SVG_DIRECTORY: Path = Path("ai_metaphors/resources/SVGs")
 
-    _SVG_EXAMPLE: Path = _BASE_PATH / "svg_example_code.txt"
-    _SVG_ELEMENTS_INSTRUCTIONS_CONTENT: Path = _BASE_PATH / "svg_elements_middle_content.txt"
-    _SVG_ELEMENTS_INSTRUCTIONS_MANIM_CONTENT: Path = _BASE_PATH / "svg_elements_manim_middle_content.txt"
-    _SVG_ELEMENTS_INSTRUCTIONS_TEMPLATE: Path = _BASE_PATH / "svg_elements_instruction_template.txt"
+    _SVG_EXAMPLE: Path = _BASE_PATH / "svg_handling/svg_example_code.txt"
+    _SVG_ELEMENTS_INSTRUCTIONS_CONTENT: Path = _BASE_PATH / "svg_handling/svg_elements_creation_strategy.txt"
+    _SVG_ELEMENTS_INSTRUCTIONS_MANIM_CONTENT: Path = _BASE_PATH / "svg_handling/svg_elements_manim_using_strategy.txt"
+    _SVG_ELEMENTS_INSTRUCTIONS_TEMPLATE: Path = _BASE_PATH / "svg_handling/svg_elements_instruction_template.txt"
     _MANIM_LIBRARY_TEMPLATE: Path = _BASE_PATH / "manim_library.txt"
 
     _SYSTEM_PROMPT_CLASSES_TEMPLATE: Path = _BASE_PATH / "classes/system_prompt_classes.txt"
@@ -81,9 +80,9 @@ class PromptProvider(ABC):
     def _get_svg_example(self) -> str:
         return self._SVG_EXAMPLE.read_text()
 
-    def _get_svg_elements_instructions_content(self, svg: str) -> str:
+    def _get_svg_elements_instructions_content(self) -> str:
         return self._SVG_ELEMENTS_INSTRUCTIONS_CONTENT.read_text().format_map(
-            SafeDict(SVGs=svg, SVG_directory=self._SVG_DIRECTORY, SVG_code=self._get_svg_example()))
+            SafeDict(SVG_directory=self._SVG_DIRECTORY, SVG_code=self._get_svg_example()))
 
     def _get_svg_elements_instructions_manim_content(self, svg: str) -> str:
         return self._SVG_ELEMENTS_INSTRUCTIONS_MANIM_CONTENT.read_text().format_map(
@@ -91,12 +90,14 @@ class PromptProvider(ABC):
 
     def _get_svg_elements_instructions(self, svg: str) -> str:
         return self._SVG_ELEMENTS_INSTRUCTIONS_TEMPLATE.read_text().format_map(
-            SafeDict(middle_content=self._get_svg_elements_instructions_content(svg))
+            SafeDict(SVGs=svg, SVG_directory=self._SVG_DIRECTORY,
+                     instructions=self._get_svg_elements_instructions_content())
         )
 
     def _get_svg_elements_instructions_manim(self, svg: str) -> str:
         return self._SVG_ELEMENTS_INSTRUCTIONS_TEMPLATE.read_text().format_map(
-            SafeDict(middle_content=self._get_svg_elements_instructions_manim_content(svg))
+            SafeDict(SVGs=svg, SVG_directory=self._SVG_DIRECTORY,
+                     instructions=self._get_svg_elements_instructions_manim_content(svg))
         )
 
     def _get_manim_library_documentation(self) -> str:
