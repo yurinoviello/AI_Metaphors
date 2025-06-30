@@ -140,7 +140,7 @@ class MetaphorProcessor:
             self._manim_provider.write_and_run_python(video_refined_code)
 
     def _add_cartoon_avatar(self):
-        if not self._manim_type == ManimType.CARTOON_AVATAR:
+        if self._manim_type != ManimType.CARTOON_AVATAR:
             return
         logging.info("Adding cartoon avatar...")
         CartoonAvatarProcessor(
