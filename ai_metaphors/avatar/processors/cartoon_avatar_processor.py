@@ -46,6 +46,6 @@ class CartoonAvatarProcessor:
 
     def generate_video_with_avatar(self):
         animation = animate(audio_file=self._audio_path, transcript=self._get_transcript(), fps=self._fps)
-        background_clip = VideoFileClip(self._video_path).set_duration(animation.duration)
+        background_clip = VideoFileClip(self._video_path).with_duration(animation.duration)
         animation.export(path=self._output_path, background=background_clip)
         self._rename_output_video()
