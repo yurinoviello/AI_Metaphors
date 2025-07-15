@@ -3,8 +3,7 @@ import logging
 from pathlib import Path
 import re
 
-from ai_metaphors.avatar.processors.avatar_processor import AvatarProcessor
-from ai_metaphors.avatar.processors.avatar_postprocessor import AvatarPostProcessor
+from ai_metaphors.avatar.processors import AvatarProcessor, AvatarPostProcessor
 from ai_metaphors.core.providers.prompt_provider import PromptProvider
 from ai_metaphors.core.providers.grazie_provider import GrazieProvider
 from ai_metaphors.core.processors.manim_processor import ManimProcessor
