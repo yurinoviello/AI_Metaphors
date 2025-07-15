@@ -87,7 +87,7 @@ def parse_arguments() -> argparse.Namespace:
             "anthropic-claude-3.7-sonnet",
             "anthropic-claude-4-sonnet",
         ],
-        default="anthropic-claude-3.7-sonnet",
+        default="anthropic-claude-4-opus",
         help="LLM to be used to create classes code, SVG graphics in particular",
     )
     parser.add_argument(
