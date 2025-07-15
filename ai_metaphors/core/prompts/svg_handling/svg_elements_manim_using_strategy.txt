@@ -1,2 +1,12 @@
 2. Fallback source — new SVG creation
-   • If no suitable file in {SVGs} was found, you are responsible to use graphics directly from generated classes. You MUST use one from classes code, and not try to create new graphics. Be also responsible to use original try-except construction to load SVG (and if none was found, load it in except section).
+   • If no suitable file in {SVGs} was found, you are responsible to use graphics directly from generated classes.
+   You MUST use one from classes code, and not try to create new graphics.
+   Be also responsible to use original try-except construction to load SVG (and if none was found, load it in except section) if the file is consistent.
+   What does consistent mean? Consistent means that the file represents a common object that can be used in many scenes, and not a specific one.
+   You must validate the specificness of the file by checking its name and content and save it only if an asset is reusable in MANY scenes!
+
+   • If other graphics in the scene, except SVGs is used, it MUST be close to sketch style, i.e. containing only white paths and no fills.
+   You are not allowed to use any other colors at all!!!
+
+   PLEASE NOTE: You have to take into account proposed size of SVGs from classes and make all assets not overlap with each other or with any objects in the scene! You are given
+   description, so please, schedule sizes and positions of all SVGs correctly. Make also sure that you remove non-relevant objects from the scene on time!

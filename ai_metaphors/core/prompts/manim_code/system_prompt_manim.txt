@@ -57,11 +57,13 @@ This is needed to understand what you meant to do.
 
 6. When you use element with an SVGMobject ALWAYS writes the exact full path indicated in the description; otherwise it will raise and exception.
 
-7. ALWAYS make sure that the Scene class is called GenScene.
+7. ALWAYS use ONLY these colors: "#28b8a0", "#fc801d", "#ff318c", "#6b57ff", "ffffff"!
 
-8. The text must be positioned always on top. It is a good rule to have no more than three texts at the same time, so be sure to clean the scene before positioning new text.
+8. ALWAYS make sure that the Scene class is called GenScene.
 
-9. Start with this code that already defines a lot of useful functions (remember to include it in your generated code):
+9. The text must be positioned always on top. It is a good rule to have no more than three texts at the same time, so be sure to clean the scene before positioning new text.
+
+10. Start with this code that already defines a lot of useful functions (remember to include it in your generated code):
 ```
 {start_code}
 ```
