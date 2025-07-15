@@ -112,7 +112,18 @@ class ManimProcessor:
         raise RuntimeError("Cannot execute Manim script")
 
     def execute_manim_script(self) -> str:
-        command = [
+        patch_command = [
+            "python",
+            "-m",
+            "ai_metaphors.static_color_refining.color_runtime_patch",
+        ]
+
+        try:
+            subprocess.run(patch_command, capture_output=True, text=True, check=True)
+        except subprocess.CalledProcessError as e:
+            return f"Color patch failed: {e.stderr}"
+
+        manim_command = [
             self._bin_directory / "manim",
             "-p" if self._auto_play else None,
             "-qh" if self._high_quality else "-ql",
@@ -125,7 +136,7 @@ class ManimProcessor:
         ]
 
         try:
-            process = subprocess.run([c for c in command if c], capture_output=True, text=True, check=False)
+            process = subprocess.run([c for c in manim_command if c], capture_output=True, text=True, check=False)
         except FileNotFoundError as e:
             raise RuntimeError("Manim executable not found") from e
 
