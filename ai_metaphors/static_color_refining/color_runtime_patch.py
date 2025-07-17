@@ -1,10 +1,17 @@
+from manim import ManimColor, Mobject, Scene, VMobject
 import numpy as np
-from manim import Scene, Mobject, VMobject, ManimColor
-from .palette import nearest_color
+
+from ai_metaphors.static_color_refining.palette import nearest_color
+
+KEYS_TO_CLAMP = (
+    "color",
+    "stroke_color",
+    "fill_color",
+)
 
 
 def _normalize_colors(mob: Mobject):
-    if isinstance(mob, VMobject):
+    if isinstance(mob, VMobject) and mob.get_num_points() > 0:
         if np.all(mob.get_fill_opacities() == 0):
             mob.set_stroke(nearest_color(mob.get_stroke_color()))
         else:
@@ -48,20 +55,30 @@ def _patched_construct(self: Scene):
 Scene.construct = _patched_construct
 
 
-def _wrap_setters(method_name: str):
-    original_method = getattr(VMobject, method_name)
+def _wrap_setter(name: str):
+    orig = getattr(VMobject, name)
 
-    def wrapped_method(self: VMobject, *args, **kwargs):
-        if args:
-            args = (nearest_color(ManimColor(args[0])),) + args[1:]
-        if "color" in kwargs and kwargs["color"] is not None:
-            kwargs["color"] = nearest_color(ManimColor(kwargs["color"]))
-        return original_method(self, *args, **kwargs)
+    def wrapper(self: VMobject, *args, **kw):
+        if args and args[0] is not None:
+            try:
+                first_clamped = nearest_color(ManimColor(args[0]))
+                args = (first_clamped,) + args[1:]
+            except (ValueError, TypeError):
+                pass
 
-    return wrapped_method
+        for key in KEYS_TO_CLAMP:
+            if key in kw and kw[key] is not None:
+                try:
+                    kw[key] = nearest_color(ManimColor(kw[key]))
+                except (ValueError, TypeError):
+                    pass
+
+        return orig(self, *args, **kw)
+
+    return wrapper
 
 
 for name in ("set_fill", "set_stroke", "set_color"):
-    setattr(VMobject, name, _wrap_setters(name))
+    setattr(VMobject, name, _wrap_setter(name))
 
-print("✅  Color runtime patch is active.")
+print("Color runtime patch is active!")
