@@ -104,7 +104,9 @@ class MetaphorProcessor:
             logging.info("One-line Metaphor: %s", self._one_line_story)
 
     def _generate_classes(self):
-        self._grazie_provider.change_model(self._model_classes)
+        if self._model_classes != "default":
+            self._grazie_provider.change_model(self._model_classes)
+
         classes = self._grazie_provider.get_classes(self._story, self._manim_provider.svg)
         logging.info("Classes created")
         self._classes_dict = extract_json(classes)
