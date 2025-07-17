@@ -2,12 +2,16 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 
 from ai_metaphors.core.utils.manim_type import ManimType, SafeDict
+from ai_metaphors.static_color_refining.palette import PALETTE_HEX
 
 
 class PromptProvider(ABC):
     _LANGUAGE = "Python"
     _BASE_PATH: Path = Path("ai_metaphors/core/prompts")
     _SVG_DIRECTORY: Path = Path("ai_metaphors/resources/SVGs")
+
+    # Remove black color from allowed, because the background is black already
+    _ALLOWED_SVG_COLORS = ", ".join(PALETTE_HEX).replace(", #000000", "")
 
     _SVG_EXAMPLE: Path = _BASE_PATH / "svg_handling/svg_example_code.txt"
     _SVG_ELEMENTS_INSTRUCTIONS_CONTENT: Path = _BASE_PATH / "svg_handling/svg_elements_creation_strategy.txt"
@@ -82,7 +86,8 @@ class PromptProvider(ABC):
 
     def _get_svg_elements_instructions_content(self) -> str:
         return self._SVG_ELEMENTS_INSTRUCTIONS_CONTENT.read_text().format_map(
-            SafeDict(SVG_directory=self._SVG_DIRECTORY, SVG_code=self._get_svg_example()))
+            SafeDict(SVG_directory=self._SVG_DIRECTORY, SVG_code=self._get_svg_example(),
+                     allowed_colors=self._ALLOWED_SVG_COLORS))
 
     def _get_svg_elements_instructions_manim_content(self, svg: str) -> str:
         return self._SVG_ELEMENTS_INSTRUCTIONS_MANIM_CONTENT.read_text().format_map(
@@ -143,7 +148,8 @@ class PromptProvider(ABC):
                     self._get_additional_methods_for_manim_voice_start_code()
                 ),
                 manim_library=self._get_manim_library_documentation(),
-                svg_instructions=self._get_svg_elements_instructions_manim(svg)
+                svg_instructions=self._get_svg_elements_instructions_manim(svg),
+                allowed_colors=self._ALLOWED_SVG_COLORS,
             )
         )
 
