@@ -13,6 +13,14 @@
     viewBox="0 0 665.64 570.01"
     version="1.0"
   >
+  <style>
+        path, rect, ellipse, circle {
+        stroke: white;
+        stroke-width: 1;
+        stroke-linejoin: round;
+        vector-effect: non-scaling-stroke;
+        }
+    </style>
   <defs
       id="defs4"
     >

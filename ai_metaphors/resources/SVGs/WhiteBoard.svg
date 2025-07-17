@@ -3,6 +3,14 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="63.5395 -8.9915 2520.7073 1600.0001" enable-background="new 63.5395 -8.9915 2520.7073 1600.0001" xml:space="preserve"
 	>
+	<style>
+        path, rect, ellipse, circle {
+        stroke: white;
+        stroke-width: 1;
+        stroke-linejoin: round;
+        vector-effect: non-scaling-stroke;
+        }
+    </style>
 <g>
 	<rect x="63.7946" y="-8.8716" width="2520.197" height="1599.76"/>
 	<rect x="2567.363" y="-0.3745" width="12.8823" height="75.7349"/>

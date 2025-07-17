@@ -13,6 +13,14 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
+  <style>
+        path, rect, ellipse, circle {
+        stroke: white;
+        stroke-width: 1;
+        stroke-linejoin: round;
+        vector-effect: non-scaling-stroke;
+        }
+    </style>
   <defs
      id="defs1" />
   <sodipodi:namedview

@@ -4,7 +4,15 @@
 <!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
 <svg version="1.0" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
 	 width="800px" height="800px" viewBox="0 0 64 64" enable-background="new 0 0 64 64" xml:space="preserve">
-<g>
+<style>
+    path {
+
+      stroke: white;
+      stroke-width: 1;
+      stroke-linejoin: round;
+    }
+  </style>
+	<g>
 	<path fill="#506C7F" d="M6.966,61.26c-0.143,0.532-0.691,0.849-1.224,0.707c-0.534-0.145-0.851-0.691-0.708-1.225l2.552-9.686
 		c0.405,0.672,0.998,1.212,1.712,1.55L6.966,61.26z"/>
 	<path fill="#B4CCB9" d="M55,27c0,13.233-10.767,24-24,24H11c-1.104,0-2-0.896-2-2v-1V27C9,14.641,18.92,4.769,33.124,2.992
