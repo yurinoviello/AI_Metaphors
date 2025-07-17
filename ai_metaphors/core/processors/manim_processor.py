@@ -81,7 +81,12 @@ class ManimProcessor:
         self.script_path = scripts_dir / f"{subject_id}.py"
 
     def write_python(self, text: str):
+        # Apply color patch
         code = extract_python_code(text)
+        try:
+            code = "import ai_metaphors.static_color_refining.color_runtime_patch\n" + code
+        except TypeError:
+            logging.warning("Failed to apply color patch. Using original code instead.")
 
         if code:
             try:
@@ -112,17 +117,6 @@ class ManimProcessor:
         raise RuntimeError("Cannot execute Manim script")
 
     def execute_manim_script(self) -> str:
-        patch_command = [
-            "python",
-            "-m",
-            "ai_metaphors.static_color_refining.color_runtime_patch",
-        ]
-
-        try:
-            subprocess.run(patch_command, capture_output=True, text=True, check=True)
-        except subprocess.CalledProcessError as e:
-            return f"Color patch failed: {e.stderr}"
-
         manim_command = [
             self._bin_directory / "manim",
             "-p" if self._auto_play else None,
