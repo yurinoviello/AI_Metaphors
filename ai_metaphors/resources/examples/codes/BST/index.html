@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Interactive BST Search Visualization</title>
+  <!-- Firebase (optional) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <style>
+    /* Global Styles */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .step-explanation {
+      background-color: #e4edef;
+      color: #000;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 20px;
+      width: 80%;
+    }
+    .container {
+      display: flex;
+      justify-content: space-between;
+      width: 95%;
+    }
+    .code-window,
+    .memory-window,
+    .visual-window {
+      flex: 1;
+      margin: 10px;
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    /* Code Window */
+    .code-window code {
+      font-size: 16px;
+      line-height: 1.5;
+      white-space: pre;
+    }
+    /* Memory & Visual Window Images */
+    .memory-window img,
+    .visual-window img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    /* Control Buttons */
+    .iteration-control {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .iteration-control button {
+      margin: 5px;
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 12px;
+      background-color: #fff;
+      color: #000;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      transition: background-color 0.3s, transform 0.3s;
+      outline: 2px solid rgba(0,0,0,0.2);
+    }
+    .iteration-control button:hover {
+      background-color: #bdd5d7;
+    }
+    .iteration-control button:active {
+      background-color: #e4edef;
+      box-shadow: 0 2px #666;
+      transform: translateY(2px);
+    }
+    /* Code highlighting */
+    .highlight {
+      background-color: yellow;
+      outline: 2px solid orange;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- Step Explanation -->
+    <div class="step-explanation" id="step-explanation">
+      Step 0: <code>Initial BST Setup</code>.
+    </div>
+  
+    <!-- Main Container -->
+    <div class="container">
+      <!-- Code Window -->
+      <div class="code-window">
+        <h3>Python Code for BST Search (__contains__)</h3>
+        <pre id="code">
+<code>
+<span id="line1">def __contains__(self, item: Any) -> bool:</span>
+<span id="line2">    """Return whether &lt;item&gt; is in this BST."""</span>
+<span id="line3">    if self.is_empty():</span>
+<span id="line4">        return False</span>
+<span id="line5">    elif item == self._root:</span>
+<span id="line6">        return True</span>
+<span id="line7">    elif item &lt; self._root:</span>
+<span id="line8">        return item in self._left</span>
+<span id="line9">    else:</span>
+<span id="line10">        return item in self._right</span>
+<span id="line11">bst1.__contains__(30)
+</code>
+        </pre>
+      </div>
+      
+      <!-- Memory Visualization Window -->
+      <div class="memory-window" id="memory-window">
+        <h3>Memory Visualization</h3>
+        <!-- Use an image that shows your BST structure in memory (e.g., nodes and pointers) -->
+        <img id="memoryImage" src="Memory/Step0.png" alt="Memory Step 0">
+      </div>
+      
+      <!-- Visual (BST) Visualization Window -->
+      <div class="visual-window">
+        <h3>BST Visualization</h3>
+        <!-- Use an image that shows a visual representation of your BST (e.g., a drawn tree) -->
+        <img id="visualImage" src="Visual/Step0.png" alt="Visual Step 0">
+      </div>
+    </div>
+  
+    <!-- Control Buttons -->
+    <div class="iteration-control">
+      <span id="step-info">Step 0</span>
+      <button onclick="decrementStep()">Previous Step</button>
+      <button onclick="incrementStep()">Next Step</button>
+      <button onclick="runAllSteps()">Run All Steps</button>
+      <button onclick="resetSteps()">Reset</button>
+    </div>
+  </div>
+
+  <script>
+    /********* Firebase Initialization (optional) **********/
+    const firebaseConfig = {
+      apiKey: "AIzaSyAn_mT725rpxJdgdZ_HchR6FpAYs1sD6Zo",
+      authDomain: "visual-interactions-csc108.firebaseapp.com",
+      projectId: "visual-interactions-csc108",
+      storageBucket: "visual-interactions-csc108",
+      messagingSenderId: "703068795993",
+      appId: "1:703068795993:web:2c734051b205606affad48",
+      measurementId: "G-QWCWFNX1BR"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore().collection('bst-search');
+    const userId = 'user-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+    function logInteraction(eventType, details) {
+      db.add({
+        userId: userId,
+        eventType: eventType,
+        details: details,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        console.log(`Logged: ${eventType}`, details);
+      }).catch((error) => {
+        console.error("Error logging interaction: ", error);
+      });
+    }
+
+    /********* Global Variables **********/
+    let currentStep = 0;
+    // Adjust totalSteps based on your explanation steps.
+    // For this example, we show steps for searching for the value 30.
+    const totalSteps = 4;
+    const stepDescriptions = [
+      "Step 0: <code>Initial BST Setup</code> – the BST has been constructed (e.g., with nodes 40, 20, 60, 10, 30, 50, 70).",
+      "Step 1: Call <code>__contains__(30)</code>. First, check if the tree is empty or if the root (40) equals 30.",
+      "Step 2: Since 30 &lt; 40, the search proceeds to the left subtree (rooted at 20).",
+      "Step 3: In the left subtree, compare 30 with node 20. Since 30 &gt; 20, check the right subtree of 20 (which should contain 30).",
+      "Step 4: 30 is found in the right subtree of 20 – search completed."
+    ];
+
+    const stepInfo = document.getElementById('step-info');
+    const stepExplanation = document.getElementById('step-explanation');
+
+    // Scale UI to fit the window if necessary.
+    function scaleApp() {
+      const app = document.getElementById('app');
+      const scaleFactor = window.innerWidth / 1200;
+      app.style.transform = 'scale(' + scaleFactor + ')';
+      app.style.transformOrigin = 'center center';
+    }
+
+    /********* Update Memory & Visual Images **********/
+    function updateImages(step) {
+      document.getElementById("memoryImage").src = `Memory/Step${step}.png`;
+      document.getElementById("visualImage").src = `Visual/Step${step}.png`;
+    }
+    
+    /********* Update Step Description & Info **********/
+    function updateStepDescription(step) {
+      if (step >= 0 && step <= totalSteps) {
+        stepExplanation.innerHTML = stepDescriptions[step];
+      }
+    }
+    function updateStepInfo(step) {
+      stepInfo.textContent = `Step ${step}`;
+    }
+    
+    /********* Code Highlighting **********/
+    function highlightCode(step) {
+      // Clear previous highlights
+      for (let i = 1; i <= 11; i++) {
+        const line = document.getElementById(`line${i}`);
+        if (line) line.classList.remove('highlight');
+      }
+      // Highlight code lines based on the current step:
+      switch(step) {
+        case 0:
+          document.getElementById('line11').classList.add('highlight');
+          break;
+        case 1:
+          // Step 1: Check if tree is empty (line 3) and if the root equals 30 (lines 5-6)
+          document.getElementById('line3').classList.add('highlight');
+          document.getElementById('line5').classList.add('highlight');
+          break;
+        case 2:
+          // Step 2: 30 < 40 so proceed to left subtree (lines 7-8)
+          document.getElementById('line7').classList.add('highlight');
+          document.getElementById('line8').classList.add('highlight');
+          break;
+        case 3:
+          // Step 3: In left subtree: 30 > 20 so go to the right subtree (lines 9-10)
+          document.getElementById('line9').classList.add('highlight');
+          document.getElementById('line10').classList.add('highlight');
+          break;
+        case 4:
+          document.getElementById('line10').classList.add('highlight');
+          break;
+        default:
+          break;
+      }
+    }
+    
+    /********* Reset Visualization **********/
+    function resetSteps() {
+      currentStep = 0;
+      updateImages(currentStep);
+      highlightCode(currentStep);
+      updateStepDescription(currentStep);
+      updateStepInfo(currentStep);
+      logInteraction('resetSteps', { step: currentStep });
+    }
+    
+    /********* Execute a Step **********/
+    function executeStep(step) {
+      updateImages(step);
+      highlightCode(step);
+      updateStepDescription(step);
+      updateStepInfo(step);
+      logInteraction('executeStep', { step: step });
+    }
+    
+    /********* Step Control **********/
+    function incrementStep() {
+      if (currentStep < totalSteps) {
+        currentStep++;
+        executeStep(currentStep);
+        logInteraction('incrementStep', { step: currentStep });
+      } else {
+        alert("All steps completed.");
+        logInteraction('alert', { message: "All steps completed." });
+      }
+    }
+    
+    function decrementStep() {
+      if (currentStep > 0) {
+        currentStep--;
+        executeStep(currentStep);
+        logInteraction('decrementStep', { step: currentStep });
+      } else {
+        alert("Already at the first step.");
+        logInteraction('alert', { message: "Already at the first step." });
+      }
+    }
+    
+    function runAllSteps() {
+      while (currentStep < totalSteps) {
+        incrementStep();
+      }
+    }
+    
+    window.onload = () => {
+      window.addEventListener('resize', scaleApp);
+      window.addEventListener('load', scaleApp);
+      resetSteps();
+    };
+  </script>
+</body>
+</html>

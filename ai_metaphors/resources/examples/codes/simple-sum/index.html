@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Basic metadata for character encoding and responsive layout -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summing 1D List</title>  <!-- Title of the page -->
+    <link rel="stylesheet" href="styles.css">  <!-- Link to the external CSS file -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+</head>
+<body>
+    <!-- Main heading of the page -->
+    <h1>Summing 1D List</h1>
+    
+    <!-- Displays the explanation of the current step in the loop -->
+    <div class="step-explanation" id="step-explanation"></div>
+    
+    <!-- Main container for code, memory, and visual sections -->
+    <div class="container">
+        
+        <!-- Code window to display the Python-like code being executed -->
+        <div class="code-window">
+            <h3>Code</h3>
+            <pre id="code">  <!-- Preformatted text block to show code -->
+<code><span id="line1">total = 0</span> <!-- Line 1: total variable initialization -->
+<span id="line2">lst = [2, 4, 6, 8]</span> <!-- Line 2: List definition -->
+<span id="line3">for i in range(len(lst)): </span> <!-- Line 3: Loop starts, ? button shows info about range -->
+<span id="line4">    total += lst[i]</span></code> <!-- Line 4: Adding list elements to total, ? button shows info about increment -->
+            </pre>
+        </div>
+
+        <!-- Memory window to display variables and their values during execution -->
+        <div class="memory-window">
+            <h3>Memory</h3>
+            <div id="memory">
+                
+                <!-- Displaying the 'total' variable and its current value -->
+                <div class="memory-block" id="memory-total">
+                    <div class="variable-name" id="variable-total">total</div> <!-- Button to show more info about 'total' -->
+                    <div class="pointer"></div> <!-- Arrow pointer -->
+                    <div class="memory-value" id="memory-total-value">0</div> <!-- Current value of 'total' displayed here -->
+                </div>
+                <!-- Displaying the 'lst' variable and its elements -->
+                <div class="memory-block" id="memory-lst">
+                    <div class="variable-name" id="variable-lst">lst </div> <!-- Button to show more info about 'lst' -->
+                    <div class="pointer"></div> <!-- Arrow pointer -->
+                    <div class="nested-list" id="memory-lst-value">
+                        <div class="inner-list">
+                                <div>[2, 4, 6, 8]</div> <!-- List elements displayed here -->
+                        </div>
+                    </div>
+                </div>
+                <!-- Displaying the 'i' variable (loop counter) and its current value -->
+                <div class="memory-block" id="memory-i">
+                    <div class="variable-name" id="variable-i">i</div> <!-- Button to show more info about 'i' -->
+                    <div class="pointer"></div> <!-- Arrow pointer -->
+                    <div class="memory-value" id="memory-i-value">0</div> <!-- Current value of 'i' displayed here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Visual window to show a graphical representation of the list and operations -->
+        <div class="visual-window">
+            <h3 class="visual-title">Visual</h3>
+            <div id="visual"></div> <!-- Visual elements will be dynamically generated here -->
+            
+            
+                
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Interactive section for displaying questions or extra information -->
+    <div id="interactive-element" class="hidden">
+        <div id="question"></div> <!-- Questions will appear here -->
+        <button onclick="hideInteractive()">Close</button> <!-- Button to close the interactive section -->
+    </div>
+
+    <!-- Control section for navigating through the loop iterations -->
+    <div class="iteration-control">
+        <button class="custom-button" onclick="decrementLoop()">Previous Iteration</button> <!-- Button to go to the previous iteration -->
+        <button class="custom-button" onclick="incrementLoop()">Next Iteration</button> <!-- Button to go to the next iteration -->
+        <button class="custom-button" onclick="runAllIterations()">Run All Iterations</button> <!-- Button to run all iterations at once -->
+        <button class="custom-button" onclick="resetLoop()">Reset</button> <!-- Button to reset the loop to the initial state -->
+    </div>
+
+    <!-- External JavaScript file to handle logic and interactions -->
+    <script src="script.js"></script>
+</body>
+</html>

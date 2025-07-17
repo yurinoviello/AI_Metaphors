@@ -1,0 +1,38 @@
+Example input:
+Programming Concept:
+```Summing 1D List```
+
+Code:
+```total = 0
+lst = [2, 4, 6, 8]
+for i in range(len(lst)):
+    total += lst[i]```
+
+Analogy:
+```Adding Up Coins in a Piggy Bank.
+Imagine you have a small piggy bank and a row of coins on your desk: a 2¢ coin, a 4¢ coin, a 6¢ coin, and an 8¢ coin.
+You want to know how much money you have in total, so you pick up one coin at a time and drop it into the piggy bank, keeping track of the total as you go.
+
+**Mapping the Metaphor to the Code:**
+
+- `total = 0`:
+ This is like starting with an empty piggy bank — you have no money yet.
+
+- `lst = [2, 4, 6, 8]`:
+ These are your coins lined up on the desk — each number represents the value of a coin.
+
+- `for i in range(len(lst)):`
+ This loop is like you picking up each coin, one by one, from the leftmost to the rightmost.
+
+- `total += lst[i]`:
+ As you pick up each coin, you drop it into the piggy bank and add its value to your total savings.
+
+**Example:**
+You pick up the 2¢ coin → total is now 2¢
+Then the 4¢ coin → total becomes 6¢
+Then the 6¢ coin → total becomes 12¢
+Finally, the 8¢ coin → total is now 20¢
+
+So in the end, `total` holds the final value of all coins combined — just like in the code, where the total is the sum of the list.```
+Example output:
+```Summing a list is like dropping each coin into a piggy bank```

@@ -1,0 +1,120 @@
+"<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Using a Dictionary</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Using a Dictionary</h1>
+    
+    <!-- Explanation of each step -->
+    <div class="step-explanation" id="step-explanation"></div>
+    
+    <div class="container">
+        <!-- Code Window -->
+        <div class="code-window">
+            <h3>Code</h3>
+            <pre id="code">
+<code><span id="line1">grades = {
+    "Alice": 85,
+    "Bob": 92,
+    "Charlie": 78
+}</span> 
+<span id="line2">print(grades["Bob"]) </span>
+<span id="line3">grades["David"] = 88</span>
+<span id="line4">print(grades["David"])</span> 
+<span id="line5">grades["Alice"] = 90 </span> 
+<span id="line6">print(grades["Alice"])</span>
+<span id="line7">print(grades.get("Eve")) </span> </code>
+            </pre>
+        </div>
+
+        <div class="memory-window">
+            <h3>Memory</h3>
+            <div id="memory">
+                <div class="memory-block" id="memory-lst">
+                    <div class="variable-name">grades</div>
+                    <div class="pointer"></div> <!-- Arrow pointer -->
+                    <div class="memory-value" id="memory-lst-value">
+                        <div class="nested-list">
+                            <div class="inner-list">
+                                <div class="index-container" id="cont0">
+                                    <div class="variable-name" id="var0">Alice</div>
+                                    <div class="arrow-down"></div> <!-- Arrow pointer -->
+                                    <div class="list-value" id="val0">85</div>
+                                </div>
+                                <div class="index-container" id="cont1">
+                                    <div class="variable-name" id="var1">Bob</div>
+                                    <div class="arrow-down"></div> <!-- Arrow pointer -->
+                                    <div class="list-value" id="val1">92</div>
+                                </div>
+                                <div class="index-container" id="cont2">
+                                    <div class="variable-name" id="var2">Charlie</div>
+                                    <div class="arrow-down"></div> <!-- Arrow pointer -->
+                                    <div class="list-value" id="val2">78</div>
+                                </div>
+                                <div class="index-container" id="cont3">
+                                    <div class="variable-name">David</div>
+                                    <div class="arrow-down"></div> <!-- Arrow pointer -->
+                                    <div class="list-value" id="val3">88</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visual Window -->
+        <div class="visual-window">
+            <h3 class="visual-title">Visual</h3>
+            <div id="visual"></div>
+            <div class="image-container" id="space-container"> 
+                <div class="laptop-space" id="lap">
+                    <div class="laptop-title" id="laptop-title">Class Discussion</div> 
+                    <div class="laptop-overlay top-left-box" id="box-top-left"></div>
+                    <div class="laptop-overlay bottom-right-box" id="box-bottom-right"></div>
+                    <img class="laptop-image" id="laptop" src="laptop.png" alt="Laptop" />
+                </div>
+            
+                <div class="paper-with-image">
+                    <div class="lined-paper" id="grade-book">
+                        <div class="paper-title" id="paper-title">Grade Book</div> 
+                        <div class="line" id="paper-line1">
+                            <span class="student-name">Alice:&nbsp; </span> <span class="student-value" id="alice-val">85</span>
+                        </div>
+                        <div class="line" id="paper-line2">
+                            <span class="student-name">Bob:&nbsp; </span> <span class="student-value" id="bob-val">92</span>
+                        </div>
+                        <div class="line" id="paper-line3">
+                            <span class="student-name">Charlie:&nbsp; </span> <span class="student-value">78</span>
+                        </div>
+                        <div class="line" id="paper-line4">
+                            <span class="student-name" id="david-name"> </span> <span class="student-value" id="david-val"> </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive and Control Elements -->
+    <div id="interactive-element" class="hidden">
+        <div id="question"></div>
+        <button onclick="hideInteractive()">Close</button>
+    </div>
+
+    <!-- Loop control buttons -->
+    <div class="iteration-control">
+        <button class="custom-button" onclick="decrementLoop()">Previous Iteration</button>
+        <button class="custom-button" onclick="incrementLoop()">Next Iteration</button>
+        <button class="custom-button" onclick="runAllIterations()">Run All Iterations</button>
+        <button class="custom-button" onclick="resetLoop()">Reset</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+"

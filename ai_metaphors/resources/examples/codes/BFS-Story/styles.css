@@ -1,0 +1,221 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+    flex-direction: column;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.code-window code {
+    font-size: 18px; /* Adjusted font size for readability */
+}
+
+.iteration-control {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.iteration-control button {
+    margin: 5px;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.code-window, .visual-window, .memory-window {
+    flex: 1;
+    margin: 10px;
+    background-color: white;
+    border: 2px solid #ccc;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    text-align: center;
+    color: #333;
+}
+
+.highlight {
+    background-color: #ffff99;
+    outline: 3px solid #ff9900;
+    outline-offset: 2px;
+}
+
+.highlight-table {
+    background-color: #ffff99;
+    outline: 2px solid #ff9900;
+}
+
+.visited-table {
+    background-color: #d5ddde;
+    outline: 1px solid #000;
+}
+
+.enqueue-action {
+    background-color: #ffe0b2; /* Light orange for enqueue actions */
+}
+
+.dequeue-action {
+    background-color: #ffccbc; /* Light red for dequeue actions */
+}
+
+.step-explanation {
+    background-color: #e4edef;
+    color: #000000;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    margin-bottom: 25px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #000000;
+    font-size: 16px;
+}
+
+svg {
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+}
+
+#legend {
+    margin-top: 15px;
+}
+
+.legend-box {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    border: 1px solid #000;
+    vertical-align: middle;
+}
+
+.enqueue-color {
+    background-color: #f0ad4e; /* Orange for enqueued nodes */
+}
+
+.dequeue-color {
+    background-color: #ff6a00; /* Red for dequeued nodes */
+}
+
+.queue-color {
+    background-color: #f0ad4e; /* Orange for nodes in queue */
+}
+
+.visited-color {
+    background-color: #d5ddde; /* Light blue for visited nodes */
+}
+
+.current-node-color {
+    background-color: #ffff00; /* Yellow for current node */
+}
+
+/* Styles for the visual queue */
+.queue-container {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.queue-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 50px;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+}
+
+.queue-node {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    margin: 0 5px;
+    background-color: #f0ad4e; /* Default color for in-queue nodes */
+    border: 2px solid #000;
+    border-radius: 5px;
+    position: relative;
+    transition: background-color 0.3s, transform 0.3s;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.queue-node.enqueue-visual {
+    background-color: #ffe0b2; /* Light orange for enqueue actions */
+    animation: enqueueAnimation 0.5s forwards;
+}
+
+.queue-node.dequeue-visual {
+    background-color: #ffccbc; /* Light red for dequeue actions */
+    animation: dequeueAnimation 0.5s forwards;
+}
+
+.empty-queue {
+    font-style: italic;
+    color: #777;
+    font-size: 16px;
+}
+
+.arrow {
+    font-size: 24px;
+    margin: 0 5px;
+    color: #555;
+}
+
+/* Animation for enqueue */
+@keyframes enqueueAnimation {
+    0% { transform: scale(0.5); opacity: 0.5; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Animation for dequeue */
+@keyframes dequeueAnimation {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(0.5); opacity: 0.5; }
+}
+
+/* Responsive SVG */
+@media (max-width: 800px) {
+    .container {
+        flex-direction: column;
+    }
+
+    svg {
+        width: 100%;
+        height: auto;
+    }
+}
+
+.variable {
+    font-family: 'Courier New', Courier, monospace; /* Example font */
+    color:#ff6a00
+}

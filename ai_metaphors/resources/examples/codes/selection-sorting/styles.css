@@ -1,0 +1,265 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+    flex-direction: column;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    width: 80%;
+}
+
+h1 {
+    grid-column: span 2;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.iteration-control {
+    grid-column: span 2;
+    text-align: center;
+}
+
+.iteration-control button {
+    margin: 5px;
+}
+
+.code-window, .visual-window, .memory-window {
+    flex: 1;
+    margin: 10px;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    height: 450px;
+}
+
+.code-window h3, .visual-window h3, .memory-window h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.code-window pre {
+    text-align: left;
+    margin: 0;
+}
+
+.code-window span {
+    display: inline;
+    padding: 0 0;
+}
+
+.highlight {
+    background-color: yellow;
+    border: 3px solid #ff6a00;
+}
+
+pre, code {
+    font-size: 18px;
+    line-height: 2;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.pre {
+    text-align: left;
+    margin: 0;
+    padding: 10px 0;
+}
+
+.memory-window {
+    grid-column: span 2;
+    text-align: center;
+}
+
+.memory-block {
+    display: flex;
+    align-items: center;
+    margin: 10px;
+}
+
+.variable-name {
+    background-color: lightblue;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #000000;
+}
+
+.pointer {
+    width: 30px;
+    height: 2px;
+    background-color: black;
+    margin: 0 10px;
+    position: relative;
+}
+
+.pointer::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent transparent black;
+}
+
+.memory-value {
+    background-color: #e8e8e8;
+    border: 1px solid rgb(0, 0, 0);
+    border-radius: 5px;
+    padding: 10px;
+    min-width: 40px;
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+#interactive-element {
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 8px;
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+.visual-window {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#visual {
+    display: grid;
+    grid-template-columns: repeat(12, 50px);
+    grid-gap: 5px;
+}
+
+.nested-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.inner-list {
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+}
+
+.index-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 5px;
+    position: relative;
+}
+
+.arrow-down {
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 10px solid black;
+    margin: 5px 0;
+}
+
+.list-value {
+    background-color: #e8e8e8;
+    padding: 5px 10px;
+    border: 1px solid rgb(0, 0, 0);
+    border-radius: 5px;
+    position: relative;
+    margin-top: 5px;
+}
+
+.step-explanation {
+    background-color: #e4edef;
+    color: #000000;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+button {
+    background-color: #ffffff;
+    border: none;
+    color: rgb(0, 0, 0);
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 12px;
+    transition: 0.3s;
+    outline: 2px solid rgba(0, 0, 0, 0.2);
+}
+
+button:hover {
+    background-color: #bdd5d7;
+}
+
+button:active {
+    background-color: #e4edef;
+    box-shadow: 0 2px #666;
+    transform: translateY(2px);
+}
+
+#table-container {
+    position: absolute;
+    bottom: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+#table-image {
+    width: 700px;
+    height: 100px;
+    bottom: 0px;
+}
+
+#hats-container {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+#hats-container img {
+    width: 110px;
+    height: auto;
+}
+
+.hat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.variable {
+    font-family: 'Courier New', Courier, monospace;
+    color: #ff6a00;
+}

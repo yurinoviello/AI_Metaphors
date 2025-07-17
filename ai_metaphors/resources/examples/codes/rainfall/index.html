@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nested Loop Sum</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+</head>
+<body>
+    <h1>Nested Loop Summing</h1>
+    <div class="container">
+        <div class="code-window">
+            <h3>Code</h3>
+            <pre id="code">
+                <code><span id="line1">total = 0</span>
+                <span id="line2">lst = [[20, 12, 1, 5], [25, 10, 7], [9, 30]]</span>
+                <span id="line3">for i in range(len(lst)): </span>
+                <span id="line4">    for j in range(len(lst[i])):</span>
+                <span id="line5">        total += lst[i][j] </span></code>
+            </pre>
+        </div>
+        <div class="memory-window">
+            <h3>Memory</h3>
+            <div id="memory">
+                <div class="memory-block" id="memory-total">
+                    <div class="variable-name" id="var1">total </div>
+                    <div class="pointer"></div>
+                    <div class="memory-value" id="memory-total-value">0</div>
+                </div>
+                <div class="memory-block" id="memory-i">
+                    <div class="variable-name" id="var2">i </div>
+                    <div class="pointer"></div>
+                    <div class="memory-value" id="memory-i-value">0</div>
+                </div>
+                <div class="memory-block" id="memory-j">
+                    <div class="variable-name" id="var3">j</div>
+                    <div class="pointer"></div>
+                    <div class="memory-value" id="memory-j-value">0</div>
+                </div>
+                <div class="memory-block" id="memory-lst">
+                    <div class="variable-name" id="var4">lst </div>
+                    <div class="pointer"></div>
+                    <div class="memory-value" id="memory-lst-value">
+                        <div class="nested-list">
+                            <div>[</div>
+                            <div class="inner-list">
+                                <div class="list-index">0:</div>
+                                <div>[20, 12, 1, 5]</div>
+                            </div>
+                            <div class="inner-list">
+                                <div class="list-index">1:</div>
+                                <div>[25, 10, 7]</div>
+                            </div>
+                            <div class="inner-list">
+                                <div class="list-index">2:</div>
+                                <div>[9, 30]</div>
+                            </div>
+                            <div>]</div>
+                        </div>
+                    </div>
+                </div>                
+            </div>
+        </div>
+        <div class="visual-window">
+            <h3>Visual</h3>
+            <div id="visual"></div>
+            <div class="papers-container">
+                <div class="paper-with-image">
+                    
+                    <img id="paper-image1" src="Man0b.jpg" alt="Image 1" class="paper-image">
+                    <div class="lined-paper" id="paper1"></div>
+                </div>
+        
+                <div class="paper-with-image">
+                    <img id="paper-image2" src="Man1b.jpg" alt="Image 2" class="paper-image">
+                    <div class="lined-paper" id="paper2"></div>
+                </div>
+        
+                <div class="paper-with-image">
+                    <img id="paper-image3" src="Man2b.jpg" alt="Image 3" class="paper-image">
+                    <div class="lined-paper" id="paper3"></div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    <div id="interactive-element" class="hidden">
+        <div id="question"></div>
+        <button onclick="hideInteractive()">Close</button>
+    </div>
+    <div class="iteration-control">
+        <button onclick="decrementLoop()">Previous Iteration</button>
+        <!-- <span id="iteration-info">Iteration i = 0, j = 0</span> -->
+        <button onclick="incrementLoop()">Next Iteration</button>
+        <button onclick="runAllIterations()">Run All Iterations</button>
+        <button onclick="resetLoop()">Reset</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

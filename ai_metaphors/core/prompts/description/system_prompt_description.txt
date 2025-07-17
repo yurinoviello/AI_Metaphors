@@ -61,6 +61,7 @@ You will receive the following information:
 * Never use:
   * `Bubble`, `SpeechBubbles`, `ThoughtBubble`, or similar unsupported elements.
   * Zoom techniques or camera transitions — **focus on small, detailed, clear actions**.
+{additional_guidelines}
 
 #### Student Weaknesses to Address
 

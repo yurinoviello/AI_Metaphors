@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Interactive Tree Deletion Visualization with Brushing &amp; Lines</title>
+  <!-- Firebase (optional) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <style>
+    /* Global Styles */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .step-explanation {
+      background-color: #e4edef;
+      color: #000;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 20px;
+      width: 80%;
+    }
+    .container {
+      display: flex;
+      justify-content: space-between;
+      width: 95%;
+    }
+    .code-window,
+    .memory-window,
+    .visual-window {
+      flex: 1;
+      margin: 10px;
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    /* Code Window */
+    .code-window code {
+      font-size: 16px;
+      line-height: 1.5;
+      white-space: pre;
+    }
+    /* Memory & Visual Window Images */
+    .memory-window img,
+    .visual-window img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    /* Control Buttons */
+    .iteration-control {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .iteration-control button {
+      margin: 5px;
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 12px;
+      background-color: #fff;
+      color: #000;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      transition: background-color 0.3s, transform 0.3s;
+      outline: 2px solid rgba(0,0,0,0.2);
+    }
+    .iteration-control button:hover {
+      background-color: #bdd5d7;
+    }
+    .iteration-control button:active {
+      background-color: #e4edef;
+      box-shadow: 0 2px #666;
+      transform: translateY(2px);
+    }
+    /* Code highlighting (applied to the code window) */
+    .highlight {
+      background-color: yellow;
+      outline: 2px solid orange;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+  <!-- Step Explanation -->
+  <div class="step-explanation" id="step-explanation">
+    Step 0: <code>Initial</code>.
+  </div>
+  
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Code Window -->
+    <div class="code-window">
+      <h3>Python Code for Deletion</h3>
+      <pre id="code">
+<code>
+<span id="line1">def delete_item(self, item: Any) -> bool:</span>
+<span id="line2">    if self.is_empty():</span>
+<span id="line3">        return False  # tree is empty</span>
+<span id="line4">    elif self._subtrees == []:</span>
+<span id="line5">        if self._root != item:</span>
+<span id="line6">            return False</span>
+<span id="line7">        else:</span>
+<span id="line8">            self._root = None</span>
+<span id="line9">            return True</span>
+<span id="line10">    else:</span>
+<span id="line11">        if self._root == item:</span>
+<span id="line12">            self._delete_root()  # promote a child</span>
+<span id="line13">            return True</span>
+<span id="line14">        else:</span>
+<span id="line15">            for subtree in self._subtrees:</span>
+<span id="line16">                subtree.delete_item(item)</span>
+<span id="line17"># Example call:
+delete_item(70)</span>
+</code>
+      </pre>
+    </div>
+    
+    <!-- Memory Visualization Window -->
+    <div class="memory-window" id="memory-window">
+      <h3>Memory Visualization</h3>
+      <img id="memoryImage" src="Memory/Step0.png" alt="Memory Step 0">
+    </div>
+    
+    <!-- Visual (Tree) Visualization Window -->
+    <div class="visual-window">
+      <h3>Tree Visualization</h3>
+      <img id="visualImage" src="Visual/Step0.png" alt="Visual Step 0">
+    </div>
+  </div>
+  
+  <!-- Control Buttons -->
+  <div class="iteration-control">
+    <span id="step-info">Step 0</span>
+    <button onclick="decrementStep()">Previous Step</button>
+    <button onclick="incrementStep()">Next Step</button>
+    <button onclick="runAllSteps()">Run All Steps</button>
+    <button onclick="resetSteps()">Reset</button>
+  </div>
+</div>
+  <script>
+    /********* Firebase Initialization (optional) **********/
+    const firebaseConfig = {
+      apiKey: "AIzaSyAn_mT725rpxJdgdZ_HchR6FpAYs1sD6Zo",
+      authDomain: "visual-interactions-csc108.firebaseapp.com",
+      projectId: "visual-interactions-csc108",
+      storageBucket: "visual-interactions-csc108",
+      messagingSenderId: "703068795993",
+      appId: "1:703068795993:web:2c734051b205606affad48",
+      measurementId: "G-QWCWFNX1BR"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore().collection('trees1');
+    const userId = 'user-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+    function logInteraction(eventType, details) {
+      db.add({
+        userId: userId,
+        eventType: eventType,
+        details: details,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        console.log(`Logged: ${eventType}`, details);
+      }).catch((error) => {
+        console.error("Error logging interaction: ", error);
+      });
+    }
+    
+    /********* Global Variables **********/
+    let currentStep = 0;
+    const totalSteps = 6;  // Steps 0 through 6
+    const stepDescriptions = [
+      "Step 0: <code>Initial</code>.",
+      "Step 1: <code>delete_item(70)</code> called on the <code>root</code> – it is not <code>70</code>.",
+      "Step 2: <code>delete_item(70)</code> called on <code>subtree[0]</code> but <code>30</code> is not <code>70</code>.",
+      "Step 3: <code>delete_item(70)</code> called on <code>subtree[1]</code> and this node should be <code>deleted</code>.",
+      "Step 4: Need to promote the last child (<code>80</code>) – <code>pop()</code> it.",
+      "Step 5: Replace current tree's node with <code>child's root</code>.",
+      "Step 6: <code>New tree</code>."
+    ];
+    const stepInfo = document.getElementById('step-info');
+    const stepExplanation = document.getElementById('step-explanation');
+    
+    function scaleApp() {
+      const app = document.getElementById('app');
+      // For example, base design is for 1920px width
+      const scaleFactor = window.innerWidth / 1200;
+      app.style.transform = 'scale(' + scaleFactor + ')';
+      app.style.transformOrigin = 'center center';
+    }
+
+    /********* Update Memory & Visual Images **********/
+    function updateImages(step) {
+      document.getElementById("memoryImage").src = `Memory/Step${step}.png`;
+      document.getElementById("visualImage").src = `Visual/Step${step}.png`;
+    }
+    
+    /********* Step Description & Info **********/
+    function updateStepDescription(step) {
+      if (step >= 0 && step <= totalSteps) {
+        stepExplanation.innerHTML = stepDescriptions[step];
+      }
+    }
+    function updateStepInfo(step) {
+      stepInfo.textContent = `Step ${step}`;
+    }
+    
+    /********* Code Highlighting **********/
+    function highlightCode(step) {
+      // Remove previous highlights
+      for (let i = 1; i <= 17; i++) {
+        const line = document.getElementById(`line${i}`);
+        if (line) line.classList.remove('highlight');
+      }
+      // Highlight code lines based on the current step.
+      // (These mappings are approximate based on the new description.)
+      switch(step) {
+        case 1:
+          document.getElementById('line17').classList.add('highlight');
+          break;
+        case 2:
+          document.getElementById('line11').classList.add('highlight');
+          break;
+        case 3:
+          document.getElementById('line15').classList.add('highlight');
+          break;
+        case 4:
+          document.getElementById('line15').classList.add('highlight');
+          break;
+        case 5:
+          document.getElementById('line16').classList.add('highlight');
+          break;
+        case 6:
+          document.getElementById('line16').classList.add('highlight');
+          break;
+        default:
+          break;
+      }
+    }
+    
+    /********* Reset Visualization **********/
+    function resetSteps() {
+      currentStep = 0;
+      updateImages(currentStep);
+      highlightCode(currentStep);
+      updateStepDescription(currentStep);
+      updateStepInfo(currentStep);
+      logInteraction('resetSteps', { step: currentStep });
+    }
+    
+    /********* Execute a Step **********/
+    function executeStep(step) {
+      // For this revised version the visualization is entirely image-based.
+      // We simply update the images, code highlighting, and step description.
+      updateImages(step);
+      highlightCode(step);
+      updateStepDescription(step);
+      updateStepInfo(step);
+      logInteraction('executeStep', { step: step });
+    }
+    
+    /********* Step Control **********/
+    function incrementStep() {
+      if (currentStep < totalSteps) {
+        currentStep++;
+        executeStep(currentStep);
+        logInteraction('incrementStep', { step: currentStep });
+      } else {
+        alert("All steps completed.");
+        logInteraction('alert', { message: "All steps completed." });
+      }
+    }
+    
+    function decrementStep() {
+      if (currentStep > 0) {
+        currentStep--;
+        executeStep(currentStep);
+        logInteraction('decrementStep', { step: currentStep });
+      } else {
+        alert("Already at the first step.");
+        logInteraction('alert', { message: "Already at the first step." });
+      }
+    }
+    
+    function runAllSteps() {
+      while (currentStep < totalSteps) {
+        incrementStep();
+      }
+    }
+    
+    window.onload = () => {
+      window.addEventListener('resize', scaleApp);
+      window.addEventListener('load', scaleApp);
+      resetSteps();
+    };
+  </script>
+</body>
+</html>

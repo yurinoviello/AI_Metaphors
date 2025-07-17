@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive BFS Visualization</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="step-explanation" id="step-explanation">Initialization: Start BFS with node A in the queue.</div>
+    <div class="container">
+        <div class="code-window">
+            <h3>Pseudocode</h3>
+            <pre id="code">
+<code>
+<span id="line1">Start BFS with the starting node.</span>
+<span id="line2">    Add start node to the queue.</span>
+<span id="line3">    Mark start node as visited.</span>
+<span id="line4">    While the queue is not empty:</span>
+<span id="line5">        Take the first node from the queue.</span>
+<span id="line6">        If this node has not been visited:</span>
+<span id="line7">            Mark it as visited.</span>
+<span id="line8">            Add all its neighbors to the queue.</span>
+<span id="line9">    End While</span>
+<span id="line10">End BFS</span>
+</code>
+            </pre>
+        </div>
+        <div class="memory-window">
+            <h3>Queue & Visited Nodes</h3>
+            <div class="queue-container">
+                <div id="queue-visual" class="queue-visual">
+                    <!-- Dynamic Queue Elements Will Appear Here -->
+                </div>
+            </div>
+            <table id="bfs-table">
+                <tr><th>Visited</th></tr>
+                <!-- Visited nodes will be listed here -->
+            </table>
+        </div>
+        <div class="visual-window">
+            <h3>Graph Visualization</h3>
+            <svg id="graph" width="400" height="400"></svg>
+            <div id="legend">
+                <h4>Legend</h4>
+                <ul>
+                    <li><span class="legend-box enqueue-color"></span> Enqueued</li>
+                    <li><span class="legend-box visited-color"></span> Visited</li>
+                    <li><span class="legend-box current-node-color"></span> Current Node</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="iteration-control">
+        <span id="step-info">Step 0</span>
+        <button onclick="decrementStep()">Previous Step</button>
+        <button onclick="incrementStep()">Next Step</button>
+        <button onclick="runAllSteps()">Run All Steps</button>
+        <button onclick="resetSteps()">Reset</button>
+    </div>
+</body>
+</html>

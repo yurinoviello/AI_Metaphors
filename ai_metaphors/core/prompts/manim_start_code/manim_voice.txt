@@ -1,12 +1,13 @@
 from manim import *
 from manim_voiceover import *
+import textwrap
 
 """This file already contains helpers that keep the narrator speaking for the entire duration of each scene.
 
 1. Create one (or more) *scene‑builder* functions inside ``construct``.
    Each function receives the ``scene`` object (``self``) and must call Manim ``play``/``wait``/``add`` commands that build that part of the animation.
 2. Call ``self.narrate(<voice‑over text>, <builder>)`` for each scene in the desired order.
-3. Use ``self.say_caption(text, wait_time)`` for short on‑screen explanations.
+3. Use ``self.describe_scene(caption)`` for short on‑screen explanations.
 
 Intro and outro titles are handled automatically by ``start_end_scene``.
 """
@@ -22,12 +23,12 @@ class GenScene(VoiceoverScene):
         return
 
 
-    def start_end_scene(self, title: str):
+    def start_end_scene(self, title_text: str):
         """
         :param self: The Scene object where the animations and visual elements are rendered.
         :type self: Scene
-        :param title: The title text to be displayed at the start/end of the scene.
-        :type title: str
+        :param title_text: The title text to be displayed at the start/end of the scene.
+        :type title_text: str
         :return: None. Performs visual operations in the given scene and then exits.
         :rtype: None
         """
@@ -35,15 +36,18 @@ class GenScene(VoiceoverScene):
         self.remove_everything()
 
         # Define the title and the logo
-        title = Text(
-            title,
+        title_wrapped = textwrap.wrap(title_text, width=45)
+        title = Paragraph(
+            "\n".join(title_wrapped),
             color=WHITE,
             font_size=40,
+            line_spacing=1,
+            alignment='center',
         )
         logo = ImageMobject("ai_metaphors/resources/JetBrains-logo.png").scale(0.3).next_to(title, DOWN)
 
         self.set_speech_service(OpenAIService())
-        with self.voiceover(text=title.text) as _:
+        with self.voiceover(text=title_text) as _:
             # Display the title and the logo
             self.play(Write(title))
             self.play(FadeIn(logo))
@@ -61,7 +65,6 @@ class GenScene(VoiceoverScene):
         :param caption: A string representing the description text to display on the scene.
         :return: None
         """
-        self.set_speech_service(OpenAIService())
         description = Text(
             caption,
             color=WHITE,
@@ -96,13 +99,12 @@ class GenScene(VoiceoverScene):
         >>> mailboxes = self.narrate("voice‑over", build_map)
         >>> # *mailboxes* can now be reused in later scenes
         """
-
-        self.set_speech_service(OpenAIService())
         with self.voiceover(text=narration_text):
             result = builder(self)
         self.wait(2)
         return result
 
+{additional_methods}
     # ------------------------------------------------------------------
     # Entry point for the LLM‑generated content
     # ------------------------------------------------------------------
@@ -116,14 +118,25 @@ class GenScene(VoiceoverScene):
         def scene1(scene: "GenScene"):
             """Builder for the first part of the animation."""
             # TODO: generated Manim commands (scene.play, scene.add, …)
-            # Use scene.say_caption("short explanation") when needed.
+            # Always initialize the scene as a next section
+            scene.next_section("scene1")
+            # Use scene.describe_scene("short explanation") when needed.
+            self.wait(2)
             pass
 
         mobjects_names = self.narrate("VOICEOVER FOR SCENE 1", scene1)
+        self.wait(2) # Always wait after a scene for 2 seconds
 
         # -- Add further scenes in the same pattern --------------------
-        # def scene2(scene): ...
-        # self.narrate("VOICEOVER FOR SCENE 2", scene2)
-
+        # def scene2(scene):
+            # """Builder for the second part of the animation."""
+            # TODO: generated Manim commands (scene.play, scene.add, …)
+            # Always initialize the scene as a next section
+            scene.next_section("scene2")
+            # Use scene.describe_scene("short explanation") when needed.
+            pass
+        mobjects_names = self.narrate("VOICEOVER FOR SCENE 2", scene2)
+        self.wait(2)
+        ...
         # Outro --------------------------------------------------------
         self.start_end_scene("Thanks for watching!")

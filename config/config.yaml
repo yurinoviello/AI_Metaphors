@@ -4,27 +4,28 @@
 
 # Term and definition
 term_name: null  # Uncomment and set to provide a default term name
-term_definition: null  # Uncomment and set to provide a default term definition
+term_value: null  # Uncomment and set to provide a default term definition
 metaphor: null  # Uncomment and set to provide a default metaphor
+term_type: "code"
 
 # Dataset example (0-13), -1 to ignore
 use_dataset_example: -1
 
 # Generation options
 generate_metaphor_text: true
-animation_type: "basic"
+animation_type: "voice"
 
 # Directory settings
-bin_directory: "/usr/local/bin"
+bin_directory: "./.venv/bin"
 working_dir: "./animations"
 
 # Model settings
 model: "openai-gpt-4o"  # LLM to be used for processing
-model_manim: "default"  # LLM to be used to process only the manim script
+model_manim: "anthropic-claude-3.7-sonnet"  # LLM to be used to process only the manim script
 temperature: 0.1
 
 # Execution settings
 vllm_fix: false  # Perform automatic vllm analysis and code correction
-auto_play: false  # Automatically play the animation at the end of execution
+auto_play: true  # Automatically play the animation at the end of execution
 high_quality: false  # Generate high quality animation (1080p60p)
-debug: false  # Activate debug mode
+debug: true  # Activate debug mode

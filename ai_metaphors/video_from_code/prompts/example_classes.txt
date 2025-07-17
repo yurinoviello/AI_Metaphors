@@ -1,0 +1,63 @@
+- Programming Concept:
+```Summing 1D List```
+
+- Code:
+```total = 0
+lst = [2, 4, 6, 8]
+for i in range(len(lst)):
+    total += lst[i]```
+
+- Analogy to animate:
+```Adding Up Coins in a Piggy Bank.
+Imagine you have a small piggy bank and a row of coins on your desk: a 2¢ coin, a 4¢ coin, a 6¢ coin, and an 8¢ coin.
+You want to know how much money you have in total, so you pick up one coin at a time and drop it into the piggy bank, keeping track of the total as you go.
+
+**Mapping the Metaphor to the Code:**
+
+- `total = 0`:
+ This is like starting with an empty piggy bank — you have no money yet.
+
+- `lst = [2, 4, 6, 8]`:
+ These are your coins lined up on the desk — each number represents the value of a coin.
+
+- `for i in range(len(lst)):`
+ This loop is like you picking up each coin, one by one, from the leftmost to the rightmost.
+
+- `total += lst[i]`:
+ As you pick up each coin, you drop it into the piggy bank and add its value to your total savings.
+
+**Example:**
+You pick up the 2¢ coin → total is now 2¢
+Then the 4¢ coin → total becomes 6¢
+Then the 6¢ coin → total becomes 12¢
+Finally, the 8¢ coin → total is now 20¢
+
+So in the end, `total` holds the final value of all coins combined — just like in the code, where the total is the sum of the list.```
+
+
+- **Output:**
+
+```json
+{
+  "elements": [
+    {
+      "name": "Coin",
+      "role": "Represents each coin with a numeric value that will be summed; it moves from the desk into the piggy bank.",
+      "actions": ["show value", "be picked up", "move to piggy bank slot"],
+      "code": "from manim import *\n\nclass Coin(VGroup):\n    def __init__(self, value, **kwargs):\n        super().__init__(**kwargs)\n        self.value = value\n        circle = Circle(radius=0.3, color=YELLOW)\n        label = Text(str(value), font_size=24)\n        self.add(circle, label)\n        label.move_to(circle.get_center())\n\n    def move_to_bank(self, bank):\n        # Returns an animation of the coin flying into the piggy bank slot\n        return self.animate.move_to(bank.get_coin_slot())"
+    },
+    {
+      "name": "PiggyBank",
+      "role": "Container that receives coins and keeps track of the running total.",
+      "actions": ["start empty", "receive coin", "update total display"],
+      "code": "from manim import *\n\nclass PiggyBank(VGroup):\n    def __init__(self, **kwargs):\n        super().__init__(**kwargs)\n        body = RoundedRectangle(width=2, height=1, corner_radius=0.2, color=PINK)\n        slot = Rectangle(width=0.8, height=0.1, color=BLACK)\n        slot.next_to(body, UP, buff=0)\n        self.total = 0\n        self.total_text = Text('0', font_size=24)\n        self.total_text.next_to(body, DOWN)\n        self.add(body, slot, self.total_text)\n\n    def get_coin_slot(self):\n        # Position where coins should land\n        return self[1].get_center()\n\n    def update_total(self, value):\n        self.total += value\n        new_text = Text(str(self.total), font_size=24)\n        new_text.move_to(self.total_text.get_center())\n        self.total_text.become(new_text)"
+    },
+    {
+      "name": "Person",
+      "role": "Person who picks up each coin and drops it into the piggy bank, mirroring the loop that iterates over the list.",
+      "actions": ["pick up coin", "drop coin into piggy bank"],
+      "code": "from manim import *\n\nclass Person(SVGMobject):\n    def __init__(self, **kwargs):\n        super().__init__('ai_metaphors/resources/SVGs/Person.svg', height=2, **kwargs)\n\n    def pick_up_coin(self, coin):\n        # Animation of the collector grabbing a coin\n        return coin.animate.move_to(self.get_center()+UP*0.3)\n\n    def drop_coin(self, coin, bank):\n        # Animation of the collector dropping the coin into the bank\n        return coin.animate.move_to(bank.get_coin_slot())"
+    }
+  ]
+}
+```

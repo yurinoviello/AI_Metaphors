@@ -1,0 +1,20 @@
+{
+  "citation": "",
+  "description": "",
+  "features": {
+    "name": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "definition": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "metaphor": {
+      "dtype": "string",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": ""
+}

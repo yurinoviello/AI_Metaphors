@@ -1,0 +1,5 @@
+* Each scene must refer to a specific line of the code block. We want to explain the code block step-by-step.
+    * If the code block execution requires 10 steps, we will have 10 scenes (excluded start and end scene).
+    * For the number of steps, rely on the `Steps to highlight`. Be sure to provide a scene for each step.
+    * You should position the code block on the left side of the screen (not too big), while the real actions happen on the right.
+    * Be sure to highlight the current code-line in its current scene.
