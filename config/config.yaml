@@ -21,6 +21,7 @@ working_dir: "./animations"
 
 # Model settings
 model: "openai-gpt-4o"  # LLM to be used for processing
+model_classes: "default" # LLM to be used to process only the classes
 model_manim: "anthropic-claude-3.7-sonnet"  # LLM to be used to process only the manim script
 temperature: 0.1
 
