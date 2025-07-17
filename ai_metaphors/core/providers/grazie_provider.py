@@ -57,7 +57,9 @@ class GrazieProvider:
             chat=ChatPrompt().add_system(system_prompt).add_user(user_prompt),
             profile=MyProfile(),
             parameters={}
-            if "o3" in self._model
+
+            # Grazie API says it does not support temperature for OpenAI models
+            if "openai" in self._model
             else {
                 LLMParameters.Temperature: Parameters.FloatValue(self._temperature),
             },
