@@ -57,7 +57,7 @@ This is needed to understand what you meant to do.
 
 6. When you use element with an SVGMobject ALWAYS writes the exact full path indicated in the description; otherwise it will raise and exception.
 
-7. ALWAYS use ONLY these colors: "#28b8a0", "#fc801d", "#ff318c", "#6b57ff", "ffffff"!
+7. ALWAYS use ONLY these colors: {allowed_colors}!
 
 8. ALWAYS make sure that the Scene class is called GenScene.
 

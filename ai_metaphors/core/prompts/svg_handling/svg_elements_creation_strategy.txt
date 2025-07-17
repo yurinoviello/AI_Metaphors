@@ -1,74 +1,11 @@
-2. Fallback — generate and save a new SVG asset.
+2. Fallback — generate a new SVG asset.
   You are a top-tier IT company designer. You must generate SVG assets for animation in sketch-like style, it should be simple, contain only white contours, and no fills at all!
-  You must primarily use white color, but allowed to also use "#28b8a0", "#fc801d", "#ff318c", "#6b57ff".
+  You must primarily use white color, but allowed to also use {allowed_colors}.
 
-  PLEASE NOTE: You have to assign size for used SVGs dynamically. For example, during class generation you also have to realize what is the approximate size of the SVG will be in the animation!
-
-  # Your tasks:
-    - Task 1: **Expand the Text Prompt**. The given prompt is terse and abstract. First, imagine what the final image should contain and rewrite the prompt in rich visual detail.
-    - Task 2: **Write SVG Code**. Translate your expanded prompt into SVG elements. Pay special attention to following the brand style. Pay also attention to all paths inside the files! They should be valid and do not overstep the boundaries of the SVG canva.
-
-  # Constraints:
-    1. Allowed SVG Elements: Use only: `rect`, `circle`, `ellipse`, `line`, `polyline`, `polygon`, and short `path` (final command must be Z). No `text`, gradients, masks, or clip paths. If a path contains a single command, raise its `stroke-width` so it is visible.
-    2. Canvas Details: The SVG canvas is defined by a `512`x`512` unit viewBox. Coordinates start at (0, 0) in the top-left and extend to (512, 512) at the bottom-right.
-    3. Element Stacking Order: The sequencing of SVG elements matters; elements defined later in the code will overlap earlier ones.
-    4. Colors: You must use only white for paths, and you cannot fill shapes at all.
-    5. Simplicity: Keep the SVG code simple and clear.
-    6. Realism: While using simple shapes, strive to create recognizable and proportionate representations of objects.
-    7. Shape IDs: **Every** shape element should have a unique "id" starting with "path_num".
-
-- Expanded Prompt:
-Object 1: A cup of coffee with steam rising from it.
-
-First, do not dive into details. Think about exposition of the whole scene:
-	1.	The cup rests centered on a saucer placed on a flat tabletop.
-	2.	Gentle wisps of steam curl upward from the hot coffee, suggesting warmth and aroma.
-	3.	A subtle porcelain sheen highlights the rim and gives the vessel form.
-	4.	A graceful handle arcs from the cup’s side, inviting the viewer to imagine picking it up.
-
-Next, break down the scene into individual elements:
-    1. Saucer ellipse (outer rim) and thin inner ellipse accent.
-    2. Cup base ellipse (contact point with saucer).
-    3. Left wall of the cup (curved path).
-    4. Right wall of the cup (mirrored curved path).
-    5. Upper lip of the cup (horizontal ellipse).
-    6. Inner surface of coffee (smaller, lighter ellipse).
-    7. Outer contour of handle (larger sweeping path).
-    8. Inner contour of handle (narrower path inside the first).
-    9. Rising steam—four slender, S-shaped paths with varying opacity.
-  Examples for this prompt and other prompts are provided below:
+Example Code:
    {SVG_code}
 
-   SO:
+SO:
    • If no suitable filename exists, generate clean, valid SVG code into the variable `svg_code`.
-     But important: ideally, you are BIASED to CREATE a new SVG file and NOT to try to create some graphics using manim primitives.
-     If it goes to animations, of course, you can use Manim primitives, but for static illustrations, you should create SVG files.
-   • Immediately after generating `svg_code`, save it in {SVG_directory} under a name that includes the concept keyword:
-     ```python
-     from pathlib import Path
-     filename = topic + ".svg" # topic should be in CamelCase, e.g., "SystemPromptClasses"
-     Path(f"{SVG_directory}/" + filename).write_text(svg_code, encoding="utf-8")
-     ```
-   • Then load it:
-     ```python
-     element = SVGMobject(f"{SVG_directory}/" + filename, height=desired_height)
-     ```
-   • (In your class constructor you can use:
-     ```python
-     try:
-         super().__init__(path, height=desired_height, **kwargs)
-     except (FileNotFoundError, OSError):
-         Path(path).write_text(svg_code, encoding="utf-8")
-         super().__init__(path, height=desired_height, **kwargs)
-     ```
-     )
-
-3. Design language
-   • Valid XML; group logically with `<g>`; avoid filters unsupported by Manim.
-
-4. No external icon libraries
-   • Every SVG must either already reside in {SVG_directory} or have just been created there.
-
-5. Directory hygiene
-   • Re‐use existing files whenever they truly match to avoid duplicates.
-   • Name new files concisely as `<concept>.svg` (lowercase, unique).
+     But important: ideally, you are BIASED to write a new SVG and NOT to try to create some graphics using manim primitives.
+     If it goes to animations, of course, you can use Manim primitives, but for static illustrations, you should use SVGs.

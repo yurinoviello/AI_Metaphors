@@ -6,8 +6,9 @@ You must manage all SVG graphics as follows:
    • A file is suitable only if its name (without “.svg”) is very related to the concept keyword.
    • If one or more suitable filenames are found, pick the best match (typically `<keyword>_icon.svg`) and load it.
      ```python
-     element = SVGMobject(f"{SVG_directory}/chosen_filename.svg", height=desired_height)
+     element = SVGMobject(f"{SVG_directory}/ChosenFilename.svg", height=desired_height)
      ```
+   • You must not assign colors for the files, as they already have suitable style for animations.
 
 {instructions}
 
