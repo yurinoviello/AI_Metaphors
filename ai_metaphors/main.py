@@ -93,7 +93,7 @@ def parse_arguments() -> argparse.Namespace:
         "--model-manim",
         type=str,
         choices=[
-            "openai-gpt-4o",
+            "default",
             "openai-gpt4.1",
             "openai-o1",
             "openai-o3",
