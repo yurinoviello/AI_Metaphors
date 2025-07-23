@@ -40,6 +40,18 @@ class PromptProvider(ABC):
     def __init__(self, manim_type: ManimType):
         self._manim_type = manim_type
 
+    def get_system_prompt_term_definition(self) -> str:
+        return ""
+
+    def get_user_prompt_term_definition(self) -> str:
+        return ""
+
+    def get_system_prompt_one_line_term_definition(self) -> str:
+        return ""
+
+    def get_user_prompt_one_line_term_definition(self, term_definition: str) -> str:
+        return ""
+
     def get_system_prompt_classes(self, svg: str) -> str:
         return self._SYSTEM_PROMPT_CLASSES_TEMPLATE.read_text().format_map(
             SafeDict(
@@ -68,11 +80,11 @@ class PromptProvider(ABC):
     def _get_manim_library_documentation(self) -> str:
         return self._MANIM_LIBRARY_TEMPLATE.read_text()
 
-    def get_user_prompt_classes(self, metaphor: str) -> str:
+    def get_user_prompt_classes(self, story: str) -> str:
         return self._USER_PROMPT_CLASSES_TEMPLATE.read_text().format_map(
             SafeDict(
                 input_data=self._get_input_data(),
-                metaphor=metaphor
+                story=story
             )
         )
 
@@ -87,12 +99,12 @@ class PromptProvider(ABC):
     def _get_additional_guidelines_for_description(self) -> str:
         return ""
 
-    def get_user_prompt_description(self, metaphor: str, one_line_metaphor: str, classes: str) -> str:
+    def get_user_prompt_description(self, story: str, one_line_story: str, classes: str) -> str:
         return self._USER_PROMPT_DESCRIPTION_TEMPLATE.read_text().format_map(
             SafeDict(
                 input_data=self._get_input_data(),
-                metaphor=metaphor,
-                one_line_metaphor=one_line_metaphor,
+                story=story,
+                one_line_story=one_line_story,
                 classes=classes
             )
         )
@@ -118,12 +130,12 @@ class PromptProvider(ABC):
     def _get_additional_methods_for_manim_voice_start_code(self) -> str:
         return ""
 
-    def get_user_prompt_manim(self, metaphor: str, one_line_metaphor: str, classes: str, instructions: str = "") -> str:
+    def get_user_prompt_manim(self, story: str, one_line_story: str, classes: str, instructions: str = "") -> str:
         return self._USER_PROMPT_MANIM_TEMPLATE.read_text().format_map(
             SafeDict(
                 input_data=self._get_input_data(),
-                metaphor=metaphor,
-                one_line_metaphor=one_line_metaphor,
+                story=story,
+                one_line_story=one_line_story,
                 classes=classes,
                 instructions=instructions,
             )
@@ -158,13 +170,13 @@ class PromptProvider(ABC):
         return self._SYSTEM_PROMPT_METAPHOR_TEMPLATE.read_text().format_map(
             SafeDict(
                 language=self._LANGUAGE,
+                input_explanation=self._get_input_explanation(),
                 example=self._get_example_for_metaphor()
             )
         )
 
-    @abstractmethod
     def _get_example_for_metaphor(self) -> str:
-        pass
+        return ""
 
     def get_user_prompt_metaphor(self) -> str:
         return self._USER_PROMPT_METAPHOR_TEMPLATE.read_text().format_map(
@@ -181,9 +193,8 @@ class PromptProvider(ABC):
             )
         )
 
-    @abstractmethod
     def _get_example_for_one_line_metaphor(self) -> str:
-        pass
+        return ""
 
     def get_user_prompt_one_line_metaphor(self, metaphor: str) -> str:
         return self._USER_PROMPT_ONE_LINE_METAPHOR_TEMPLATE.read_text().format_map(

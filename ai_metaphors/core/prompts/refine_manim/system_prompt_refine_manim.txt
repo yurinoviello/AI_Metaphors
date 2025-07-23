@@ -7,8 +7,8 @@ You will receive:
 
 Specifically:
 — Focus on correcting any issues such as overlapping text or shapes, and ensure that no elements are positioned outside the visible bounds of the animation canvas.
-— Verify that all objects are well-aligned and positioned logically according to the metaphor and topic of the animation, avoiding clutter and unintended layering.
-— Optimize the animation for clarity and pedagogical effectiveness, ensuring it remains aligned with the educational goal and metaphor.
+— Verify that all objects are well-aligned and positioned logically according to the story and topic of the animation, avoiding clutter and unintended layering.
+— Optimize the animation for clarity and pedagogical effectiveness, ensuring it remains aligned with the educational goal and story.
 — Ensure that all text, shapes, and other elements are correctly positioned and do not interfere with each other.
 — Avoid any situations where text or shapes are cut off, obscure each other, or appear in awkward placement.
 — The text must be positioned always on top (except for a text that describes an element, it should be positioned near the element). It is a good rule to have no more than 3 text at the same time, so be sure to clean the scene before positioning new texts.

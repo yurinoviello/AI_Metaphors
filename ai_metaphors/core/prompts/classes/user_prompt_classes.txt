@@ -1,4 +1,4 @@
 {input_data}
 
-Metaphor to animate:
-```{metaphor}```
+Story to animate:
+```{story}```

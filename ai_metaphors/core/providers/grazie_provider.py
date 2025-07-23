@@ -69,6 +69,18 @@ class GrazieProvider:
     def change_model(self, model: str) -> None:
         self._model = model
 
+    def get_term_definition(self) -> str:
+        return self.__safe_call(
+            system_prompt=self._prompt_provider.get_system_prompt_term_definition(),
+            user_prompt=self._prompt_provider.get_user_prompt_term_definition(),
+        )
+
+    def get_one_line_term_definition(self, term_definition: str) -> str:
+        return self.__safe_call(
+            system_prompt=self._prompt_provider.get_system_prompt_one_line_term_definition(),
+            user_prompt=self._prompt_provider.get_user_prompt_one_line_term_definition(term_definition),
+        )
+
     def get_metaphor(self) -> str:
         return self.__safe_call(
             system_prompt=self._prompt_provider.get_system_prompt_metaphor(),
@@ -81,29 +93,29 @@ class GrazieProvider:
             user_prompt=self._prompt_provider.get_user_prompt_one_line_metaphor(metaphor),
         )
 
-    def get_classes(self, metaphor: str, svg: str) -> str:
+    def get_classes(self, story: str, svg: str) -> str:
         return self.__safe_call(
             system_prompt=self._prompt_provider.get_system_prompt_classes(svg),
-            user_prompt=self._prompt_provider.get_user_prompt_classes(metaphor),
+            user_prompt=self._prompt_provider.get_user_prompt_classes(story),
         )
 
-    def get_description(self, metaphor: str, one_line_metaphor: str, classes: str) -> str:
+    def get_description(self, story: str, one_line_story: str, classes: str) -> str:
         return self.__safe_call(
             system_prompt=self._prompt_provider.get_system_prompt_description(),
-            user_prompt=self._prompt_provider.get_user_prompt_description(metaphor, one_line_metaphor, classes),
+            user_prompt=self._prompt_provider.get_user_prompt_description(story, one_line_story, classes),
         )
 
     def get_manim(
         self,
-        metaphor: str,
-        one_line_metaphor: str,
+        story: str,
+        one_line_story: str,
         classes: str,
         svg: str,
         instructions: str,
     ) -> str:
         return self.__safe_call(
             system_prompt=self._prompt_provider.get_system_prompt_manim(svg),
-            user_prompt=self._prompt_provider.get_user_prompt_manim(metaphor, one_line_metaphor, classes, instructions),
+            user_prompt=self._prompt_provider.get_user_prompt_manim(story, one_line_story, classes, instructions),
         )
 
     def request_static_refinement(self, code: str, runtime_error: str, static_error: str, svg: str) -> str:

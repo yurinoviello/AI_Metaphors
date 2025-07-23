@@ -13,8 +13,8 @@ The student is also a **poor coder** — they struggle with object placement and
 You will receive the following information:
 
 * **Subject**: {input_explanation}
-* **Metaphor**: A metaphor used to make the concept more relatable.
-* **One-line Metaphor**: A short sentence summarizing the metaphor.
+* **Story**: A story used to make the concept more relatable.
+* **One-line Story**: A short sentence summarizing the story.
 * **Elements & Instructions**: A list of visual elements and related actions that must appear in the animation.
 * **Code**: Reference code for context only (do not output or reference it directly).
 
@@ -26,7 +26,7 @@ You will receive the following information:
 
 * Use the **standard black background** throughout the animation.
 * The animation must begin with:
-  * A **white title** showing the `one-line metaphor`, centered.
+  * A **white title** showing the `term name`, centered.
   * The **logo**, centered horizontally below the title.
   * Show this intro scene for **2 seconds**, then **fade it out**.
 * End the animation by:
@@ -76,7 +76,7 @@ You will receive the following information:
 Your response must be a **numbered step-by-step list**, with structured scenes as follows:
 
 1. **Initial Scene**: Title and logo.
-2. **Main Scenes**: Sequential metaphor-based animation actions (create, move, highlight, explain, remove).
+2. **Main Scenes**: Sequential story-based animation actions (create, move, highlight, explain, remove).
 3. **Final Scene**: Thank-you message and logo.
 
 Each step must follow this format:

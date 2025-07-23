@@ -1,0 +1,61 @@
+- **Topic to explain:**
+
+  ```break```
+
+- **Definition to animate:**
+
+  ```The `break` statement is a control flow instruction used to immediately terminate the execution of the nearest enclosing loop or switch construct. When encountered, it causes the program to exit the loop regardless of the iteration condition, transferring control to the first statement after the loop.```
+
+- **Output:**
+
+  ```json
+  {
+      "elements": [
+        {
+          "name": "LoopWheel",
+          "role": "Represents the overall loop mechanism, visualized as a rotating wheel indicating repeated iterations.",
+          "actions": [
+            "Symbolizes continuous cycle of iterations",
+            "Holds the iteration elements on its path"
+          ],
+          "code": "from manim import *\n\nclass LoopWheel(Circle):\n    def __init__(self, **kwargs):\n        super().__init__(radius=1.2, color=WHITE, stroke_width=3)\n        self.set_fill(WHITE, opacity=0.1)\n        self.label = Text('Loop\\n(wheel)', font_size=24, color=WHITE).move_to(self.get_center())\n        self.add(self.label)"
+        },
+        {
+          "name": "IterationDot",
+          "role": "Represents each individual iteration step within the loop, visualized as a moving blue dot.",
+          "actions": [
+            "Moves along the loop path to indicate current iteration",
+            "Executes the code block for each iteration"
+          ],
+          "code": "from manim import *\n\nclass IterationDot(Dot):\n    def __init__(self, position=ORIGIN, **kwargs):\n        super().__init__(radius=0.15, color=BLUE)\n        self.move_to(position)"
+        },
+        {
+          "name": "StopSign",
+          "role": "Represents the `break` statement as a clear visual stop sign to interrupt the loop execution.",
+          "actions": [
+            "Signals immediate termination of the loop",
+            "Visually emphasizes the stopping point in the iteration"
+          ],
+          "code": "from manim import *\n\nclass StopSign(Polygon):\n    def __init__(self, **kwargs):\n        octagon_points = [\n            UP + LEFT * 0.6,\n            UP * 0.9 + LEFT * 0.2,\n            UP * 0.9 + RIGHT * 0.2,\n            UP + RIGHT * 0.6,\n            DOWN + RIGHT * 0.6,\n            DOWN * 0.9 + RIGHT * 0.2,\n            DOWN * 0.9 + LEFT * 0.2,\n            DOWN + LEFT * 0.6,\n        ]\n        super().__init__(*octagon_points, color=RED, fill_opacity=0.5, **kwargs)\n        self.label = Text('BREAK', font_size=28, color=WHITE).move_to(self.get_center())\n        self.add(self.label)"
+        },
+        {
+          "name": "PathArrow",
+          "role": "Indicates the flow of control between elements in the loop and after the loop.",
+          "actions": [
+            "Shows direction of execution flow",
+            "Connects iteration steps and break with subsequent blocks"
+          ],
+          "code": "from manim import *\n\nclass PathArrow(Arrow):\n    def __init__(self, start=ORIGIN, end=RIGHT, **kwargs):\n        super().__init__(start=start, end=end, color=WHITE, stroke_width=3, **kwargs)"
+        },
+        {
+          "name": "AfterLoopDoor",
+          "role": "Symbolizes the code block executed after the loop ends or is interrupted.",
+          "actions": [
+            "Receives control after the loop terminates",
+            "Represents the continuation of program flow"
+          ],
+          "code": "from manim import *\n\nclass AfterLoopDoor(Square):\n    def __init__(self, **kwargs):\n        super().__init__(side_length=1.5, color=WHITE, stroke_width=3)\n        self.set_fill(WHITE, opacity=0.1)\n        self.label = Text('After Loop', font_size=20, color=WHITE).move_to(self.get_center())\n        self.add(self.label)"
+        }
+      ]
+  }
+  ```

@@ -5,6 +5,7 @@ import re
 
 from ai_metaphors.avatar.processors.avatar_processor import AvatarProcessor
 from ai_metaphors.avatar.processors.cartoon_avatar_processor import CartoonAvatarProcessor
+from ai_metaphors.core.utils import TermType
 from ai_metaphors.core.output_structure.output_structure import OutputStructure
 from ai_metaphors.core.providers.prompt_provider import PromptProvider
 from ai_metaphors.core.providers.grazie_provider import GrazieProvider
@@ -16,12 +17,13 @@ from ai_metaphors.core.utils.text_utils import extract_json, extract_content
 class MetaphorProcessor:
     _subject_id: str
     _manim_type: ManimType
+    _term_type: TermType
     _working_dir: Path
     _model_manim: str
     _vllm_fix: bool
 
-    _metaphor: str | None
-    _one_line_metaphor: str | None
+    _story: str | None   #  metaphor or definition
+    _one_line_story: str | None
     _classes_dict: str | None
     _description: str | None
 
@@ -35,6 +37,7 @@ class MetaphorProcessor:
             subject_id: str,
             prompt_provider: PromptProvider,
             metaphor: str | None,
+            term_type: TermType,
             manim_type: ManimType,
             bin_directory: Path,
             working_dir: Path,
@@ -52,7 +55,8 @@ class MetaphorProcessor:
 
         self._subject_id = subject_id
         self._manim_type = manim_type
-        self._metaphor = metaphor
+        self._story = metaphor
+        self._term_type = term_type
         self._working_dir = working_dir
         self._model_manim = model_manim
         self._vllm_fix = vllm_fix
@@ -78,17 +82,26 @@ class MetaphorProcessor:
             high_quality
         )
 
-    def _generate_metaphor(self):
-        if self._metaphor is None:
-            self._metaphor = extract_content(self._grazie_provider.get_metaphor())
-        logging.info("Metaphor: %s", self._metaphor)
+    def _generate_story(self):
+        if self._term_type == TermType.ACADEMIC_DEFINITION:
+            self._story = extract_content(self._grazie_provider.get_term_definition())
+            logging.info("Term definition: %s", self._story)
+        elif self._story is None:
+            self._story = extract_content(self._grazie_provider.get_metaphor())
+            logging.info("Metaphor: %s", self._story)
 
-    def _generate_one_line_metaphor(self):
-        self._one_line_metaphor = extract_content(self._grazie_provider.get_one_line_metaphor(self._metaphor))
-        logging.info("One-line Metaphor: %s", self._one_line_metaphor)
+    def _generate_one_line_story(self):
+        if self._story is None:
+            return
+        if self._term_type == TermType.ACADEMIC_DEFINITION:
+            self._one_line_story = extract_content(self._grazie_provider.get_one_line_term_definition(self._story))
+            logging.info("One-line term definition: %s", self._one_line_story)
+        else:
+            self._one_line_story = extract_content(self._grazie_provider.get_one_line_metaphor(self._story))
+            logging.info("One-line Metaphor: %s", self._one_line_story)
 
     def _generate_classes(self):
-        classes = self._grazie_provider.get_classes(self._metaphor, self._manim_provider.svg)
+        classes = self._grazie_provider.get_classes(self._story, self._manim_provider.svg)
         logging.info("Classes created")
         self._classes_dict = extract_json(classes)
         with self._manim_provider.classes_file.open(mode="w", encoding="utf-8") as json_file:
@@ -96,7 +109,7 @@ class MetaphorProcessor:
         logging.info("Classes extracted")
 
     def _generate_description(self):
-        self._description = self._grazie_provider.get_description(self._metaphor, self._one_line_metaphor, str(self._classes_dict))
+        self._description = self._grazie_provider.get_description(self._story, self._one_line_story, str(self._classes_dict))
         with self._manim_provider.description_file.open(mode="w", encoding="utf-8") as text_file:
             text_file.write(self._description)
         logging.info("Description created")
@@ -106,8 +119,8 @@ class MetaphorProcessor:
             self._grazie_provider.change_model(self._model_manim)
 
         manim_code = self._grazie_provider.get_manim(
-            self._metaphor,
-            self._one_line_metaphor,
+            self._story,
+            self._one_line_story,
             str(self._classes_dict),
             self._manim_provider.svg,
             self._description,
@@ -145,13 +158,13 @@ class MetaphorProcessor:
         logging.info("Adding cartoon avatar...")
         CartoonAvatarProcessor(
             description=self._description,
-            one_line_metaphor=self._one_line_metaphor,
+            one_line_story=self._one_line_story,
             output_structure=self._output_structure
         ).generate_video_with_avatar()
 
     def generate_video(self):
-        self._generate_metaphor()
-        self._generate_one_line_metaphor()
+        self._generate_story()
+        self._generate_one_line_story()
         self._generate_classes()
         self._generate_description()
         manim_code = self._generate_manim_code()

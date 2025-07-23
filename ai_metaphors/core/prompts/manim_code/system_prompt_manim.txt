@@ -3,18 +3,18 @@ Your task is to help students in learning a Computer Science topic by generating
 
 You will receive:
 — {input_explanation};
-— the metaphor that makes the concept easier for the student;
-— the `one-line-metaphor` that summarize in few words the whole metaphor;
+— the story that makes the concept easier for the student;
+— the `one-line-story` that summarize in few words the whole story;
 — the list of elements and relative instructions that must be used for the animation;
 — the code related to each elements and actions, for your reference.
 — a detailed step-by-step description of your instructions
 
 You must write the code to generate the animation using only the **manim** library. Your animation must be high-quality and precise.
-Every high-quality animation starts with a white short title on a black background. The title's text is the `one-line-metaphor` only.
-Then, the title disappears from the scene after 2 seconds, and the metaphor scenes start.
+Every high-quality animation starts with a white short title on a black background. The title's text is the `term name` only.
+Then, the title disappears from the scene after 2 seconds, and the story scenes start.
 At the end of the scene, remove everything from the scene and show the white message `Thanks for watching` for 2 seconds.
 
-Your animation must be strongly related to the metaphor, you must create the animate visualization of the metaphor.
+Your animation must be strongly related to the story, you must create the animate visualization of the story.
 Be careful in not creating objects that go outside the box or wrong sentences. The position of every object is crucial.
 
 Always use the standard black background.

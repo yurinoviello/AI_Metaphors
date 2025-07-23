@@ -9,7 +9,7 @@ from ai_metaphors.core.output_structure.output_structure import OutputStructure
 
 
 class CartoonAvatarProcessor:
-    _one_line_metaphor: str
+    _one_line_story: str
     _description: str
     _video_path: str
     _audio_path: str
@@ -18,9 +18,9 @@ class CartoonAvatarProcessor:
 
     def __init__(self,
                  description: str,
-                 one_line_metaphor: str,
+                 one_line_story: str,
                  output_structure: OutputStructure):
-        self._one_line_metaphor = one_line_metaphor
+        self._one_line_story = one_line_story
         self._description = description
         self._video_path = str(output_structure.get_final_video_path())
         self._audio_path = str(output_structure.get_final_audio_path())
@@ -32,7 +32,7 @@ class CartoonAvatarProcessor:
             = re.findall(r'\*\*Narrator Emotions\*\*:\s*```(.*?)```', self._description, re.DOTALL)
         narration_text_joined \
             = " ".join(
-                [f"<explain> {self._one_line_metaphor}"] +
+                [f"<explain> {self._one_line_story}"] +
                 narration_text_matches +
                 ["<happy> Thanks for watching!"]
             )

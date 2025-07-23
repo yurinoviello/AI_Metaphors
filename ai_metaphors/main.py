@@ -3,8 +3,10 @@ import logging
 import datasets
 
 from ai_metaphors.config_arg_parser import ConfigArgumentParser
+from ai_metaphors.core.utils import TermType
 from ai_metaphors.core.processors.metaphor_processor import MetaphorProcessor
 from ai_metaphors.core.utils.manim_type import ManimType
+from ai_metaphors.video_from_academic_definition import AcademicDefinitionPromptProvider
 from ai_metaphors.video_from_code import CodePromptProvider
 from ai_metaphors.video_from_definition.providers import DefinitionPromptProvider
 from ai_metaphors.core.utils.path_utils import process_bin_directory, process_temperature, process_working_dir
@@ -29,11 +31,12 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--metaphor", help="Metaphor associated with the term")
     parser.add_argument("--generate-metaphor-text", action="store_true", help="Flag to generate the metaphor")
     parser.add_argument("--term-type",
-        choices=['definition', 'code'],
+        choices=['definition', 'code', 'academic-definition'],
         default='definition',
         help="""Type of the input to explain:
-            definition - term with definition
-            code       - term with code""",
+            definition          - term with definition
+            code                - term with code
+            academic-definition - term with optional academic definition (without metaphor) """,
     )
     parser.add_argument(
         "--animation-type",
@@ -112,23 +115,34 @@ def parse_arguments() -> argparse.Namespace:
         help="Activate debug mode",
     )
     args = parser.parse_args()
+    match args.term_type:
+        case "definition":
+            args.term_kind = TermType.DEFINITION_METAPHOR
+        case "code":
+            args.term_kind = TermType.CODE_METAPHOR
+        case "academic-definition":
+            args.term_kind = TermType.ACADEMIC_DEFINITION
+        case _:
+            raise ValueError(f"Unknown term type: {args.term_type}")
     if args.use_dataset_example != -1:
-        match args.term_type:
-            case "definition":
+        match args.term_kind:
+            case TermType.DEFINITION_METAPHOR:
                 ds = datasets.load_from_disk("ai_metaphors/resources/examples/definitions")
                 args.term_name = ds[args.use_dataset_example]["name"]
                 args.term_value = ds[args.use_dataset_example]["definition"]
                 args.metaphor = ds[args.use_dataset_example]["metaphor"]
-            case "code":
+            case TermType.CODE_METAPHOR:
                 ds = datasets.load_from_disk("ai_metaphors/resources/examples/codes")
                 args.term_name = ds[args.use_dataset_example]["name"]
                 args.term_value = ds[args.use_dataset_example]["folder"]
+            case _:
+                raise ValueError(f"Not supported term type: {args.term_kind} for dataset example")
     else:
         if args.term_name is None:
             raise ValueError("Term must not be empty when no example is used.")
-        if args.term_value is None:
+        if args.term_kind != TermType.ACADEMIC_DEFINITION and args.term_value is None:
             raise ValueError("Definition must not be empty when no example is used.")
-        if not args.generate_metaphor_text and args.metaphor is None:
+        if args.term_kind != TermType.ACADEMIC_DEFINITION and not args.generate_metaphor_text and args.metaphor is None:
             raise ValueError("Metaphor must not be empty if not generating it.")
     if args.vllm_fix:
         args.high_quality = False
@@ -150,21 +164,24 @@ def main():
     args = parse_arguments()
     if args.debug:
         logging.basicConfig(level=logging.INFO)
-    match args.term_type:
-        case "definition":
+    match args.term_kind:
+        case TermType.DEFINITION_METAPHOR:
             term = {
                 "name": args.term_name,
                 "definition": args.term_value
             }
             prompt_provider = DefinitionPromptProvider(term, args.manim_type)
-        case "code":
+        case TermType.CODE_METAPHOR:
             term = {
                 "name": args.term_name,
                 "code_folder": args.term_value
             }
             prompt_provider = CodePromptProvider(term, args.manim_type)
+        case TermType.ACADEMIC_DEFINITION:
+            term = { "name": args.term_name }
+            prompt_provider = AcademicDefinitionPromptProvider(term, args.manim_type)
         case _:
-            raise ValueError(f"Unknown term type: {args.term_type}")
+            raise ValueError(f"Unknown term type: {args.term_kind}")
     print(args)
     subject_id = args.term_name.replace(' ', '_')
 
@@ -172,6 +189,7 @@ def main():
         subject_id=subject_id,
         prompt_provider=prompt_provider,
         metaphor=args.metaphor,
+        term_type=args.term_kind,
         manim_type=args.manim_type,
         bin_directory=args.bin_directory,
         working_dir=args.working_dir,
