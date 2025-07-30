@@ -1,0 +1,29 @@
+apiVersion: skaffold/v4beta8
+kind: Config
+metadata:
+  name: ai-metaphors
+build:
+  tagPolicy:
+    sha256: {}
+  artifacts:
+    - image: registry.jetbrains.team/p/edu-research/containers/ai-metaphors-image
+      context: ../
+      docker:
+        dockerfile: server.Dockerfile
+  local:
+    useDockerCLI: false
+    useBuildkit: true
+deploy:
+  helm:
+    releases:
+      - name: ai-metaphors
+        remoteChart: oci://registry.jetbrains.team/p/cb/helm-charts/simple-app
+        version: 0.2.1
+        upgradeOnChange: true
+        setValueTemplates:
+          image: "{{.IMAGE_FULLY_QUALIFIED}}"
+          imagePullSecret: "{{.IMAGE_PULL_SECRET}}"
+          applicationName: "{{.APPLICATION_NAME}}"
+        valuesFiles:
+          - values.yaml
+

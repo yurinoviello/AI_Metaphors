@@ -8,7 +8,7 @@ numba==0.61.0
 numpy<2
 fonttools==4.56.0
 manimpango==0.6.0
-datasets>=3.2.0
+datasets>=2.0.0
 grazie-api-gateway-client>=0.1.13
 pylint>=3.3.2,<4.0.0
 python-dotenv>=0.21.0,<0.22.0
@@ -17,6 +17,20 @@ scikit-image>=0.19.3
 ruff==0.8.3
 pyyaml>=6.0
 nltk==3.8
+fastapi>=0.115.13
+gunicorn>=22.0.0
+uvicorn>=0.34.3
+sqlalchemy>=2.0.41
+psycopg2-binary>=2.9
+asyncpg>=0.29.0
+google-cloud-storage>=2.9.0
+moviepy>=2.0.0
+attrs~=25.3.0
+tiktoken~=0.3.1
+pydantic~=2.11.7
+protobuf~=6.31.1
+setuptools==59.8.0
+pydantic-settings>=2.10.1
 
 git+https://github.com/yurinoviello/manim.git@custom_manim
 git+https://github.com/openai/whisper.git@v20230314

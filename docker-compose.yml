@@ -1,5 +1,5 @@
 services:
-  ai-metaphors:
+  ai-metaphors-cli:
     build:
       context: .
       dockerfile: Dockerfile
@@ -7,8 +7,24 @@ services:
       - .:/app
       - ./animations:/app/animations
       - ./config:/app/config
-    entrypoint:
-      python -m ai_metaphors.main --bin-directory /usr/local/bin --config config/config.yaml
+    entrypoint: [
+      "python", "-m", "ai_metaphors.cli.main", "--bin-directory", "/usr/local/bin", "--config", "config/config.yaml"
+    ]
+    env_file:
+      - .env
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app
+
+  ai-metaphors-server:
+    build:
+      context: .
+      dockerfile: server.Dockerfile
+    ports:
+      - "8898:8898"
+    volumes:
+      - .:/app
     env_file:
       - .env
     environment:

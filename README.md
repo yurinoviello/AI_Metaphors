@@ -2,6 +2,52 @@
 
 This Python module generates metaphors, associated classes, descriptions, and Manim animation code for a given term. It integrates several providers, including **GrazieProvider** and **ManimProvider**, to produce results and animations.
 
+## Project Structure
+
+The project is organized into three main components:
+
+#### Common Module
+The `ai_metaphors/common` directory contains shared functionality used by # Alternative Installation with `pip`
+
+1. **Add Tokens**
+   You can add the access token to the [pip config file](https://pip.pypa.io/en/stable/topics/configuration/).
+
+2. **Install dependencies**
+```bash
+   pip install -r requirements.txt
+```
+
+3. **Additional Dependencies** (if needed)
+```bash
+   brew install cairo pkg-config
+```
+```bash
+   brew install portaudio
+```
+
+4. **Run**
+```bash
+   python3 -m ai_metaphors.main --help
+```
+---both the CLI and server components:
+- **Core utilities**: Base functionality for processing metaphors, handling paths, and working with different term types
+- **Video generation**: Components for generating videos from different sources (academic definitions, code, general definitions)
+- **Avatar**: Functionality for creating animated avatars
+- **Output structure**: Standardized output formats
+
+#### CLI Module
+The `ai_metaphors/cli` directory contains the command-line interface for the application:
+- **main.py**: Entry point for CLI execution with argument parsing
+- **config_arg_parser**: Utilities for parsing configuration from files and command line arguments
+
+#### Server Module
+The `ai_metaphors/server` directory contains the FastAPI server implementation:
+- **API endpoints**: REST API endpoints for video generation and status checking
+- **Database models**: Data models for storing video tasks
+- **Schemas**: Pydantic models for request/response validation
+- **Services**: Business logic for processing video generation tasks
+- **Settings**: Server configuration
+
 ## **Overview**
 
 The script performs the following steps:
@@ -26,113 +72,65 @@ Ensure the following tools and libraries are installed:
 
 ---
 
-## **Folder and Token Requirements**
+## Environment Variables
 
-1. **Token File**:  
-   Place the following tokens in a file named `.env` inside the project root folder.
-   - `GRAZIE_JWT_TOKEN`: it will be used to authenticate via the `GrazieApiGatewayClient`
-   - `POETRY_HTTP_BASIC_SPACE_GRAZIE_ML_USERNAME`
-   - `POETRY_HTTP_BASIC_SPACE_GRAZIE_ML_PASSWORD`
-   - `OPENAI_API_KEY`: it will be used to execute the video evaluation and text-to-speech feature
+The following environment variables are required to run the application (see `.env.example`):
 
-   You can rename the example file `.env.example` to `.env` and add your tokens inside it.
+- **GRAZIE_JWT_TOKEN**: Authentication token for the Grazie API
+- **OPENAI_API_KEY**: API key for OpenAI services (used for video evaluation and text-to-speech)
+- **BUCKET_NAME**: AWS S3 bucket name for storing generated videos (server mode)
+- **AWS_ACCESS_KEY_ID**: AWS access key for S3 storage
+- **AWS_SECRET_ACCESS_KEY**: AWS secret key for S3 storage
 
-   ```
-   ./AI_Metaphors/.env.example
-   ```
+### Running with Docker Compose
 
-2. **Manim working dir**:  
-   Specify a directory in which the code related with animations and the output videos will be placed.
+There are two ways to run the application using Docker Compose:
 
-   For example:
-   ```
-   ./AI_Metaphors/animations
-   ```
----
+#### 1. CLI Mode
 
-## Suggested Installation
-To set up the project and install all dependencies, follow these steps using **Poetry**:
-To set up the project and install all dependencies using **Poetry**, follow these steps:
+CLI mode runs the application as a one-time process that generates a video based on the configuration in `config/config.yaml`.
 
-1. **Clone the Repository**  
-   Clone the project from GitHub to your local machine:
-
-   ```bash
-   git clone https://git.jetbrains.team/edu-research/AI_Metaphors.git
-   cd AI_Metaphors
-   ```
-
-2. **Add the tokens to the local environment**
-
-   Execute the following command to export the tokens in your shell.
-   It will allow you to install the `grazie-api-gateway-client` package:
-
-   ```bash
-   set -o allexport && source .env && set +o allexport
-   ```
-
-3. **Install Dependencies**  
-   Use Poetry to create a virtual environment and install all dependencies:
-
-   ```bash
-   poetry lock --no-update
-   poetry install
-   ```
-
-   This command will:
-   - Create a virtual environment for the project.
-   - Install all required dependencies specified in `pyproject.toml`.
-
-4. **Activate the Virtual Environment**  
-   To activate the virtual environment created by Poetry, run:
-
-   ```bash
-   poetry shell
-   ```
-
-4. **Verify the Installation**  
-   Run the following command to check that all dependencies are installed correctly:
-
-   ```bash
-   poetry run python ai_metaphors/main.py --help
-   ```
-   or simply
-   ```bash
-   ai-metaphors --help
-   ```
-
----
-
-## Alternative Installation with `pip`
-
-1. **Add Tokens**
-You can add the access token to the [pip config file](https://pip.pypa.io/en/stable/topics/configuration/).
-
-2. **Install dependencies**
 ```bash
-   pip install -r requirements.txt
+# Build the container
+docker-compose build ai-metaphors-cli
+
+# Run the application in CLI mode
+docker-compose run ai-metaphors-cli
 ```
 
-3. **Additional Dependencies** (if needed)
+The CLI mode:
+- Uses the configuration from `config/config.yaml`
+- Generates a single video based on the configuration
+- Outputs the video to the `/animations` directory
+- Exits after completion
+
+#### 2. Server Mode
+
+Server mode runs the application as a REST API service that can accept multiple video generation requests.
+
 ```bash
-   brew install cairo pkg-config
-```
-```bash
-   brew install portaudio
+# Build the container
+docker-compose build ai-metaphors-server
+
+# Run the application in server mode
+docker-compose up ai-metaphors-server
 ```
 
-4. **Run**
-```bash
-   python3 -m ai_metaphors.main --help
-```
----
+The server mode:
+- Starts a FastAPI server on port 8898
+- Provides REST API endpoints for video generation
+- Processes video generation tasks asynchronously
+- Stores videos in an S3 bucket
+- Provides endpoints to check task status
+
+API endpoints:
+- `POST /video`: Submit a new video generation task
+- `GET /video/tasks/{task_id}`: Check the status of a specific task
+- `GET /video/tasks`: List all tasks
 
 ## **Usage**
 
 Run the script with the following arguments:
-
-### Command-Line Options
-
 ```bash
 ai-metaphors [OPTIONS]
 ```
@@ -142,19 +140,22 @@ ai-metaphors [OPTIONS]
 | `--use-dataset-example`    | `int`    | Use an example from the dataset (index between 0 and 13). Set `-1` to disable. Default is `-1`.                                                    |
 | `--term-name`              | `str`    | The name of the term (required if `use-dataset-example` is not set).                                                                               |
 | `--term-definition`        | `str`    | Definition of the term (required).                                                                                                                 |
+| `--term-type`              | `str`    | Type of term: `code`, `definition`, or `academic-definition`. Default is `definition`.                                                             |
 | `--metaphor`               | `str`    | The metaphor associated with the term. If `--generate-metaphor` is set, this will be ignored.                                                      |
 | `--generate-metaphor-text` | `flag`   | Flag to generate the metaphor automatically.                                                                                                       |
-| `--animation-type`         | `str`    | Type of animation to generate: `basic` (default, simple animation), `voice` (adds voice-over), or `avatar` (adds animated avatar with voice-over). |
+| `--animation-type`         | `str`    | Type of animation to generate: `basic` (default, simple animation), `voice` (adds voice-over), `avatar` (adds animated avatar with voice-over), or `cartoon-avatar` (adds cartoon-style avatar with voice-over). |
 | `--bin-directory`          | `str`    | Path to the executable for Manim. Default is `.venv/bin`.                                                                                          |
 | `--working-dir`            | `str`    | Working directory for Manim output. Default: `./animations`.                                                                                       |
 | `--model`                  | `str`    | Language model to process with. Default: `openai-gpt-4o`.                                                                                          |
-| `--model-manim`            | `str`    | LLM to process only the Manim script. Default: `default`.                                                                                          |
+| `--model-classes`          | `str`    | LLM to be used specifically for processing classes. Default: `default`.                                                                            |
+| `--model-manim`            | `str`    | LLM to process only the Manim script. Default: `anthropic-claude-3.7-sonnet`.                                                                      |
 | `--temperature`            | `float`  | Temperature value to be used by the chosen language model. Default: `0.1`.                                                                         |
 | `--vllm-fix`               | `flag`   | **Experimental** Perform an automatic vLLM analysis and code correction.                                                                           |
 | `--auto-play`              | `flag`   | Automatically play the animation at the end of the execution.                                                                                      |
 | `--high-quality`           | `flag`   | Generate a high-quality animation (1080p60). If not set, the default is 480p15.                                                                    |
 | `--debug`                  | `flag`   | Activate debug mode.                                                                                                                               |
 | `--config`                 | `str`    | Path to the config file from which other arguments will be read. If not provided, the arguments will be read from the command line.                 |
+
 ### Example Usage
 
 1. **With Manually Provided Inputs**:
@@ -164,7 +165,7 @@ ai-metaphors [OPTIONS]
 
 2. **Generating a Metaphor**:
    ```bash
-   ai-metaphors --term-name Boolean --term-definition 'A data type that has one of two possible values (usually denoted true and false) intended to represent the two truth values of logic and Boolean algebra.' --generate-metaphor
+   ai-metaphors --term-name Boolean --term-definition 'A data type that has one of two possible values (usually denoted true and false) intended to represent the two truth values of logic and Boolean algebra.' --generate-metaphor-text
    ```
 
 3. **Using a Dataset Example**:
@@ -174,7 +175,7 @@ ai-metaphors [OPTIONS]
    You can use terms, metaphors, and definitions from this dataset:
 
    | index | term                  |
-   |-------|-----------------------|
+      |-------|-----------------------|
    | 0     | `Boolean`             |
    | 1     | `append`              |
    | 2     | `break`               |
@@ -228,47 +229,9 @@ The script checks for:
 3. **Empty required inputs**:  
    If `--term-name` or `--term-definition` is empty, the script exits with an error.
 4. **Metaphor Requirements**:  
-   If `--generate-metaphor` is **not** used, a metaphor must be provided.
+   If `--generate-metaphor-text` is **not** used, a metaphor must be provided.
 
 ---
-
-## Usage with Docker Compose
-
-1. **Set up environment variables**:
-   ```bash
-   cp .env.example .env
-   ```
-   You can find example configurations in `.env.example` file.
-
-2. **Configure your `.env` file**:
-
-   Add _one of these_ LLM provider tokens (required):
-   - `GRAZIE_JWT_TOKEN` or
-   - `OPENAI_API_KEY`
-
-   Note: Poetry authentication tokens are not needed for Docker setup.
-
-3. **Configure the application**:
-   Edit the `config/config.yaml` file to set your desired parameters.
-
-4. **Build and run with Docker Compose**:
-   ```bash
-   # Build the container
-   docker-compose build
-
-   # Run the application
-   docker-compose up
-   ```
-
-5. **Access Generated Content**:
-   - Generated animations will be available in the `/animations` folder
-   - This folder is mapped as a volume in [`docker-compose.yml`](docker-compose.yml)
-
-Notes:
-- Make sure Docker and Docker Compose are installed on your system
-- The first run will take longer as it needs to build the container
-- All dependencies will be automatically installed in the container
-- All configuration is now done through the `config/config.yaml` file instead of command-line arguments
 
 **Development Notes**:
 - When making changes to the configuration or dependencies:

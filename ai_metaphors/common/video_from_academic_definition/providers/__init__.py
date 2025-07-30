@@ -1,0 +1,3 @@
+from ai_metaphors.common.video_from_academic_definition.providers.academic_definition_prompt_provider import AcademicDefinitionPromptProvider
+
+__all__ = ["AcademicDefinitionPromptProvider"]
