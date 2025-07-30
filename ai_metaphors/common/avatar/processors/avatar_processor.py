@@ -26,9 +26,11 @@ class AvatarProcessor:
     _avatar_face_file = Path("ai_metaphors/resources/avatar_face.jpg")
     _float_model_dir: Path
     _phrases_mapping_dir: Path
+    _task_id: str | None
 
-    def __init__(self, working_dir: Path, description: str, subject_id: str):
+    def __init__(self, working_dir: Path, description: str, subject_id: str, task_id: str | None = None):
         self._working_dir = working_dir
+        self._task_id = task_id
         self._description = description
         self._avatar_dir = self._working_dir / self._AVATAR / subject_id
         if self._avatar_dir.exists():
@@ -90,8 +92,10 @@ class AvatarProcessor:
             f.write(json_str)
 
     def generate_avatar_and_break_into_frames(self, texts: list[str]):
-        subprocess.run(["sh", "ai_metaphors/resources/setup_float_model.sh"], check=True)
-
+        if self._task_id is None:
+            subprocess.run(["sh", "ai_metaphors/resources/setup_float_model.sh"], check=True)
+        else:
+            subprocess.run(["sh", "ai_metaphors/resources/setup_float_model.sh", self._task_id], check=True)
         self._text_to_dir_name = {text: str(i) for i, text in enumerate(texts)}
         self._save_texts_to_json()
 

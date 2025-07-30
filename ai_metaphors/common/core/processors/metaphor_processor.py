@@ -19,6 +19,7 @@ class MetaphorProcessor:
     _manim_type: ManimType
     _term_type: TermType
     _working_dir: Path
+    _task_id: str | None
     _model_manim: str
     _vllm_fix: bool
 
@@ -47,7 +48,8 @@ class MetaphorProcessor:
             temperature: float,
             vllm_fix: bool,
             auto_play: bool,
-            high_quality: bool
+            high_quality: bool,
+            task_id: str | None = None,
     ) -> None:
         if not bin_directory.exists():
             raise ValueError(f"bin_directory does not exist: {bin_directory}")
@@ -59,6 +61,7 @@ class MetaphorProcessor:
         self._story = metaphor
         self._term_type = term_type
         self._working_dir = working_dir
+        self._task_id = task_id
         self._model = model
         self._model_classes = model_classes
         self._model_manim = model_manim
@@ -145,6 +148,7 @@ class MetaphorProcessor:
                 working_dir=self._working_dir,
                 description=self._description,
                 subject_id=self._subject_id,
+                task_id=self._task_id
             ).generate_avatar_and_break_into_frames(narration_text)
 
     def _refine_video(self):

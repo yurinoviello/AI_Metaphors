@@ -48,7 +48,7 @@ class VideoTaskProcessor:
             logging.info(f"Starting video generation task {task_id}")
             await task.update(task_id=task_id, status=Status.processing)
 
-            self.metaphor_processor = self.processor_setup(task)
+            self.metaphor_processor = self.processor_setup(task, task_id)
             self.metaphor_processor.generate_video()
 
             logging.info(f"Video generation completed successfully")
@@ -67,7 +67,7 @@ class VideoTaskProcessor:
                 logging.info(f"Deleted working directory {self.working_dir}")
             logging.info(f"Video generation task {task_id} completed")
 
-    def processor_setup(self, task: VideoTask):
+    def processor_setup(self, task: VideoTask, task_id: str) -> MetaphorProcessor:
         term_name: str | None = task.term_name
         term_value: str | None = task.term_definition
         metaphor: str | None = task.metaphor
@@ -130,6 +130,7 @@ class VideoTaskProcessor:
             vllm_fix=task.vllm_fix,
             auto_play=False,
             high_quality=task.high_quality,
+            task_id=task_id
         )
 
     def upload_video(self, task_id: str):

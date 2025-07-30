@@ -1,5 +1,10 @@
 CURRENT_DIR=$(pwd)
-FLOAT_MODEL_DIR="$CURRENT_DIR/animations/float_model"
+if [ $# -eq 1 ]; then
+    TASK_ID=$1
+    FLOAT_MODEL_DIR="$CURRENT_DIR/animations/$TASK_ID/float_model"
+else
+    FLOAT_MODEL_DIR="$CURRENT_DIR/animations/float_model"
+fi
 need_to_download_checkpoints=false
 
 if [ ! -d "$FLOAT_MODEL_DIR" ]; then
