@@ -34,6 +34,10 @@ RUN mkdir /.local && chmod -R 777 /.local
 RUN python -m nltk.downloader -d $NLTK_DATA averaged_perceptron_tagger_eng
 RUN python -m nltk.downloader -d $NLTK_DATA averaged_perceptron_tagger
 RUN python -m nltk.downloader -d $NLTK_DATA cmudict
+
+RUN chmod +x /app/ai_metaphors/resources/setup_float_model.sh
+RUN /app/ai_metaphors/resources/setup_float_model.sh
+
 # RUN python -m ai_metaphors.server.db.init_db
 
 COPY --chown=1001:1001 entrypoint.sh /app/entrypoint.sh
