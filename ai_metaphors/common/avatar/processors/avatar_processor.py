@@ -67,9 +67,13 @@ class AvatarProcessor:
         original_dir = os.getcwd()
         try:
             os.chdir(self._float_model_dir)
+            if self._task_id is None:
+                ref_path = f"../../{self._avatar_face_file}"
+            else:
+                ref_path = f"../../../{self._avatar_face_file}"
             subprocess.run([
                 "python", "generate.py",
-                "--ref_path", f"../../{self._avatar_face_file}",
+                "--ref_path", ref_path,
                 "--aud_path", str(audio_file),
                 "--seed", "15",
                 "--a_cfg_scale", "2",
