@@ -89,7 +89,7 @@ class VideoTask(Base):
             total = total_count.scalar()
 
             # Get paginated results
-            query = select(cls).where(cls.created_at >= non_expired_threshold).offset(skip).limit(limit)
+            query = select(cls).where(cls.created_at >= non_expired_threshold).order_by(cls.created_at.desc()).offset(skip).limit(limit)
             result = await session.execute(query)
 
             return {
