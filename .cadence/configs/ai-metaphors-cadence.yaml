@@ -1,0 +1,46 @@
+project_name: ai-metaphors
+working_dir: "."
+cmd:
+- |-
+  sudo docker compose build ai-metaphors-cadence
+  sudo docker compose up ai-metaphors-cadence
+provisioning:
+  gpu_type: a10g
+  gpu_count: 4
+  cpu_count: 48
+  ram: 192
+teamcity:
+  url: https://api.cadence.jetbrains.com
+  build_conf_id: AiMetaphors_JetTrain
+env:
+  variables: {}
+  python: {}
+  secrets:
+    variables: {}
+    ssh_keys: []
+  aws:
+    sync_config: false
+    sync_credentials: false
+    sync_cache: false
+project_sync:
+  local:
+    root: "."
+    storage_name: Cadence Storage
+    uri: ""
+    exclude:
+    - animations
+    include: []
+    sync_back: false
+    snapshots: true
+    storage_type: DEFAULT
+inputs: []
+outputs:
+- type: OUTPUT
+  storage_name: Cadence Storage
+  uri: ""
+  path: "."
+  acceleration: false
+  storage_type: DEFAULT
+mounts: []
+storages: []
+description: ""

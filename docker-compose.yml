@@ -17,6 +17,32 @@ services:
       - PYTHONUNBUFFERED=1
       - PYTHONPATH=/app
 
+  ai-metaphors-cadence:
+    build:
+      context: .
+      dockerfile: cadence.Dockerfile
+    volumes:
+      - .:/app
+      - ./animations:/app/animations
+      - ./config:/app/config
+    entrypoint: [
+      "python", "-m", "ai_metaphors.cli.main", "--bin-directory", "/opt/conda/bin", "--config", "config/config.yaml"
+    ]
+    env_file:
+      - .env
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    profiles: ["gpu"]
+
   ai-metaphors-server:
     build:
       context: .
