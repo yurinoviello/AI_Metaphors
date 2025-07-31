@@ -45,8 +45,9 @@ async def get_task_status(task_id: str):
 
 
 @router.get("/video/tasks", response_model=VideoTaskList)
-async def get_tasks_list():
-    tasks = await VideoTask.all()
+async def get_tasks_list(skip: int = 0, limit: int = 100):
+    pagination_result = await VideoTask.all(skip=skip, limit=limit)
+
     return VideoTaskList(
         tasks=[
             VideoTaskStatus(
@@ -55,6 +56,9 @@ async def get_tasks_list():
                 created_at=task.created_at,
                 video_url=task.s3_video_url if task.status == Status.completed else None
             )
-            for task in tasks
-        ]
+            for task in pagination_result["items"]
+        ],
+        total=pagination_result["total"],
+        skip=pagination_result["skip"],
+        limit=pagination_result["limit"]
     )

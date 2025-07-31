@@ -81,10 +81,20 @@ class VideoTask(Base):
             return task
 
     @classmethod
-    async def all(cls):
+    async def all(cls, skip: int = 0, limit: int = 100):
         async with async_session() as session:
             non_expired_threshold = func.now() - datetime.timedelta(hours=settings.URL_EXPIRATION / 3600)
-            result = await session.execute(
-                select(cls).where(cls.created_at >= non_expired_threshold)
-            )
-            return result.scalars().all()
+            count_query = select(func.count()).select_from(cls).where(cls.created_at >= non_expired_threshold)
+            total_count = await session.execute(count_query)
+            total = total_count.scalar()
+
+            # Get paginated results
+            query = select(cls).where(cls.created_at >= non_expired_threshold).offset(skip).limit(limit)
+            result = await session.execute(query)
+
+            return {
+                "items": result.scalars().all(),
+                "total": total,
+                "skip": skip,
+                "limit": limit
+            }

@@ -50,4 +50,7 @@ class VideoTaskStatus(BaseModel):
 
 class VideoTaskList(BaseModel):
     tasks: List[VideoTaskStatus]
+    total: int
+    skip: int
+    limit: int
 
