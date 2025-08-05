@@ -185,17 +185,19 @@ def main():
         case TermType.DEFINITION_METAPHOR:
             term = {
                 "name": args.term_name,
-                "definition": args.term_value
+                "definition": args.term_value,
+                "working_dir": "animations"
             }
             prompt_provider = DefinitionPromptProvider(term, args.manim_type)
         case TermType.CODE_METAPHOR:
             term = {
                 "name": args.term_name,
-                "code_folder": args.term_value
+                "code_folder": args.term_value,
+                "working_dir": "animations"
             }
             prompt_provider = CodePromptProvider(term, args.manim_type)
         case TermType.ACADEMIC_DEFINITION:
-            term = { "name": args.term_name }
+            term = { "name": args.term_name, "working_dir": "animations" }
             prompt_provider = AcademicDefinitionPromptProvider(term, args.manim_type)
         case _:
             raise ValueError(f"Unknown term type: {args.term_kind}")

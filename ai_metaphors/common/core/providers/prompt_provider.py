@@ -145,7 +145,8 @@ class PromptProvider(ABC):
                 example_code=self._manim_type.value.get_example_code(),
                 start_code=self._manim_type.value.get_start_code(
                     self._get_subject_name(),
-                    self._get_additional_methods_for_manim_voice_start_code()
+                    self._get_additional_methods_for_manim_voice_start_code(),
+                    self._get_working_dir(),
                 ),
                 manim_library=self._get_manim_library_documentation(),
                 svg_instructions=self._get_svg_elements_instructions_manim(svg),
@@ -177,7 +178,8 @@ class PromptProvider(ABC):
                 additional_instructions=self._get_additional_instructions_for_refine_manim(),
                 start_code=self._manim_type.value.get_start_code(
                     self._get_subject_name(),
-                    self._get_additional_methods_for_manim_voice_start_code()
+                    self._get_additional_methods_for_manim_voice_start_code(),
+                    self._get_working_dir(),
                 ),
                 manim_library=self._get_manim_library_documentation()
             )
@@ -248,7 +250,7 @@ class PromptProvider(ABC):
         return self._SYSTEM_PROMPT_FIX_VIDEO_TEMPLATE.read_text().format_map(
             SafeDict(
                 example_code=self._manim_type.value.get_example_code(),
-                start_code=self._manim_type.value.get_start_code(self._get_subject_name()),
+                start_code=self._manim_type.value.get_start_code(self._get_subject_name(), working_dir=self._get_working_dir()),
                 manim_library=self._get_manim_library_documentation(),
                 svg_instructions=self._get_svg_elements_instructions(svg),
             )
@@ -265,4 +267,8 @@ class PromptProvider(ABC):
 
     @abstractmethod
     def _get_subject_name(self):
+        pass
+
+    @abstractmethod
+    def _get_working_dir(self):
         pass
