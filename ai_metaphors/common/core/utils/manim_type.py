@@ -11,10 +11,11 @@ class ManimConfig:
         self._start_code = Path(start_code)
         self._example_code = Path(example_code)
 
-    def get_start_code(self, term_name: str, additional_methods: str) -> str:
+    def get_start_code(self, term_name: str, additional_methods: str, working_dir: str) -> str:
         return self._start_code.read_text().format_map(
             SafeDict(
                 term_name=term_name.replace(' ', '_'),
+                working_dir=working_dir,
                 additional_methods=additional_methods
             ))
 

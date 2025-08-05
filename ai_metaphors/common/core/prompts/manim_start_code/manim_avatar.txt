@@ -14,14 +14,14 @@ class PreGeneratedSpeechService(SpeechService):
         if cache_dir is None:
             cache_dir = self.cache_dir
 
-        with open("animations/avatar/{term_name}/phrases.json", "r", encoding="utf-8") as f:
+        with open("{working_dir}/avatar/{term_name}/phrases.json", "r", encoding="utf-8") as f:
             data = json.load(f)
             text_index = data.get(text)
 
         if text_index is None:
             raise ValueError("Text not found in phrases.json")
 
-        audio_path = Path(f"animations/avatar/{term_name}/narration_audio/{{text_index}}.mp3")
+        audio_path = Path(f"{working_dir}/avatar/{term_name}/narration_audio/{{text_index}}.mp3")
         if not audio_path.exists():
             raise FileNotFoundError(f"Audio file not found: {{audio_path}}")
 
@@ -97,7 +97,7 @@ class GenScene(VoiceoverScene):
             A sequence of Manim animations to play in sync with the narration.
 
         """
-        with open("animations/avatar/{term_name}/phrases.json", "r", encoding="utf-8") as f:
+        with open("{working_dir}/avatar/{term_name}/phrases.json", "r", encoding="utf-8") as f:
             data = json.load(f)
             text_index = data.get(text)
 
@@ -105,7 +105,7 @@ class GenScene(VoiceoverScene):
         if text_index is None:
             return
 
-        frames_folder = f"animations/avatar/{term_name}/avatar_video_{{text_index}}/avatar_frames"
+        frames_folder = f"{working_dir}/avatar/{term_name}/avatar_video_{{text_index}}/avatar_frames"
         frame_files = sorted([
             os.path.join(frames_folder, f)
             for f in os.listdir(frames_folder)

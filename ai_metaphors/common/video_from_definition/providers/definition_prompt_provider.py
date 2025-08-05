@@ -24,6 +24,9 @@ class DefinitionPromptProvider(PromptProvider, ABC):
     def _get_subject_name(self) -> str:
         return self._term["name"]
 
+    def _get_working_dir(self):
+        return self._term["working_dir"]
+
     def _get_example_for_classes(self) -> str:
         return self._EXAMPLE_CLASSES.read_text()
 

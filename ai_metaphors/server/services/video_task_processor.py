@@ -98,17 +98,19 @@ class VideoTaskProcessor:
             case TermType.DEFINITION_METAPHOR:
                 term = {
                     "name": term_name,
-                    "definition": term_value
+                    "definition": term_value,
+                    "working_dir": f"animations/{task_id}",
                 }
                 prompt_provider = DefinitionPromptProvider(term, manim_type)
             case TermType.CODE_METAPHOR:
                 term = {
                     "name": term_name,
-                    "code_folder": term_value
+                    "code_folder": term_value,
+                    "working_dir": f"animations/{task_id}",
                 }
                 prompt_provider = CodePromptProvider(term, manim_type)
             case TermType.ACADEMIC_DEFINITION:
-                term = {"name": term_name}
+                term = {"name": term_name, "working_dir": f"animations/{task_id}",}
                 prompt_provider = AcademicDefinitionPromptProvider(term, manim_type)
             case _:
                 raise ValueError(f"Unknown term type: {task.term_type}")
