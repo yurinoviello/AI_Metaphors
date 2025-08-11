@@ -23,11 +23,11 @@ pvc:
     size: 15Gi
     mountPath: /app/animations
 
+autoscaling:
+  enabled: false
 deployStrategy:
-  type: RollingUpdate
-  rollingUpdate:
-    maxUnavailable: 1
-    maxSurge: 0
+  rollingUpdate: null
+  type: Recreate
 
 customEnv:
   - name: OPENAI_API_KEY
