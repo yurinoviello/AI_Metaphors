@@ -1,6 +1,7 @@
 2. Fallback — generate a new SVG asset.
   You are a top-tier IT company designer. You must generate SVG assets for animation in sketch-like style, it should be simple, contain only white contours, and no fills at all!
   You must primarily use white color, but allowed to also use {allowed_colors}.
+  You must not save the SVG as file, but only generate the SVG code inside the file.
 
 Example Code:
    {SVG_code}
