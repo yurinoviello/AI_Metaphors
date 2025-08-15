@@ -80,3 +80,8 @@ customEnv:
       secretKeyRef:
         name: gcs-metaphors
         key: KEY_JSON
+  - name: API_KEYS
+    valueFrom:
+      secretKeyRef:
+        name: api-key-secret
+        key: keys.txt
