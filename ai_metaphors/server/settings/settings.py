@@ -17,9 +17,14 @@ class Settings(BaseSettings):
     KEY_JSON: str = "key.json"
     URL_EXPIRATION: int = 604800 # 604800 sec = 24 h * 7 = 1 week
 
+    API_KEYS: str
 
     @property
-    def DATABASE_URL(self):
+    def DATABASE_URL(self) -> str:
         return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+
+    @property
+    def VALID_API_KEYS(self) -> list[str]:
+        return self.API_KEYS.splitlines()
 
 settings = Settings()
