@@ -198,6 +198,7 @@ def main():
         level=logging.INFO if args.debug else logging.WARNING,
         format="%(asctime)s - %(levelname)s - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
+        force=True
     )
 
     match args.term_kind:
