@@ -126,6 +126,19 @@ def parse_arguments() -> argparse.Namespace:
         action="store_true",
         help="Generate an high quality animation (1080p60p). If not set, the default is 480p15.",
     )
+    # Interactivity flags
+    parser.add_argument("--wait-analogy", action="store_true", help="Wait for user input after analogy generation (accept/redo).")
+    parser.add_argument("--wait-classes", action="store_true", help="Wait for user input after classes generation (accept/redo).")
+    parser.add_argument("--wait-description", action="store_true", help="Wait for user input after description generation (accept/redo).")
+    parser.add_argument("--wait-manim", action="store_true", help="Wait for user input after Manim code generation (accept/redo).")
+    parser.add_argument("--wait-video", action="store_true", help="Wait for user input after video generation (accept/redo).")
+    parser.add_argument(
+        "--start-stage",
+        type=str,
+        choices=["analogy", "classes", "description", "manim", "video"],
+        default="analogy",
+        help="Stage to start the pipeline from (default: analogy). Use 'video' to skip generation and just run existing code.",
+    )
     parser.add_argument(
         "--debug",
         action="store_true",
@@ -179,8 +192,14 @@ def parse_arguments() -> argparse.Namespace:
 
 def main():
     args = parse_arguments()
-    if args.debug:
-        logging.basicConfig(level=logging.INFO)
+
+    # Configure logging with timestamps; honor --debug
+    logging.basicConfig(
+        level=logging.INFO if args.debug else logging.WARNING,
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+
     match args.term_kind:
         case TermType.DEFINITION_METAPHOR:
             term = {
@@ -201,10 +220,10 @@ def main():
             prompt_provider = AcademicDefinitionPromptProvider(term, args.manim_type)
         case _:
             raise ValueError(f"Unknown term type: {args.term_kind}")
-    print(args)
+
     subject_id = args.term_name.replace(' ', '_')
 
-    MetaphorProcessor(
+    processor = MetaphorProcessor(
         subject_id=subject_id,
         prompt_provider=prompt_provider,
         metaphor=args.metaphor,
@@ -219,7 +238,100 @@ def main():
         vllm_fix=args.vllm_fix,
         auto_play=args.auto_play,
         high_quality=args.high_quality,
-    ).generate_video()
+    )
+
+    # Token usage logging: start
+    logging.info("Token usage at start: %d", processor.get_token_usage())
+
+    def _wait_loop(stage_name: str, enabled: bool, allow_jump_back: bool = False) -> str:
+        if not enabled:
+            return "accept"
+        while True:
+            if allow_jump_back:
+                prompt = (
+                    f"[{stage_name}] Type 'accept' to proceed, 'redo' to redo this stage, or 'redo <stage>' to jump back to a specific stage "
+                    f"(analogy/classes/description/manim/video): "
+                )
+            else:
+                prompt = f"[{stage_name}] Type 'accept' to proceed or 'redo' to redo this stage: "
+            logging.info("Waiting for user input after '%s' stage", stage_name)
+            try:
+                choice = input(prompt).strip().lower()
+            except EOFError:
+                choice = "accept"
+            if choice == "accept" or choice == "redo":
+                logging.info("User input after '%s': %s", stage_name, choice)
+                return choice
+            if allow_jump_back and choice.startswith("redo "):
+                target = choice.split(maxsplit=1)[1]
+                if target in {"analogy", "classes", "description", "manim", "video"}:
+                    logging.info("User requested jump back to stage: %s", target)
+                    return choice
+            logging.info("Unrecognized input: %s", choice)
+
+    # Orchestrate stages with possibility to jump back from the video stage
+    stage = args.start_stage
+    while True:
+        if stage == "analogy":
+            while True:
+                processor.generate_analogy()
+                logging.info("Token usage so far: %d", processor.get_token_usage())
+                decision = _wait_loop("analogy", args.wait_analogy)
+                if decision == "accept":
+                    stage = "classes"
+                    break
+                # 'redo' loops and reruns analogy
+            continue
+
+        if stage == "classes":
+            while True:
+                processor.reload_from_files()
+                processor.generate_classes()
+                logging.info("Token usage so far: %d", processor.get_token_usage())
+                decision = _wait_loop("classes", args.wait_classes)
+                if decision == "accept":
+                    stage = "description"
+                    break
+            continue
+
+        if stage == "description":
+            while True:
+                processor.reload_from_files()
+                processor.generate_description()
+                logging.info("Token usage so far: %d", processor.get_token_usage())
+                decision = _wait_loop("description", args.wait_description)
+                if decision == "accept":
+                    stage = "manim"
+                    break
+            continue
+
+        if stage == "manim":
+            while True:
+                processor.reload_from_files()
+                processor.generate_manim_code()
+                logging.info("Token usage so far: %d", processor.get_token_usage())
+                decision = _wait_loop("manim", args.wait_manim)
+                if decision == "accept":
+                    stage = "video"
+                    break
+            continue
+
+        if stage == "video":
+            while True:
+                processor.reload_from_files()
+                processor.run_manim()
+                decision = _wait_loop("video", args.wait_video, allow_jump_back=True)
+                if decision == "accept":
+                    logging.info("Token usage at end: %d", processor.get_token_usage())
+                    return
+                if decision == "redo":
+                    # rerun video with current assets
+                    continue
+                if decision.startswith("redo "):
+                    target = decision.split(maxsplit=1)[1]
+                    stage = target
+                    break
+            continue
 
 
 if __name__ == "__main__":

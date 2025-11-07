@@ -7,24 +7,34 @@ metaphor: null  # A custom metaphor to use (if not generating one)
 term_type: "definition"  # Type of term: "code", "definition" or "academic-definition"
 
 # Dataset example settings
-use_dataset_example: -1  # Index of example to use from the dataset (0-13), -1 to disable
+use_dataset_example: 0  # Index of example to use from the dataset (0-13), -1 to disable
 
 # Generation options
-generate_metaphor_text: false  # Whether to automatically generate a metaphor
-animation_type: "basic"  # Type of animation: "basic", "voice", "avatar" or "cartoon-avatar"
+generate_metaphor_text: true  # Whether to automatically generate a metaphor
+animation_type: "voice"  # Type of animation: "basic", "voice", "avatar" or "cartoon-avatar"
 
 # Directory settings
-bin_directory: "/usr/local/bin"  # Directory containing executable binaries
+bin_directory: ".venv/bin"  # Directory containing executable binaries
 working_dir: "./animations"  # Directory where animations will be saved
 
 # Model settings
 model: "openai-gpt-4o"  # LLM to be used for general processing
 model_classes: "default"  # LLM to be used specifically for processing classes
-model_manim: "anthropic-claude-3.7-sonnet"  # LLM to be used specifically for Manim script generation
+model_manim: "anthropic-claude-4-sonnet"  # LLM to be used specifically for Manim script generation
 temperature: 0.1  # Creativity level for LLM responses (0.0-1.0)
 
 # Execution settings
 vllm_fix: false  # Whether to perform automatic vLLM analysis and code correction
 auto_play: false  # Whether to automatically play the animation after generation
 high_quality: false  # Whether to generate high-quality animation (1080p60)
-debug: false  # Whether to enable debug mode with additional logging
+debug: true  # Whether to enable debug mode with additional logging
+
+# Interactivity (wait for user input after stages)
+wait_analogy: true       # Wait after analogy (story + one-liner) generation
+wait_classes: true       # Wait after classes generation
+wait_description: true   # Wait after description generation
+wait_manim: true         # Wait after Manim code generation
+wait_video: true         # Wait after video generation
+
+# Pipeline control
+start_stage: "analogy"   # Stage to start from: "analogy", "classes", "description", "manim", or "video"

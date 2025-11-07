@@ -91,6 +91,89 @@ class MetaphorProcessor:
     def get_output_structure(self):
         return self._output_structure
 
+    def get_token_usage(self) -> int:
+        return self._grazie_provider.num_tokens
+
+    def reload_from_files(self) -> None:
+        """Reload files from the disk to reflect manual edits."""
+        try:
+            if self._manim_provider.analogy_file.exists():
+                self._one_line_story, self._story = self._manim_provider.analogy_file.read_text(encoding="utf-8").split(":", 1)
+                logging.info("Reloaded analogy from file: %s", self._manim_provider.analogy_file)
+        except Exception as e:
+            logging.warning("Failed to reload analogy from file: %s", e)
+        try:
+            if self._manim_provider.classes_file.exists():
+                with self._manim_provider.classes_file.open("r", encoding="utf-8") as f:
+                    self._classes_dict = json.load(f)
+                    logging.info("Reloaded classes from file: %s", self._manim_provider.classes_file)
+        except Exception as e:
+            logging.warning("Failed to reload classes from file: %s", e)
+        try:
+            if self._manim_provider.description_file.exists():
+                self._description = self._manim_provider.description_file.read_text(encoding="utf-8")
+                logging.info("Reloaded description from file: %s", self._manim_provider.description_file)
+        except Exception as e:
+            logging.warning("Failed to reload description from file: %s", e)
+
+
+
+    def generate_analogy(self) -> tuple[str | None, str | None]:
+        """Generate story/definition and its one-line version."""
+        logging.info("Start: Analogy generation (model: %s)", self._model)
+        self._generate_story()
+        self._generate_one_line_story()
+        logging.info("End: Analogy generation")
+        return self._story, self._one_line_story
+
+    def generate_classes(self) -> None:
+        """Generate classes JSON and persist to file."""
+        model_used = self._model_classes if self._model_classes != "default" else self._model
+        logging.info("Start: Classes generation (model: %s)", model_used)
+        self._generate_classes()
+        logging.info("End: Classes generation")
+
+    def generate_description(self) -> None:
+        """Generate description text and persist to file."""
+        logging.info("Start: Description generation (model: %s)", self._model)
+        self._generate_description()
+        logging.info("End: Description generation")
+
+    def generate_manim_code(self) -> str:
+        model_used = self._model_manim if self._model_manim != "default" else self._model
+        logging.info("Start: Manim code generation (model: %s)", model_used)
+        code = self._generate_manim_code()
+        self.write_manim_code(code)
+        logging.info("End: Manim code generation")
+        return code
+
+    def write_manim_code(self, manim_code: str) -> None:
+        """Write the provided Manim code to the script file without executing it.
+        This allows the user to edit the file before running the video stage.
+        """
+        try:
+            self._manim_provider.write_python(manim_code)
+            logging.info("Manim code written to: %s", self._manim_provider.script_path)
+        except Exception as e:
+            logging.exception("Failed to write Manim code: %s", e)
+            raise
+
+    def run_manim(self) -> None:
+        logging.info("Start: Video generation (execution)")
+        self._generate_avatar()
+        # If a script file already exists, assume the user may have edited it and run it as-is
+        try:
+            logging.info("Executing Manim script from file: %s", self._manim_provider.script_path)
+            result = self._manim_provider.run_python_with_static_analysis()
+            if result != "success":
+                logging.warning("Manim execution reported error: %s", result)
+        except Exception as e:
+            logging.exception("Error during Manim execution: %s", e)
+            raise
+        self._refine_video()
+        self._add_cartoon_avatar()
+        logging.info("End: Video generation (execution)")
+
     def _generate_story(self):
         if self._term_type == TermType.ACADEMIC_DEFINITION:
             self._story = extract_content(self._grazie_provider.get_term_definition())
@@ -108,6 +191,9 @@ class MetaphorProcessor:
         else:
             self._one_line_story = extract_content(self._grazie_provider.get_one_line_metaphor(self._story))
             logging.info("One-line Metaphor: %s", self._one_line_story)
+        with self._manim_provider.analogy_file.open(mode="w", encoding="utf-8") as text_file:
+            text_file.write(f"{self._one_line_story.strip()}:\n{self._story.strip()}")
+
 
     def _generate_classes(self):
         if self._model_classes != "default":
@@ -186,7 +272,6 @@ class MetaphorProcessor:
         self._manim_provider.write_and_run_python(manim_code)
 
         logging.info("Current token usage: %d", self._grazie_provider.num_tokens)
-        logging.info("Current token usage: %f $", 5 / 1_000_000 * self._grazie_provider.num_tokens)
 
         self._refine_video()
         self._add_cartoon_avatar()

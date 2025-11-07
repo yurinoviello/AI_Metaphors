@@ -37,6 +37,7 @@ class ManimProcessor:
     description_file: Path
     classes_file: Path
     script_path: Path
+    analogy_file: Path
 
     def __init__(
         self,
@@ -73,6 +74,14 @@ class ManimProcessor:
         classes_dir.mkdir(parents=True, exist_ok=True)
         self.classes_file = classes_dir / f"{subject_id}.json"
 
+        classes_dir = working_dir / "classes"
+        classes_dir.mkdir(parents=True, exist_ok=True)
+        self.classes_file = classes_dir / f"{subject_id}.json"
+
+        analogy_dir = working_dir / "analogies"
+        analogy_dir.mkdir(parents=True, exist_ok=True)
+        self.analogy_file = analogy_dir / f"{subject_id}.txt"
+
         self._frames_dir = working_dir / "frames" / f"{subject_id}"
         self._frames_dir.mkdir(parents=True, exist_ok=True)
 
@@ -102,13 +111,15 @@ class ManimProcessor:
                 raise RuntimeError("Cannot write manim text") from e
 
     def write_and_run_python(self, text: str):
-        logging.info("Execution...")
         self.write_python(text)
+        return self.run_python_with_static_analysis()
 
+
+    def run_python_with_static_analysis(self):
+        logging.info("Execution...")
         error = self.execute_manim_script()
         if error == "success":
             return
-
         for _ in range(self._MAX_TRIES):
             logging.info("Execution...")
             error = self.refine_code_with_static_analysis(error)

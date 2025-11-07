@@ -15,6 +15,7 @@ The `ai_metaphors/common` directory contains shared functionality used by # Alte
 2. **Install dependencies**
 ```bash
    pip install -r requirements.txt
+   pip install -e .
 ```
 
 3. **Additional Dependencies** (if needed)
@@ -138,58 +139,74 @@ ai-metaphors [OPTIONS]
 | **Option**                 | **Type** | **Description**                                                                                                                                    |
 |----------------------------|----------|----------------------------------------------------------------------------------------------------------------------------------------------------|
 | `--use-dataset-example`    | `int`    | Use an example from the dataset (index between 0 and 13). Set `-1` to disable. Default is `-1`.                                                    |
-| `--term-name`              | `str`    | The name of the term (required if `use-dataset-example` is not set).                                                                               |
-| `--term-definition`        | `str`    | Definition of the term (required).                                                                                                                 |
-| `--term-type`              | `str`    | Type of term: `code`, `definition`, or `academic-definition`. Default is `definition`.                                                             |
-| `--metaphor`               | `str`    | The metaphor associated with the term. If `--generate-metaphor` is set, this will be ignored.                                                      |
-| `--generate-metaphor-text` | `flag`   | Flag to generate the metaphor automatically.                                                                                                       |
-| `--animation-type`         | `str`    | Type of animation to generate: `basic` (default, simple animation), `voice` (adds voice-over), `avatar` (adds animated avatar with voice-over), or `cartoon-avatar` (adds cartoon-style avatar with voice-over). |
-| `--bin-directory`          | `str`    | Path to the executable for Manim. Default is `.venv/bin`.                                                                                          |
-| `--working-dir`            | `str`    | Working directory for Manim output. Default: `./animations`.                                                                                       |
-| `--model`                  | `str`    | Language model to process with. Default: `openai-gpt-4o`.                                                                                          |
-| `--model-classes`          | `str`    | LLM to be used specifically for processing classes. Default: `default`.                                                                            |
-| `--model-manim`            | `str`    | LLM to process only the Manim script. Default: `anthropic-claude-3.7-sonnet`.                                                                      |
-| `--temperature`            | `float`  | Temperature value to be used by the chosen language model. Default: `0.1`.                                                                         |
-| `--vllm-fix`               | `flag`   | **Experimental** Perform an automatic vLLM analysis and code correction.                                                                           |
-| `--auto-play`              | `flag`   | Automatically play the animation at the end of the execution.                                                                                      |
-| `--high-quality`           | `flag`   | Generate a high-quality animation (1080p60). If not set, the default is 480p15.                                                                    |
-| `--debug`                  | `flag`   | Activate debug mode.                                                                                                                               |
-| `--config`                 | `str`    | Path to the config file from which other arguments will be read. If not provided, the arguments will be read from the command line.                 |
+| `--term-name`              | `str`    | The name of the term (required if `--use-dataset-example` is not set).                                                                             |
+| `--term-value`             | `str`    | Definition/value of the term (required unless using `--use-dataset-example` or `--term-type academic-definition`).                                 |
+| `--term-type`              | `str`    | Type of term: `code`, `definition`, or `academic-definition`. Default: `definition`.                                                               |
+| `--metaphor`               | `str`    | The metaphor associated with the term. Ignored if `--generate-metaphor-text` is set.                                                               |
+| `--generate-metaphor-text` | `flag`   | Generate the metaphor automatically from the term/value.                                                                                           |
+| `--animation-type`         | `str`    | Type of animation to generate: `basic` (default), `voice`, `avatar`, or `cartoon-avatar`.                                                          |
+| `--bin-directory`          | `str`    | Path to Manim executables. Default: `.venv/bin`.                                                                                                   |
+| `--working-dir`            | `str`    | Working directory for outputs. Default: `./animations`.                                                                                            |
+| `--model`                  | `str`    | LLM used for general processing. Default: `openai-gpt-4o`.                                                                                         |
+| `--model-classes`          | `str`    | LLM to use specifically for classes generation. Default: `default` (falls back to `--model`).                                                      |
+| `--model-manim`            | `str`    | LLM to use specifically for Manim script generation. Default: `default` (falls back to `--model`).                                                |
+| `--temperature`            | `float`  | Temperature for LLM responses. Default: `0.1`.                                                                                                     |
+| `--vllm-fix`               | `flag`   | Experimental: perform automatic vLLM analysis and code correction.                                                                                 |
+| `--auto-play`              | `flag`   | Automatically play the animation after generation.                                                                                                 |
+| `--high-quality`           | `flag`   | Generate a high-quality animation (1080p60). If not set, default is 480p15.                                                                        |
+| `--wait-analogy`           | `flag`   | Wait for user input after analogy generation (accept/redo).                                                                                        |
+| `--wait-classes`           | `flag`   | Wait for user input after classes generation (accept/redo).                                                                                        |
+| `--wait-description`       | `flag`   | Wait for user input after description generation (accept/redo).                                                                                    |
+| `--wait-manim`             | `flag`   | Wait for user input after Manim code generation (accept/redo).                                                                                     |
+| `--wait-video`             | `flag`   | Wait for user input after video generation (accept/redo).                                                                                          |
+| `--start-stage`            | `str`    | Stage to start from: `analogy`, `classes`, `description`, `manim`, or `video`. Default: `analogy`. Use `video` to skip generation and run code.    |
+| `--debug`                  | `flag`   | Activate debug mode (shows timestamped INFO logs).                                                                                                  |
+| `--config`                 | `str`    | Path to a YAML config file from which other arguments will be read.                                                                                |
 
 ### Example Usage
 
-1. **With Manually Provided Inputs**:
-   ```bash
-   ai-metaphors --term-name Boolean --term-definition 'A data type that has one of two possible values (usually denoted true and false) intended to represent the two truth values of logic and Boolean algebra.' --metaphor "Imagine a light switch in your house. The switch can only be in one of two positions: ON or OFF.\n\n- When the switch is ON, it represents "true" – the light is working.\n- When the switch is OFF, it represents "false" – the light is not working.\n\nA Boolean is like this light switch. It can only hold one of two states: true (ON) or false (OFF)."
-   ```
+1. **With manually provided inputs**
+```bash
+ai-metaphors \
+  --term-name Boolean \
+  --term-value 'A data type that has one of two possible values (usually denoted true and false) intended to represent the two truth values of logic and Boolean algebra.' \
+  --metaphor "Imagine a light switch in your house. The switch can only be in one of two positions: ON or OFF.\n\n- When the switch is ON, it represents 'true' – the light is working.\n- When the switch is OFF, it represents 'false' – the light is not working.\n\nA Boolean is like this light switch. It can only hold one of two states: true (ON) or false (OFF)."
+```
 
-2. **Generating a Metaphor**:
-   ```bash
-   ai-metaphors --term-name Boolean --term-definition 'A data type that has one of two possible values (usually denoted true and false) intended to represent the two truth values of logic and Boolean algebra.' --generate-metaphor-text
-   ```
+2. **Generating a metaphor**
+```bash
+ai-metaphors \
+  --term-name Boolean \
+  --term-value 'A data type that has one of two possible values (usually denoted true and false) intended to represent the two truth values of logic and Boolean algebra.' \
+  --generate-metaphor-text
+```
 
-3. **Using a Dataset Example**:
-   ```bash
-   ai-metaphors --use-dataset-example 0
-   ```
-   You can use terms, metaphors, and definitions from this dataset:
+3. **Using a dataset example**
+```bash
+ai-metaphors --use-dataset-example 0
+```
+Dataset contains sample terms/metaphors/definitions.
 
-   | index | term                  |
-      |-------|-----------------------|
-   | 0     | `Boolean`             |
-   | 1     | `append`              |
-   | 2     | `break`               |
-   | 3     | `else branch`         |
-   | 4     | `replace`             |
-   | 5     | `val`                 |
-   | 6     | `var`                 |
-   | 7     | `Class`               |
-   | 8     | `Companion object`    |
-   | 9     | `Extension functions` |
-   | 10    | `Map`                 |
-   | 11    | `Type alias `         |
-   | 12    | `reversed`            |
-   | 13    | `shuffled`            |
+4. **Interactive run with pauses and jump-back (accept/redo)**
+```bash
+ai-metaphors \
+  --term-name "Boolean" \
+  --term-value "A data type with two values: true/false" \
+  --generate-metaphor-text \
+  --wait-analogy --wait-classes --wait-description --wait-manim --wait-video \
+  --debug
+```
+At each pause type `accept` to proceed, `redo` to redo the current stage, or at the video stage `redo <stage>` to jump back (e.g., `redo manim`).
+
+5. **Resume from a later stage**
+- Start at Manim (skip analogy/classes/description):
+```bash
+ai-metaphors ... --start-stage manim
+```
+- Just execute existing code (skip all generation):
+```bash
+ai-metaphors ... --start-stage video
+```
 
 ### Configuration File
 
@@ -200,7 +217,7 @@ You can use a YAML configuration file to set default values for command-line arg
 
 A sample configuration file is provided at `config/config.yaml` in the project directory.
 
-**Usage with Configuration File**:
+**Usage with Configuration File**
 ```bash
 # Use a specific configuration file
 ai-metaphors --config config/config.yaml
@@ -227,7 +244,7 @@ The script checks for:
 2. **Missing working directories**:  
    If the `--working-dir` does not exist, the script exits with an error.
 3. **Empty required inputs**:  
-   If `--term-name` or `--term-definition` is empty, the script exits with an error.
+   If `--term-name` or `--term-value` is empty, the script exits with an error.
 4. **Metaphor Requirements**:  
    If `--generate-metaphor-text` is **not** used, a metaphor must be provided.
 
@@ -238,3 +255,86 @@ The script checks for:
   ```bash
   docker-compose build --no-cache
   ```
+
+---
+
+### Interactive workflow (accept/redo per stage)
+
+The CLI supports a human‑in‑the‑loop pipeline split into clear stages with optional pauses after each stage. At each pause you can:
+- type `accept` to proceed
+- type `redo` to redo the same stage
+- at the video stage, you can also type `redo <stage>` to jump back to an earlier stage: `analogy`, `classes`, `description`, `manim`, or `video`.
+
+Stages:
+1. Analogy generation (story + one‑liner)
+2. Classes generation (JSON)
+3. Description generation (instructions)
+4. Manim code generation (Python)
+5. Video generation (run Manim)
+
+All key events are logged with timestamps:
+- Start and end of each generation stage
+- When the tool is waiting for user input
+- When the user requests a redo
+- When the user accepts the current state
+- Token usage at the start and end of the run, and after each stage
+
+No price/cost is logged. Only token consumption and model used per step are logged.
+
+#### Flags for interactive pauses
+
+Use per‑stage flags to enable waiting for input:
+
+```
+--wait-analogy       # pause after analogy generation
+--wait-classes       # pause after classes generation
+--wait-description   # pause after description generation
+--wait-manim         # pause after Manim code generation
+--wait-video         # pause after video generation
+```
+
+Example:
+
+```
+ai-metaphors \
+  --term-name "Boolean" \
+  --term-value "A data type with two values: true/false" \
+  --generate-metaphor-text \
+  --wait-analogy --wait-classes --wait-description --wait-manim --wait-video \
+  --debug
+```
+
+Tip: use `--debug` to see INFO-level logs (timestamps, stage boundaries, decisions). Without `--debug` only warnings/errors are shown.
+
+#### Start from a specific stage
+
+Use `--start-stage` to resume the pipeline from a later point or to skip generation entirely:
+- `--start-stage manim` starts from Manim code generation
+- `--start-stage video` skips generation and just runs the existing script on disk
+
+#### Respecting manual file edits while the tool is running
+
+Between stages, you can edit the files under your working directory (e.g., `classes/<subject>.json`, `descriptions/<subject>.txt`, `scripts/<subject>.py`). The tool will:
+- persist generated artifacts to disk
+- reload classes and description from files before dependent stages
+- write the Manim code to `scripts/<subject>.py` before running the video stage
+- run the existing script file if it exists (so your manual edits are preserved)
+
+#### Configuration file support
+
+All flags can be set via `config/config.yaml`. Example keys:
+
+```
+wait_analogy: true
+wait_classes: true
+wait_description: true
+wait_manim: true
+wait_video: true
+start_stage: "analogy"  # or "classes", "description", "manim", "video"
+```
+
+Run with:
+
+```
+ai-metaphors --config config/config.yaml
+```
