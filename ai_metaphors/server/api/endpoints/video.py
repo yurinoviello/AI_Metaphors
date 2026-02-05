@@ -30,7 +30,7 @@ async def generate_video(
 
         return VideoResponse(task_id=task_id, status=Status.queued)
     except Exception as e:
-        logging.error(f"Unexpected error in generate_video:\n{str(e)}")
+        logging.error(f"Unexpected error in generate_video: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="An unexpected error occurred")
 
 

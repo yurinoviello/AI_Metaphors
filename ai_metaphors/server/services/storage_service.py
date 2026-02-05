@@ -69,5 +69,5 @@ class GCSStorageService:
             logging.info(f"File uploaded successfully to GCS: {object_key}")
             return url
         except Exception as e:
-            logging.error(f"Error uploading file to GCS:\n{str(e)}")
+            logging.error(f"Error uploading file to GCS: {e}", exc_info=True)
             return None

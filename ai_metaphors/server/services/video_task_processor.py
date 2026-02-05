@@ -30,7 +30,6 @@ class VideoTaskProcessor:
     }
 
     def __init__(self):
-        logging.basicConfig(level=logging.INFO)
         self._bin_directory = Path("/opt/conda/bin")
         self._ds = datasets.load_from_disk("ai_metaphors/resources/examples/definitions")
         self.storage_service = GCSStorageService()
@@ -58,7 +57,7 @@ class VideoTaskProcessor:
             await task.update(task_id=task_id, status=Status.completed, s3_video_url=self.storage_url)
 
         except Exception as e:
-            logging.error(f"Error in video generation task {task_id}:\n{str(e)}")
+            logging.error(f"Error in video generation task {task_id}: {e}", exc_info=True)
             await task.update(task_id=task_id, status=Status.failed)
 
         finally:

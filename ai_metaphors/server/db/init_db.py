@@ -45,5 +45,8 @@ async def init_db():
 
 if __name__ == "__main__":
     # This allows running the script directly
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(levelname)s: %(message)s",
+    )
     asyncio.run(init_db())

@@ -180,7 +180,15 @@ def parse_arguments() -> argparse.Namespace:
 def main():
     args = parse_arguments()
     if args.debug:
-        logging.basicConfig(level=logging.INFO)
+        logging.basicConfig(
+            level=logging.DEBUG,
+            format="%(levelname)s: %(message)s (%(filename)s:%(lineno)d)",
+        )
+    else:
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(levelname)s: %(message)s (%(filename)s:%(lineno)d)",
+        )
     match args.term_kind:
         case TermType.DEFINITION_METAPHOR:
             term = {

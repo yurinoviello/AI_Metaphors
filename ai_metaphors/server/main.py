@@ -1,9 +1,15 @@
+import logging
 from fastapi import FastAPI
 
 from ai_metaphors.server.api.endpoints import video, healthz
 from ai_metaphors.server.settings.settings import settings
 from fastapi.middleware.cors import CORSMiddleware
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(levelname)s: %(message)s (%(filename)s:%(lineno)d)",
+    force=True,
+)
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
