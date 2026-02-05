@@ -58,7 +58,7 @@ class VideoTaskProcessor:
             await task.update(task_id=task_id, status=Status.completed, s3_video_url=self.storage_url)
 
         except Exception as e:
-            logging.error(f"Error in video generation task {task_id}: {str(e)}")
+            logging.error(f"Error in video generation task {task_id}:\n{str(e)}")
             await task.update(task_id=task_id, status=Status.failed)
 
         finally:

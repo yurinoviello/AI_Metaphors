@@ -57,7 +57,7 @@ class AvatarProcessor:
     def _generate_narration_audio(self, step: str, text: str) -> Path:
         file = self._narration_audio_dir / f"{step}.mp3"
         GrazieProvider.get_narration_audio(text, file)
-        logging.info("Narration audio created for %s step", step)
+        logging.debug(f"Narration audio created for {step} step")
         return file
 
     def _generate_avatar(self, step: str, audio_file: Path) -> Path:
@@ -82,10 +82,10 @@ class AvatarProcessor:
                 "--emo", "neutral",
                 "--res_video_path", str(output_path)
             ], check=True)
-            logging.info("Avatar generated for %s step", step)
+            logging.debug(f"Avatar generated for {step} step")
             return output_path
         except subprocess.CalledProcessError as e:
-            logging.error("Failed to generate avatar for %s step: %s", step, e)
+            logging.error(f"Failed to generate avatar for {step} step:\n{e}")
             raise
         finally:
             os.chdir(original_dir)

@@ -94,32 +94,32 @@ class MetaphorProcessor:
     def _generate_story(self):
         if self._term_type == TermType.ACADEMIC_DEFINITION:
             self._story = extract_content(self._grazie_provider.get_term_definition())
-            logging.info("Term definition: %s", self._story)
+            logging.info(f"Term definition: {self._story}")
         elif self._story is None:
             self._story = extract_content(self._grazie_provider.get_metaphor())
-            logging.info("Metaphor: %s", self._story)
+            logging.info(f"Metaphor: {self._story}")
 
     def _generate_one_line_story(self):
         if self._story is None:
             return
         if self._term_type == TermType.ACADEMIC_DEFINITION:
             self._one_line_story = extract_content(self._grazie_provider.get_one_line_term_definition(self._story))
-            logging.info("One-line term definition: %s", self._one_line_story)
+            logging.info(f"One-line term definition: {self._one_line_story}")
         else:
             self._one_line_story = extract_content(self._grazie_provider.get_one_line_metaphor(self._story))
-            logging.info("One-line Metaphor: %s", self._one_line_story)
+            logging.info(f"One-line Metaphor: {self._one_line_story}")
 
     def _generate_classes(self):
         if self._model_classes != "default":
             self._grazie_provider.change_model(self._model_classes)
 
         classes = self._grazie_provider.get_classes(self._story, self._manim_provider.svg)
-        logging.info("Classes created")
+        logging.debug("Classes created")
         self._classes_dict = extract_json(classes)
         with self._manim_provider.classes_file.open(mode="w", encoding="utf-8") as json_file:
             json.dump(self._classes_dict, json_file, indent=4)
         self._grazie_provider.change_model(self._model)
-        logging.info("Classes extracted")
+        logging.debug("Classes extracted")
 
     def _generate_description(self):
         self._description = self._grazie_provider.get_description(self._story, self._one_line_story, str(self._classes_dict))
@@ -138,7 +138,7 @@ class MetaphorProcessor:
             self._manim_provider.svg,
             self._description,
         )
-        logging.info("Manim code created")
+        logging.debug("Manim code created")
         return manim_code
 
     def _generate_avatar(self):
@@ -155,7 +155,7 @@ class MetaphorProcessor:
         if self._vllm_fix and self._manim_provider.validate_video():
             video_analysis = self._manim_provider.evaluate_video()
             logging.info("Evaluation complete")
-            logging.info("Video Evaluation: %s", video_analysis)
+            logging.debug(f"Video Evaluation: {video_analysis}")
 
             video_refined_code = self._grazie_provider.request_video_refinement(
                 instructions=self._manim_provider.description_file.read_text(),
@@ -177,6 +177,9 @@ class MetaphorProcessor:
         ).generate_video_with_avatar()
 
     def generate_video(self):
+        tokens_before = self._grazie_provider.num_tokens
+        logging.debug(f"Current token usage: {tokens_before}")
+
         self._generate_story()
         self._generate_one_line_story()
         self._generate_classes()
@@ -185,8 +188,16 @@ class MetaphorProcessor:
         self._generate_avatar()
         self._manim_provider.write_and_run_python(manim_code)
 
-        logging.info("Current token usage: %d", self._grazie_provider.num_tokens)
-        logging.info("Current token usage: %f $", 5 / 1_000_000 * self._grazie_provider.num_tokens)
+        tokens_after = self._grazie_provider.num_tokens - tokens_before
+        logging.info(f"Tokens used: {tokens_after}, "
+                     f"money spent: {self._count_money(tokens_after)}$")
+
+        logging.debug(f"Current token usage: {self._grazie_provider.num_tokens}, "
+                      f"money spent: {self._count_money(self._grazie_provider.num_tokens)}$")
 
         self._refine_video()
         self._add_cartoon_avatar()
+
+    @staticmethod
+    def _count_money(tokens: int) -> float:
+        return 5 / 1_000_000 * tokens

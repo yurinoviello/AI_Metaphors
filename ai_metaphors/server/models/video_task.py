@@ -58,7 +58,7 @@ class VideoTask(Base):
                 logging.info(f"VideoTask with task_id {kwargs.get('id')} created successfully")
             return task
         except SQLAlchemyError as e:
-            logging.error(f"Error creating VideoTask: {e}")
+            logging.error(f"Error creating VideoTask:\n{e}")
             return None
 
     @classmethod

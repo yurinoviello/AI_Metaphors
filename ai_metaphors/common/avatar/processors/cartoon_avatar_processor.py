@@ -36,8 +36,7 @@ class CartoonAvatarProcessor:
                 narration_text_matches +
                 ["<happy> Thanks for watching!"]
             )
-        logging.info("Transcript generated")
-        logging.info("Transcript: %s", narration_text_joined)
+        logging.debug(f"Transcript generated:\n{narration_text_joined}")
         return narration_text_joined
 
     def _rename_output_video(self):

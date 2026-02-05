@@ -18,10 +18,7 @@ def process_bin_directory(bin_directory: str, required_tools: tuple = ("manim", 
 
 def process_working_dir(working_dir: str) -> Path:
     if not Path(working_dir).exists():
-        logging.warning(
-            "The working directory '%s' does not exist. The directory will be created.",
-            working_dir,
-        )
+        logging.warning(f"Working directory '{working_dir}' does not exist. Directory will be created.")
         Path(working_dir).mkdir(parents=True, exist_ok=True)
     return Path(working_dir).absolute()
 

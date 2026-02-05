@@ -102,15 +102,15 @@ class ManimProcessor:
                 raise RuntimeError("Cannot write manim text") from e
 
     def write_and_run_python(self, text: str):
-        logging.info("Execution...")
+        logging.debug("Starting execution...")
         self.write_python(text)
 
         error = self.execute_manim_script()
         if error == "success":
             return
 
-        for _ in range(self._MAX_TRIES):
-            logging.info("Execution...")
+        for tryNum in range(self._MAX_TRIES):
+            logging.debug(f"Execution, {tryNum} try ...")
             error = self.refine_code_with_static_analysis(error)
             if error == "success":
                 return
@@ -142,7 +142,7 @@ class ManimProcessor:
         return errors
 
     def refine_code_with_static_analysis(self, error: str) -> str:
-        logging.warning("There was an error during execution: %s", error)
+        logging.error(f"There was an error during execution:\n{error}")
         command = [
             self._bin_directory / "pylint",
             "-E",
@@ -172,7 +172,7 @@ class ManimProcessor:
         logging.warning("This feature is still under development")
         refine_video_quality = input("Do you want to refine the video quality? Enter 0 for NO or 1 for YES:")
         while refine_video_quality not in ["0", "1"]:
-            logging.warning("Invalid input. Please enter 0 for NO or 1 for YES.")
+            logging.error("Invalid input. Please enter 0 for NO or 1 for YES.")
             refine_video_quality = input("Do you want to refine the video quality? Enter 0 for NO or 1 for YES:")
         return refine_video_quality == 1
 
@@ -202,10 +202,10 @@ class ManimProcessor:
     def _validate_files(self) -> bool:
         """Validate that required files exist."""
         if not self._section_file.exists():
-            logging.error("Section file %s not found - skipping split.", self._section_file)
+            logging.error(f"Section file {self._section_file} not found - skipping split.")
             return False
         if not self._movie_file.exists():
-            logging.error("Movie file %s not found - cannot split.", self._movie_file)
+            logging.error(f"Movie file {self._movie_file} not found - cannot split.")
             return False
         return True
     
@@ -215,7 +215,7 @@ class ManimProcessor:
             sections = json.loads(self._section_file.read_text(encoding="utf-8"))
             return sections
         except Exception as exc:                             # noqa: BLE001
-            logging.error("Cannot read sections JSON: %s - cannot split.", exc)
+            logging.error(f"Cannot read sections JSON - cannot split:\n{exc}")
             return []
     
     def _prepare_output_directory(self) -> Path:
@@ -227,9 +227,9 @@ class ManimProcessor:
         for file in sections_dir.glob("*.mp4"):
             try:
                 file.unlink()
-                logging.info("Deleted %s", file.name)
+                logging.debug(f"Deleted {file.name}")
             except Exception as exc:
-                logging.error("Failed to delete %s: %s - cannot split.", file.name, exc)
+                logging.error(f"Failed to delete {file.name}, cannot split:\n{exc}")
         
         return sections_dir
     
@@ -244,7 +244,7 @@ class ManimProcessor:
             try:
                 duration = float(section["duration"])
             except (KeyError, ValueError):
-                logging.error("Section %s has no valid duration – skipping.", section)
+                logging.error(f"Section {section} has no valid duration – skipping.", section)
                 continue
                 
             title = section.get("name", f"sec_{index}")
@@ -274,6 +274,6 @@ class ManimProcessor:
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.STDOUT,
             )
-            logging.info("Wrote %s", target.name)
+            logging.debug(f"Wrote {target.name}")
         except subprocess.CalledProcessError as exc:
-            logging.error("FFmpeg failed for section %s (%s): %s", index, title, exc)
+            logging.error(f"FFmpeg failed for section {index} ({title}):\n{exc}")
