@@ -170,7 +170,7 @@ class GrazieProvider:
             )
 
         response = client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-5.2",
             messages=messages,
             max_tokens=3_000,
             seed=10,
