@@ -10,7 +10,8 @@ from ai_metaphors.server.db.session import engine
 # IMPORTANT: Do not remove these imports, otherwise the tables will not be created.
 # noinspection PyUnusedImports
 from ai_metaphors.server.models.video_task import VideoTask
-
+# noinspection PyUnusedImports
+from ai_metaphors.server.models.user import User
 
 async def create_tables(engine: AsyncEngine):
     """Create all tables in the database."""

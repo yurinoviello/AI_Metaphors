@@ -1,9 +1,10 @@
 import logging
-from fastapi import FastAPI
 
-from ai_metaphors.server.api.endpoints import video, healthz
-from ai_metaphors.server.settings.settings import settings
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from ai_metaphors.server.api.endpoints import video, healthz, users
+from ai_metaphors.server.settings.settings import settings
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -22,3 +23,4 @@ app.add_middleware(
 )
 app.include_router(healthz.router)
 app.include_router(video.router)
+app.include_router(users.router)
