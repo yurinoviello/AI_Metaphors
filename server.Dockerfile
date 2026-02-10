@@ -15,9 +15,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt ./
+RUN python -m pip install -U pip "setuptools<81" wheel
 
-RUN pip install --resume-retries 3 --no-cache-dir --compile -r requirements.txt
+COPY constraints.txt ./
+RUN python -m pip install --retries 3 --no-cache-dir --no-build-isolation openai-whisper==20230314 -c constraints.txt
+
+COPY requirements.txt ./
+RUN python -m pip install --retries 3 --no-cache-dir --compile -r requirements.txt -c constraints.txt
 
 COPY . .
 
