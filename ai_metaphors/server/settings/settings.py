@@ -1,5 +1,3 @@
-import os
-
 from pydantic_settings import BaseSettings
 
 
@@ -8,9 +6,9 @@ class Settings(BaseSettings):
 
     POSTGRES_USER: str = "postgres"
     POSTGRES_PASSWORD: str = "postgres"
-    POSTGRES_HOST: str = "host.docker.internal"
+    POSTGRES_HOST: str = "db"
     POSTGRES_PORT: str = "5432"
-    POSTGRES_DB: str = "dbname"
+    POSTGRES_DB: str = "postgres"
 
     # Storage configuration
     BUCKET_NAME: str = "ai-metaphors-videos"

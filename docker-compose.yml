@@ -16,6 +16,9 @@ services:
       - PYTHONDONTWRITEBYTECODE=1
       - PYTHONUNBUFFERED=1
       - PYTHONPATH=/app
+    depends_on:
+      db:
+        condition: service_healthy
 
   ai-metaphors-cadence:
     build:
@@ -42,6 +45,9 @@ services:
               count: all
               capabilities: [ gpu ]
     profiles: ["gpu"]
+    depends_on:
+      db:
+        condition: service_healthy
 
   ai-metaphors-server:
     build:
@@ -57,3 +63,20 @@ services:
       - PYTHONDONTWRITEBYTECODE=1
       - PYTHONUNBUFFERED=1
       - PYTHONPATH=/app
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "PGPASSWORD=postgres pg_isready -U postgres -d postgres" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
