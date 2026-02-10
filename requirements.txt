@@ -34,6 +34,8 @@ gdown>=5.0.1
 bcrypt==4.0.1
 passlib>=1.7.4
 pydantic[email]~=2.11.7
+python-jose[cryptography]>=3.3.0
+python-multipart>=0.0.7
 
 git+https://github.com/yurinoviello/manim.git@custom_manim
 git+https://github.com/lamsandler/pytoon.git@custom-pytoon

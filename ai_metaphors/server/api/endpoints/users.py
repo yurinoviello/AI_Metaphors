@@ -1,9 +1,11 @@
 import bcrypt
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 
 from ai_metaphors.server.api.api_key_manager import validate_api_key
+from ai_metaphors.server.api.auth import create_access_token, verify_password
 from ai_metaphors.server.models.user import User
-from ai_metaphors.server.schemas.user import UserCreate, UserOut
+from ai_metaphors.server.schemas.user import UserCreate, UserOut, Token, UserLogin
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -31,3 +33,17 @@ async def create_user(payload: UserCreate):
     if not user:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to create user")
     return user
+
+
+@router.post("/login", response_model=Token)
+async def login(payload: UserLogin):
+    user = await User.get_by_email(payload.email)
+    if not user or not verify_password(payload.password, user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    access_token = create_access_token(data={"sub": user.id})
+    return {"access_token": access_token, "token_type": "bearer"}

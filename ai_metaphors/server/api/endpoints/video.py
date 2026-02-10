@@ -2,13 +2,13 @@ import logging
 from uuid import uuid4
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 
-from ai_metaphors.server.api.api_key_manager import validate_api_key
+from ai_metaphors.server.api.auth import unified_auth
 from ai_metaphors.server.models.video_task import VideoTask
 from ai_metaphors.server.schemas.video import VideoResponse, VideoRequest, VideoTaskStatus, VideoTaskList, Status
 from ai_metaphors.server.services.video_task_processor import VideoTaskProcessor
 
 router = APIRouter(
-    dependencies=[Depends(validate_api_key)]
+    dependencies=[Depends(unified_auth)]
 )
 video_task_processor = VideoTaskProcessor()
 
