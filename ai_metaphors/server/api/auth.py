@@ -50,16 +50,16 @@ async def unified_auth(
     current_user: User | None = Depends(get_current_user)
 ):
     """
-    Dependency that allows access if either a valid API Key is provided 
-    or a valid JWT token (logged in user) is provided.
+    Dependency that returns an identity object if access is allowed.
+    Identity contains either user_id or api_key.
     """
     # Check API Key
     if api_key and api_key in settings.VALID_API_KEYS:
-        return True
+        return {"user_id": None, "api_key": api_key}
 
     # Check JWT User
     if current_user:
-        return True
+        return {"user_id": current_user.id, "api_key": None}
 
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

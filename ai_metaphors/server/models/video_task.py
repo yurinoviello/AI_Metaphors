@@ -37,11 +37,17 @@ class VideoTask(Base):
 
     s3_video_url = Column(String, nullable=True)
 
+    # Ownership fields
+    user_id = Column(String, nullable=True, index=True)
+    api_key = Column(String, nullable=True, index=True)
+
     @staticmethod
-    async def create_from_video_request(request: VideoRequest, task_id: str):
+    async def create_from_video_request(request: VideoRequest, task_id: str, user_id: Optional[str] = None, api_key: Optional[str] = None):
         task_data = {
             "id": task_id,
             "status": Status.queued,
+            "user_id": user_id,
+            "api_key": api_key,
             **request.model_dump(exclude_unset=True)
         }
 
@@ -81,15 +87,23 @@ class VideoTask(Base):
             return task
 
     @classmethod
-    async def all(cls, skip: int = 0, limit: int = 100):
+    async def all(cls, skip: int = 0, limit: int = 100, user_id: Optional[str] = None, api_key: Optional[str] = None):
         async with async_session() as session:
             non_expired_threshold = func.now() - datetime.timedelta(hours=settings.URL_EXPIRATION / 3600)
-            count_query = select(func.count()).select_from(cls).where(cls.created_at >= non_expired_threshold)
+            
+            # Base filters
+            filters = [cls.created_at >= non_expired_threshold]
+            if user_id:
+                filters.append(cls.user_id == user_id)
+            elif api_key:
+                filters.append(cls.api_key == api_key)
+
+            count_query = select(func.count()).select_from(cls).where(*filters)
             total_count = await session.execute(count_query)
             total = total_count.scalar()
 
             # Get paginated results
-            query = select(cls).where(cls.created_at >= non_expired_threshold).order_by(cls.created_at.desc()).offset(skip).limit(limit)
+            query = select(cls).where(*filters).order_by(cls.created_at.desc()).offset(skip).limit(limit)
             result = await session.execute(query)
 
             return {
