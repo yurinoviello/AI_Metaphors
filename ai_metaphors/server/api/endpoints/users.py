@@ -17,7 +17,7 @@ def hash_password(password: str) -> str:
     return hashed.decode('utf-8')
 
 
-@router.post("", response_model=UserOut, status_code=status.HTTP_201_CREATED, dependencies=[Depends(validate_api_key)])
+@router.post("/create", response_model=UserOut, status_code=status.HTTP_201_CREATED, dependencies=[Depends(validate_api_key)])
 async def create_user(payload: UserCreate):
     # Check unique email
     existing = await User.get_by_email(payload.email)
