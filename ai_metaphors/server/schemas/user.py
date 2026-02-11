@@ -25,6 +25,8 @@ class UserOut(BaseModel):
         from_attributes = True
 
 
-class Token(BaseModel):
+class LoginResponse(BaseModel):
     access_token: str
     token_type: str
+    name: str
+    is_active: bool

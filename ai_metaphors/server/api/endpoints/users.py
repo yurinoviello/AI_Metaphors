@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from ai_metaphors.server.api.api_key_manager import validate_api_key
 from ai_metaphors.server.api.auth import create_access_token, verify_password
 from ai_metaphors.server.models.user import User
-from ai_metaphors.server.schemas.user import UserCreate, UserOut, Token, UserLogin
+from ai_metaphors.server.schemas.user import UserCreate, UserOut, LoginResponse, UserLogin
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -35,7 +35,7 @@ async def create_user(payload: UserCreate):
     return user
 
 
-@router.post("/login", response_model=Token)
+@router.post("/login", response_model=LoginResponse)
 async def login(payload: UserLogin):
     user = await User.get_by_email(payload.email)
     if not user or not verify_password(payload.password, user.password_hash):
@@ -46,4 +46,9 @@ async def login(payload: UserLogin):
         )
 
     access_token = create_access_token(data={"sub": user.id})
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "name": user.name,
+        "is_active": user.is_active,
+    }
