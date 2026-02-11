@@ -1,30 +1,41 @@
 import asyncio
 import logging
+import os
+import subprocess
 
 from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlalchemy.sql import text
 
-from ai_metaphors.server.db.base_class import Base
 from ai_metaphors.server.db.session import engine
 # Import models here to register them with SQLAlchemy Base.metadata.
 # IMPORTANT: Do not remove these imports, otherwise the tables will not be created.
 # noinspection PyUnusedImports
-from ai_metaphors.server.models.video_task import VideoTask
-# noinspection PyUnusedImports
 from ai_metaphors.server.models.user import User
+# noinspection PyUnusedImports
+from ai_metaphors.server.models.video_task import VideoTask
+
 
 async def create_tables(engine: AsyncEngine):
-    """Create all tables in the database."""
+    """Create all tables in the database or run migrations."""
     try:
-        # Create tables
-        async with engine.begin() as conn:
-            logging.info(f"Registered tables in metadata: {list(Base.metadata.tables.keys())}")
-            # await conn.run_sync(Base.metadata.drop_all)
-            await conn.run_sync(Base.metadata.create_all)
+        # Run alembic migrations
+        logging.info("Running database migrations...")
+        # Note: In a production environment, you might want to run this outside of the app
+        # But for simplicity, we run it here.
+        process = subprocess.run(
+            ["alembic", "upgrade", "head"],
+            capture_output=True,
+            text=True,
+            env={**os.environ, "PYTHONPATH": os.getcwd()}
+        )
+        if process.returncode != 0:
+            logging.error(f"Migration failed: {process.stderr}")
+        else:
+            logging.info("Database migrations applied successfully")
+            logging.info(process.stdout)
 
-        logging.info("Database tables created successfully")
     except Exception as e:
-        logging.error(f"Error creating database tables: {e}")
+        logging.error(f"Error initializing database: {e}")
         raise
 
 
