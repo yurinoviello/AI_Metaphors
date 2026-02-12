@@ -1,5 +1,3 @@
-2. Fallback source — new SVG creation
-   • If no suitable file in {SVGs} was found, you are responsible to use graphics directly from generated classes.
+2. Fallback source — use Manim primitives
+   • If no suitable file in {SVGs} was found, you are responsible to use Manim primitive graphics directly (Circle, Rectangle, Line, Polygon, etc.) instead of SVGs.
 
-   • If other graphics in the scene, except SVGs is used, it MUST be close to sketch style, i.e. containing only white paths and no fills.
-   You are not allowed to use any other colors at all!!!

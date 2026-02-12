@@ -10,13 +10,10 @@ if [ ! -d "$FLOAT_MODEL_DIR" ] || [ ! -d "$FLOAT_MODEL_DIR/checkpoints/wav2vec2-
 
     if [ ! -d "$FLOAT_MODEL_DIR" ]; then
         mkdir -p "$FLOAT_MODEL_DIR"
-        git clone https://github.com/deepbrainai-research/float.git "$FLOAT_MODEL_DIR"
+        git clone https://github.com/yurinoviello/float.git "$FLOAT_MODEL_DIR"
     fi
 
     cd "$FLOAT_MODEL_DIR" || exit
-
-    pip install -r requirements.txt
-    pip install "numpy<2.0.0" gdown huggingface-hub
 
     huggingface-cli download facebook/wav2vec2-base-960h \
         --local-dir ./checkpoints/wav2vec2-base-960h \

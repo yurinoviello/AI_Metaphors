@@ -12,14 +12,6 @@
    version="1.1"
    inkscape:version="0.91 r13725"
    sodipodi:docname="book1.svg">
-  <style>
-    path {
-      fill: none;
-      stroke: white;
-      stroke-width: 1;
-      stroke-linejoin: round;
-    }
-  </style>
   <defs
      id="defs18">
     <filter

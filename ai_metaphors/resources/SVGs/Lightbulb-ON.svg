@@ -20,14 +20,6 @@
     inkscape:output_extension="org.inkscape.output.svg.inkscape"
     inkscape:version="0.46"
   >
-  <style>
-    path {
-
-      stroke: white;
-      stroke-width: 1;
-      stroke-linejoin: round;
-    }
-  </style>
   <sodipodi:namedview
       id="base"
       bordercolor="#666666"

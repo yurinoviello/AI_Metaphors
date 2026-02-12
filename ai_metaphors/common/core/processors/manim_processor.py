@@ -83,10 +83,12 @@ class ManimProcessor:
     def write_python(self, text: str):
         # Apply color patch
         code = extract_python_code(text)
-        try:
-            code = "from ai_metaphors.common.static_color_refining import color_runtime_patch\n" + code
-        except TypeError:
-            logging.warning("Failed to apply color patch. Using original code instead.")
+
+        # Removing this patch at the moment because it causes issues with the static analysis
+        # try:
+        #     code = "from ai_metaphors.common.static_color_refining import color_runtime_patch\n" + code
+        # except TypeError:
+        #     logging.warning("Failed to apply color patch. Using original code instead.")
 
         if code:
             try:

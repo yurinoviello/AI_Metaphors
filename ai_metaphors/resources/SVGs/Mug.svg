@@ -2,14 +2,6 @@
 <!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
 <svg height="800px" width="800px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
 	 viewBox="0 0 512 512" xml:space="preserve">
-	<style>
-    path {
-
-      stroke: white;
-      stroke-width: 1;
-      stroke-linejoin: round;
-    }
-  </style>
 <path style="fill:#EF5352;" d="M354.043,106.213h-24.511V35.404H8.17v408.511c0,17.974,14.706,32.681,32.681,32.681h256
 	c17.974,0,32.681-14.706,32.681-32.681v-38.128h24.511c82.725,0,149.787-67.062,149.787-149.787S436.768,106.213,354.043,106.213z
 	 M354.043,362.213h-24.511V149.787h24.511c58.566,0,106.213,47.646,106.213,106.213S412.609,362.213,354.043,362.213z"/>

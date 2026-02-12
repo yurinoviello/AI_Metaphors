@@ -4,15 +4,7 @@
 <!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
 <svg version="1.0" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
 	 width="800px" height="800px" viewBox="0 0 64 64" enable-background="new 0 0 64 64" xml:space="preserve">
-<style>
-    path, rect, ellipse {
-      stroke: white;
-      stroke-width: 1;
-      stroke-linejoin: round;
-        vector-effect: non-scaling-stroke;
-    }
-  </style>
-	<g>
+<g>
 	<path fill="#B4CCB9" d="M62,60c0,1.104-0.896,2-2,2H4c-1.104,0-2-0.896-2-2v-2.801l14.603-14.603c0.781-0.781,2.047-0.781,2.828,0
 		c0,0,6.197,6.198,7.15,7.15c0.953,0.953,1.88,0.95,2.829,0s17.171-17.171,17.171-17.171c0.781-0.781,2.047-0.781,2.828,0L62,45.167
 		V60z"/>

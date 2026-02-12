@@ -16,7 +16,13 @@ class PreGeneratedSpeechService(SpeechService):
 
         with open("{working_dir}/avatar/{term_name}/phrases.json", "r", encoding="utf-8") as f:
             data = json.load(f)
-            text_index = data.get(text)
+
+        text_index = None
+        for key, value in data.items():
+            # This checks if the script text exists inside the JSON key
+            if text in key:
+                text_index = value
+                break
 
         if text_index is None:
             raise ValueError("Text not found in phrases.json")
@@ -99,7 +105,12 @@ class GenScene(VoiceoverScene):
         """
         with open("{working_dir}/avatar/{term_name}/phrases.json", "r", encoding="utf-8") as f:
             data = json.load(f)
-            text_index = data.get(text)
+
+        text_index = None
+        for key, value in data.items():
+            if text in key:
+                text_index = value
+                break
 
         # Exit if no matching avatar is found for the text
         if text_index is None:

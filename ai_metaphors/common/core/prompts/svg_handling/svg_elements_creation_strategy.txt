@@ -1,12 +1,13 @@
-2. Fallback — generate a new SVG asset.
-  You are a top-tier IT company designer. You must generate SVG assets for animation in sketch-like style, it should be simple, contain only white contours, and no fills at all!
-  You must primarily use white color, but allowed to also use {allowed_colors}.
-  You must not save the SVG as file, but only generate the SVG code inside the file.
 
-Example Code:
-   {SVG_code}
+2. Fallback — use Manim primitive graphics
+   As a skilled Manim animator, when no suitable SVG file exists, you must create graphics using Manim's built-in primitive objects instead of generating SVG code.
 
-SO:
-   • If no suitable filename exists, generate clean, valid SVG code into the variable `svg_code`.
-     But important: ideally, you are BIASED to write a new SVG and NOT to try to create some graphics using manim primitives.
-     If it goes to animations, of course, you can use Manim primitives, but for static illustrations, you should use SVGs.
+   **Implementation Guidelines:**
+   • Combine multiple primitive shapes to create complex illustrations
+   • Use VGroup() to group related elements together
+   • Position elements precisely using .move_to(), .shift(), .next_to()
+   • Scale appropriately with .scale() to fit the scene
+   • Prefer Manim primitives over any SVG creation for static illustrations
+   • Only use animations when specifically needed for the story
+
+   **Key Principle**: Strongly prefer creating illustrations with Manim primitive objects rather than generating SVG code. This ensures better integration with animations and maintains consistent styling across the scene.
