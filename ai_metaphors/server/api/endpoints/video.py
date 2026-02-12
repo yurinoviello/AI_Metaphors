@@ -4,7 +4,8 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 
 from ai_metaphors.server.api.auth import unified_auth
 from ai_metaphors.server.models.video_task import VideoTask
-from ai_metaphors.server.schemas.video import VideoResponse, VideoRequest, VideoTaskStatus, VideoTaskList, Status
+from ai_metaphors.server.models.status import Status
+from ai_metaphors.server.schemas.video import VideoResponse, VideoRequest, VideoTaskStatus, VideoTaskList
 from ai_metaphors.server.services.video_task_processor import VideoTaskProcessor
 
 router = APIRouter(
@@ -52,12 +53,7 @@ async def get_task_status(task_id: str, auth: dict = Depends(unified_auth)):
     if auth.get("api_key") and task.api_key != auth.get("api_key"):
         raise HTTPException(status_code=403, detail="Access forbidden")
 
-    return VideoTaskStatus(
-        task_id=task.id,
-        status=task.status,
-        created_at=task.created_at,
-        video_url=task.s3_video_url if task.status == Status.completed else None
-    )
+    return VideoTaskStatus.from_orm_model(task)
 
 
 @router.get("/video/tasks", response_model=VideoTaskList)
@@ -71,12 +67,7 @@ async def get_tasks_list(skip: int = 0, limit: int = 100, auth: dict = Depends(u
 
     return VideoTaskList(
         tasks=[
-            VideoTaskStatus(
-                task_id=task.id,
-                status=task.status,
-                created_at=task.created_at,
-                video_url=task.s3_video_url if task.status == Status.completed else None
-            )
+            VideoTaskStatus.from_orm_model(task)
             for task in pagination_result["items"]
         ],
         total=pagination_result["total"],

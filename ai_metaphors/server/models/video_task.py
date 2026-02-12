@@ -5,7 +5,7 @@ from sqlalchemy import Column, String, Enum, DateTime, func, Integer, Boolean, F
 from sqlalchemy.exc import SQLAlchemyError
 
 from ai_metaphors.common.core.utils.term_type import TermType
-from ai_metaphors.server.schemas.video import VideoRequest, Status
+from ai_metaphors.server.models.status import Status
 from ai_metaphors.server.settings.settings import settings
 from ai_metaphors.server.db.base_class import Base
 from ai_metaphors.server.db.session import async_session
@@ -42,7 +42,12 @@ class VideoTask(Base):
     api_key = Column(String, nullable=True, index=True)
 
     @staticmethod
-    async def create_from_video_request(request: VideoRequest, task_id: str, user_id: Optional[str] = None, api_key: Optional[str] = None):
+    async def create_from_video_request(
+        request: 'VideoRequest',
+        task_id: str,
+        user_id: str | None = None,
+        api_key: str | None = None
+    ):
         task_data = {
             "id": task_id,
             "status": Status.queued,

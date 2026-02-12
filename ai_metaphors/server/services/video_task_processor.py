@@ -7,7 +7,7 @@ import datasets
 from ai_metaphors.common.core import MetaphorProcessor, ManimType
 from ai_metaphors.common.core.utils import TermType
 from ai_metaphors.server.models.video_task import VideoTask
-from ai_metaphors.server.schemas.video import Status
+from ai_metaphors.server.models.status import Status
 from ai_metaphors.server.services.storage_service import GCSStorageService
 from ai_metaphors.common.video_from_academic_definition import AcademicDefinitionPromptProvider
 from ai_metaphors.common.video_from_code import CodePromptProvider
