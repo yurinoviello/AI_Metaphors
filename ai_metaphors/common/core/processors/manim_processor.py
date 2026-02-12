@@ -3,6 +3,7 @@ from pathlib import Path
 import subprocess
 import re
 import json
+import os
 
 from ai_metaphors.common.core.providers.grazie_provider import GrazieProvider
 from ai_metaphors.common.core.utils.image_utils import extract_key_frames
@@ -119,6 +120,10 @@ class ManimProcessor:
         raise RuntimeError("Cannot execute Manim script")
 
     def execute_manim_script(self) -> str:
+        # Triton Fix
+        env = os.environ.copy()
+        env["SETUPTOOLS_USE_DISTUTILS"] = "stdlib"
+
         manim_command = [
             self._bin_directory / "manim",
             "-p" if self._auto_play else None,
@@ -132,7 +137,7 @@ class ManimProcessor:
         ]
 
         try:
-            process = subprocess.run([c for c in manim_command if c], capture_output=True, text=True, check=False)
+            process = subprocess.run([c for c in manim_command if c], capture_output=True, text=True, check=False, env=env)
         except FileNotFoundError as e:
             raise RuntimeError("Manim executable not found") from e
 
