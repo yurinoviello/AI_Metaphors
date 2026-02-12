@@ -2,8 +2,7 @@ import bcrypt
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 
-from ai_metaphors.server.api.api_key_manager import validate_api_key
-from ai_metaphors.server.api.auth import create_access_token, verify_password
+from ai_metaphors.server.api.auth import create_access_token, verify_password, admin_or_api_key
 from ai_metaphors.server.models.user import User
 from ai_metaphors.server.schemas.user import UserCreate, UserOut, LoginResponse, UserLogin
 
@@ -17,7 +16,7 @@ def hash_password(password: str) -> str:
     return hashed.decode('utf-8')
 
 
-@router.post("/create", response_model=UserOut, status_code=status.HTTP_201_CREATED, dependencies=[Depends(validate_api_key)])
+@router.post("/create", response_model=UserOut, status_code=status.HTTP_201_CREATED, dependencies=[Depends(admin_or_api_key)])
 async def create_user(payload: UserCreate):
     # Check unique email
     existing = await User.get_by_email(payload.email)

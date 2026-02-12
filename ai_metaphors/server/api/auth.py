@@ -45,6 +45,55 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> User | None:
     return user
 
 
+async def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:
+    if not current_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    if not current_user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Inactive user"
+        )
+    return current_user
+
+
+async def get_current_admin(current_user: User = Depends(get_current_active_user)) -> User:
+    if not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="The user doesn't have enough privileges"
+        )
+    return current_user
+
+
+async def admin_or_api_key(
+    api_key: str | None = Depends(api_key_header),
+    current_user: User | None = Depends(get_current_user)
+):
+    """
+    Dependency that allows access if either:
+    1. A valid API Key is provided.
+    2. A valid Admin User JWT token is provided.
+    """
+    # 1. Check API Key
+    if api_key and api_key in settings.VALID_API_KEYS:
+        return {"user_id": None, "api_key": api_key}
+
+    # 2. Check Admin User
+    if current_user and current_user.is_active and current_user.is_admin:
+        return {"user_id": current_user.id, "api_key": None}
+
+    # If neither, raise error
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Valid Admin token or X-API-Key required",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+
 async def unified_auth(
     api_key: str | None = Depends(api_key_header),
     current_user: User | None = Depends(get_current_user)
