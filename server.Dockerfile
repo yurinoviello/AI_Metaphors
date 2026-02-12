@@ -27,7 +27,7 @@ ENV NLTK_DATA=/usr/share/nltk_data
 ENV PYTHONPATH=/app
 
 RUN mkdir -p $NLTK_DATA && chmod -R 777 $NLTK_DATA
-RUN mkdir -p /app/animations && chmod -R 777 /app
+RUN mkdir -p /app/animations
 RUN mkdir /.cache && chmod -R 777 /.cache
 RUN mkdir /.triton && chmod -R 777 /.triton
 RUN mkdir /.local && chmod -R 777 /.local
@@ -36,6 +36,7 @@ RUN python -m nltk.downloader -d $NLTK_DATA averaged_perceptron_tagger
 RUN python -m nltk.downloader -d $NLTK_DATA cmudict
 
 COPY . .
+RUN chmod -R 777 /app
 
 EXPOSE ${PORT}
 
