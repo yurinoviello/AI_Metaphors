@@ -22,6 +22,9 @@ if [ ! -d "$FLOAT_MODEL_DIR" ] || [ ! -d "$FLOAT_MODEL_DIR/checkpoints/wav2vec2-
     huggingface-cli download r-f/wav2vec-english-speech-emotion-recognition \
         --local-dir ./checkpoints/wav2vec-english-speech-emotion-recognition \
         --local-dir-use-symlinks False
+       
+    gdown --id 1rvWuM12cyvNvBQNCLmG4Fr2L1rpjQBF0
+    mv float.pth checkpoints/
 else
     echo "Checkpoints already exist in $FLOAT_MODEL_DIR. Skipping download."
     cd "$FLOAT_MODEL_DIR" || exit
