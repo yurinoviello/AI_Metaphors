@@ -30,8 +30,11 @@ def extract_json(text: str) -> str | None:
         try:
             return json.loads(json_content)
         except json.JSONDecodeError:
-            return None
-    return None
+            return text
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        return text
 
 
 def extract_content(input_string: str) -> str:
