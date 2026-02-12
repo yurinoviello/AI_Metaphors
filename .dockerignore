@@ -1,0 +1,13 @@
+.git
+.venv
+.idea
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.db
+animations/
+*.mp4
+*.log
+.env
+key.json

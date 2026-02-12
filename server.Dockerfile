@@ -23,21 +23,21 @@ RUN python -m pip install --retries 3 --no-cache-dir --no-build-isolation openai
 COPY requirements.txt ./
 RUN python -m pip install --retries 3 --no-cache-dir --compile -r requirements.txt -c constraints.txt
 
-COPY . .
-
-EXPOSE ${PORT}
-
 ENV NLTK_DATA=/usr/share/nltk_data
 ENV PYTHONPATH=/app
 
-RUN mkdir -p /app/animations && chmod -R 777 /app
 RUN mkdir -p $NLTK_DATA && chmod -R 777 $NLTK_DATA
+RUN mkdir -p /app/animations && chmod -R 777 /app
 RUN mkdir /.cache && chmod -R 777 /.cache
 RUN mkdir /.triton && chmod -R 777 /.triton
 RUN mkdir /.local && chmod -R 777 /.local
 RUN python -m nltk.downloader -d $NLTK_DATA averaged_perceptron_tagger_eng
 RUN python -m nltk.downloader -d $NLTK_DATA averaged_perceptron_tagger
 RUN python -m nltk.downloader -d $NLTK_DATA cmudict
+
+COPY . .
+
+EXPOSE ${PORT}
 
 # RUN python -m ai_metaphors.server.db.init_db
 
