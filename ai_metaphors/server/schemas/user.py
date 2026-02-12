@@ -19,6 +19,7 @@ class UserOut(BaseModel):
     email: EmailStr
     name: str
     is_active: bool
+    is_admin: bool
     created_at: datetime
 
     class Config:
@@ -30,3 +31,4 @@ class LoginResponse(BaseModel):
     token_type: str
     name: str
     is_active: bool
+    is_admin: bool

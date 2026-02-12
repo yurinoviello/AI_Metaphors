@@ -51,4 +51,5 @@ async def login(payload: UserLogin):
         "token_type": "bearer",
         "name": user.name,
         "is_active": user.is_active,
+        "is_admin": user.is_admin,
     }
