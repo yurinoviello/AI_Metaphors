@@ -39,8 +39,6 @@ COPY . .
 
 EXPOSE ${PORT}
 
-# RUN python -m ai_metaphors.server.db.init_db
-
 COPY --chown=1001:1001 entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 

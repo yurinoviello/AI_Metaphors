@@ -18,7 +18,37 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Upgrade schema."""
-    # 1. Create users table if not exists
+    # 1. Create status enum if not exists
+    op.execute("DO $$ BEGIN CREATE TYPE status AS ENUM ('queued', 'processing', 'completed', 'failed'); EXCEPTION WHEN duplicate_object THEN null; END $$;")
+    
+    # 2. Create termtype enum if not exists
+    op.execute("DO $$ BEGIN CREATE TYPE termtype AS ENUM ('DEFINITION_METAPHOR', 'CODE_METAPHOR', 'ACADEMIC_DEFINITION'); EXCEPTION WHEN duplicate_object THEN null; END $$;")
+
+    # 3. Create video_task table if not exists
+    op.execute("""
+    CREATE TABLE IF NOT EXISTS video_task (
+        id VARCHAR PRIMARY KEY,
+        status status NOT NULL,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        term_name VARCHAR,
+        term_definition VARCHAR,
+        metaphor VARCHAR,
+        term_type termtype NOT NULL,
+        use_dataset_example INTEGER DEFAULT -1,
+        generate_metaphor_text BOOLEAN DEFAULT TRUE,
+        animation_type VARCHAR DEFAULT 'basic',
+        model VARCHAR DEFAULT 'openai-gpt-4o',
+        model_classes VARCHAR DEFAULT 'default',
+        model_manim VARCHAR DEFAULT 'default',
+        temperature FLOAT DEFAULT 0.1,
+        vllm_fix BOOLEAN DEFAULT FALSE,
+        high_quality BOOLEAN DEFAULT FALSE,
+        s3_video_url VARCHAR
+    )
+    """)
+    op.execute("CREATE INDEX IF NOT EXISTS ix_video_task_id ON video_task (id)")
+
+    # 4. Create users table if not exists
     op.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id VARCHAR PRIMARY KEY,
@@ -32,7 +62,7 @@ def upgrade() -> None:
     op.execute("CREATE INDEX IF NOT EXISTS ix_users_id ON users (id)")
     op.execute("CREATE INDEX IF NOT EXISTS ix_users_email ON users (email)")
 
-    # 2. Add columns to video_task if not exists
+    # 5. Add columns to video_task if not exists (for backward compatibility if table existed but without these)
     # user_id
     op.execute("ALTER TABLE video_task ADD COLUMN IF NOT EXISTS user_id VARCHAR")
     op.execute("CREATE INDEX IF NOT EXISTS ix_video_task_user_id ON video_task (user_id)")
