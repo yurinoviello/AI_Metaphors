@@ -1,11 +1,17 @@
 import json
 import os
+import re
 import shutil
 from pathlib import Path
 
 from manim import *
 from manim_voiceover import *
 from manim_voiceover.services.base import SpeechService
+
+def normalize_text(text: str) -> str:
+    text = re.sub(r'<[^>]+>\s*', '', text)
+    text = re.sub(r'\s+', ' ', text)
+    return text.strip()
 
 class PreGeneratedSpeechService(SpeechService):
     """A SpeechService that retrieves pre-generated audio files instead of generating them."""
@@ -20,7 +26,7 @@ class PreGeneratedSpeechService(SpeechService):
         text_index = None
         for key, value in data.items():
             # This checks if the script text exists inside the JSON key
-            if text in key:
+            if normalize_text(text) in normalize_text(key):
                 text_index = value
                 break
 
@@ -108,31 +114,29 @@ class GenScene(VoiceoverScene):
 
         text_index = None
         for key, value in data.items():
-            if text in key:
+            if normalize_text(text) in normalize_text(key):
                 text_index = value
                 break
 
-        # Exit if no matching avatar is found for the text
-        if text_index is None:
-            return
-
-        frames_folder = f"{working_dir}/avatar/{term_name}/avatar_video_{{text_index}}/avatar_frames"
-        frame_files = sorted([
-            os.path.join(frames_folder, f)
-            for f in os.listdir(frames_folder)
-            if f.endswith(".png")
-        ])
-        frame_images = [ImageMobject(f).scale(0.6).to_corner(DL, 0) for f in frame_files]
-        frames_count = len(frame_images)
-        avatar = frame_images[0]
-        self.add(avatar)
-        frame_tracker = ValueTracker(0)
-
-        def update_avatar(mob):
-            idx = int(frame_tracker.get_value()) % frames_count
-            mob.become(frame_images[idx])
-
-        avatar.add_updater(update_avatar)
+        # If avatar is found for the text
+        if text_index is not None:
+            frames_folder = f"{working_dir}/avatar/{term_name}/avatar_video_{{text_index}}/avatar_frames"
+            frame_files = sorted([
+                os.path.join(frames_folder, f)
+                for f in os.listdir(frames_folder)
+                if f.endswith(".png")
+            ])
+            frame_images = [ImageMobject(f).scale(0.6).to_corner(DL, 0) for f in frame_files]
+            frames_count = len(frame_images)
+            avatar = frame_images[0]
+            self.add(avatar)
+            frame_tracker = ValueTracker(0)
+    
+            def update_avatar(mob):
+                idx = int(frame_tracker.get_value()) % frames_count
+                mob.become(frame_images[idx])
+    
+            avatar.add_updater(update_avatar)
 
         self.set_speech_service(PreGeneratedSpeechService())
         with self.voiceover(text=text) as vt:
@@ -165,10 +169,10 @@ class GenScene(VoiceoverScene):
         ]
 
     # ------------------------------------------------------------------
-    # Entry point for the LLM‑generated content
+    # Entry point for the LLM?generated content
     # ------------------------------------------------------------------
     def construct(self):
-        # Intro title (one‑line metaphor) -------------------------------
+        # Intro title (one?line metaphor) -------------------------------
         self.start_end_scene("ONELINEMETAPHOR")
 
         # ---------------- Example ----------------------------
@@ -176,7 +180,7 @@ class GenScene(VoiceoverScene):
 
         def scene1(scene: "GenScene") -> list[Animation]:
             """Builder for the first part of the animation."""
-            # TODO: return list of Manim animations (Create, Write, …)
+            # TODO: return list of Manim animations (Create, Write, ?)
             pass
 
         self.play_scene_with_voice("NARRATION TEXT FOR SCENE 1", *scene1(self))
