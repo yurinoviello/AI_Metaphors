@@ -1,10 +1,46 @@
     def get_code(self, code_text: str):
-       """To highlight a line, you can access to the line i with code.code_lines[i].
-       then set color YELLOW to highlight and WHITE to reset it back."""
+        return Code(
+            code_string=code_text,
+            tab_width=2,
+            background="rectangle",
+            language="Python",  # <-- switch to Kotlin eventually
+        ).scale(0.6).to_edge(LEFT, buff=0.5).shift(LEFT * 0.48)
 
-       return Code(
-                    code_string=code_text,
-                    tab_width=4,
-                    background="rectangle",
-                    language="Python",
-                    ).scale(0.8).to_edge(LEFT, buff=0.75)
+
+    def _glyph_lines(self, code, start, end=None):
+        """
+        Return glyphs only for lines [start, end) or single line if end is None.
+        Use this method to higlhit lines (e.g. creation_highlight = SurroundingRectangle(_glyph_lines(code, 4, 8), color=HIGHLIGHT_COLOUR, buff=BUFFER, corner_radius=0.1,).scale(SCALING_RECT))
+        """
+        if end is None:
+            end = start + 1
+
+        def _is_background(m):
+            # Exclude objects that are typically backgrounds or borders
+            name = type(m).__name__
+            return name in {
+                "Rectangle", "RoundedRectangle", "BackgroundRectangle",
+                "Underline", "SurroundingRectangle", "DashedVMobject", "Dot"
+            }
+
+        def _collect_drawables(container):
+            drawables = [m for m in container.family_members_with_points() if not _is_background(m)]
+            # Safety fallback: if filter empties everything, use original object
+            return VGroup(*drawables) if drawables else VGroup(container)
+
+        # New API (1-based)
+        if hasattr(code, "code") and hasattr(code.code, "get_lines_by_number"):
+            lines = code.code.get_lines_by_number(*range(start + 1, end))
+            if not isinstance(lines, (list, tuple, VGroup)):
+                lines = [lines]
+            # Collect drawable tokens for each line
+            parts = []
+            for ln in lines:
+                parts.append(_collect_drawables(ln))
+            return VGroup(*parts)
+
+        # Fallback old API
+        parts = []
+        for i in range(start, end):
+            parts.append(_collect_drawables(code.code_lines[i]))
+        return VGroup(*parts)
