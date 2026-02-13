@@ -10,7 +10,7 @@ from manim_voiceover.services.base import SpeechService
 
 def normalize_text(text: str) -> str:
     text = re.sub(r'<[^>]+>\s*', '', text)
-    text = re.sub(r'\s+', ' ', text)
+    text = re.sub(r'\s+', '', text)
     return text.strip()
 
 class PreGeneratedSpeechService(SpeechService):
