@@ -1,11 +1,10 @@
 from datetime import datetime
-from enum import Enum
 from typing import Literal, Optional, List, TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
-from ai_metaphors.server.models.status import Status
 from ai_metaphors.common.core.utils import TermType
+from ai_metaphors.server.models.status import Status
 
 if TYPE_CHECKING:
     from ai_metaphors.server.models.video_task import VideoTask
@@ -26,6 +25,7 @@ class VideoRequest(BaseModel):
                                                     description="Animation type: basic, voice, avatar, or cartoon-avatar")
 
     model: Optional[str] = Field("openai-gpt-4o", description="LLM to be used for processing")
+    model_classes: Optional[str] = Field("openai-gpt-4o", description="LLM to be used specifically for processing classes")
     model_manim: Optional[str] = Field("default", description="LLM to be used to process only the manim script")
     temperature: Optional[float] = Field(0.1, description="Temperature for LLM generation")
 
