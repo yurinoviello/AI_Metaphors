@@ -39,20 +39,17 @@ class VideoTask(Base):
 
     # Ownership fields
     user_id = Column(String, nullable=True, index=True)
-    api_key = Column(String, nullable=True, index=True)
 
     @staticmethod
     async def create_from_video_request(
         request: 'VideoRequest',
         task_id: str,
-        user_id: str | None = None,
-        api_key: str | None = None
+        user_id: str | None = None
     ):
         task_data = {
             "id": task_id,
             "status": Status.queued,
             "user_id": user_id,
-            "api_key": api_key,
             **request.model_dump(exclude_unset=True)
         }
 
@@ -92,7 +89,7 @@ class VideoTask(Base):
             return task
 
     @classmethod
-    async def all(cls, skip: int = 0, limit: int = 100, user_id: Optional[str] = None, api_key: Optional[str] = None):
+    async def all(cls, skip: int = 0, limit: int = 100, user_id: str | None = None):
         async with async_session() as session:
             non_expired_threshold = func.now() - datetime.timedelta(hours=settings.URL_EXPIRATION / 3600)
             
@@ -100,8 +97,6 @@ class VideoTask(Base):
             filters = [cls.created_at >= non_expired_threshold]
             if user_id:
                 filters.append(cls.user_id == user_id)
-            elif api_key:
-                filters.append(cls.api_key == api_key)
 
             count_query = select(func.count()).select_from(cls).where(*filters)
             total_count = await session.execute(count_query)

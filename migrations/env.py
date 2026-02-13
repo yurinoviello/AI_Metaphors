@@ -45,7 +45,6 @@ def register_models():
         sa.Column('high_quality', sa.Boolean, default=False),
         sa.Column('s3_video_url', sa.String, nullable=True),
         sa.Column('user_id', sa.String, nullable=True, index=True),
-        sa.Column('api_key', sa.String, nullable=True, index=True),
     )
     
     # User

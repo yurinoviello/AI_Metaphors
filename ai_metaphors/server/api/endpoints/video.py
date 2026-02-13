@@ -2,7 +2,8 @@ import logging
 from uuid import uuid4
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 
-from ai_metaphors.server.api.auth import unified_auth
+from ai_metaphors.server.api.auth import unified_auth, get_current_user
+from ai_metaphors.server.models.user import User
 from ai_metaphors.server.models.video_task import VideoTask
 from ai_metaphors.server.models.status import Status
 from ai_metaphors.server.schemas.video import VideoResponse, VideoRequest, VideoTaskStatus, VideoTaskList
@@ -26,8 +27,7 @@ async def generate_video(
         await VideoTask.create_from_video_request(
             request, 
             task_id, 
-            user_id=auth.get("user_id"), 
-            api_key=auth.get("api_key")
+            user_id=auth.get("user_id")
         )
 
         background_tasks.add_task(
@@ -42,27 +42,41 @@ async def generate_video(
 
 
 @router.get("/video/tasks/{task_id}", response_model=VideoTaskStatus)
-async def get_task_status(task_id: str, auth: dict = Depends(unified_auth)):
+async def get_task_status(
+    task_id: str, 
+    auth: dict = Depends(unified_auth),
+    current_user: User | None = Depends(get_current_user)
+):
     task = await VideoTask.get(task_id)
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
     
-    # Check ownership
-    if auth.get("user_id") and task.user_id != auth.get("user_id"):
-        raise HTTPException(status_code=403, detail="Access forbidden")
-    if auth.get("api_key") and task.api_key != auth.get("api_key"):
+    # Check ownership: 
+    # - If API Key is used (auth.api_key is set), it's an admin, access allowed.
+    # - If it's a JWT user, check if they are the owner OR an admin.
+    is_admin = auth.get("api_key") is not None or (current_user and current_user.is_admin)
+    
+    if not is_admin and task.user_id != auth.get("user_id"):
         raise HTTPException(status_code=403, detail="Access forbidden")
 
     return VideoTaskStatus.from_orm_model(task)
 
 
 @router.get("/video/tasks", response_model=VideoTaskList)
-async def get_tasks_list(skip: int = 0, limit: int = 100, auth: dict = Depends(unified_auth)):
+async def get_tasks_list(
+    skip: int = 0, 
+    limit: int = 100, 
+    auth: dict = Depends(unified_auth),
+    current_user: User | None = Depends(get_current_user)
+):
+    # Admins see everything
+    is_admin = auth.get("api_key") is not None or (current_user and current_user.is_admin)
+    user_id_filter = None if is_admin else auth.get("user_id")
+
     pagination_result = await VideoTask.all(
         skip=skip, 
         limit=limit, 
-        user_id=auth.get("user_id"), 
-        api_key=auth.get("api_key")
+        user_id=user_id_filter
     )
 
     return VideoTaskList(
