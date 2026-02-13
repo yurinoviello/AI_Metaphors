@@ -11,12 +11,12 @@ resources:
     cpu: 2
     memory: 4Gi
     ephemeral-storage: 5Gi
-    nvidia.com/gpu: 1
+    nvidia.com/gpu: 2
   limits:
     cpu: 8
     memory: 16Gi
     ephemeral-storage: 5Gi
-    nvidia.com/gpu: 1
+    nvidia.com/gpu: 2
 
 pvc:
   data:
