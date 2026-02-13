@@ -47,9 +47,11 @@ async def get_task_status(
     auth: dict = Depends(unified_auth),
     current_user: User | None = Depends(get_current_user)
 ):
-    task = await VideoTask.get(task_id)
-    if not task:
+    result = await VideoTask.get_with_user(task_id)
+    if not result:
         raise HTTPException(status_code=404, detail="Task not found")
+    
+    task, user_name = result
     
     # Check ownership: 
     # - If API Key is used (auth.api_key is set), it's an admin, access allowed.
@@ -59,7 +61,7 @@ async def get_task_status(
     if not is_admin and task.user_id != auth.get("user_id"):
         raise HTTPException(status_code=403, detail="Access forbidden")
 
-    return VideoTaskStatus.from_orm_model(task)
+    return VideoTaskStatus.from_orm_model(task, user_name=user_name)
 
 
 @router.get("/video/tasks", response_model=VideoTaskList)
@@ -73,7 +75,7 @@ async def get_tasks_list(
     is_admin = auth.get("api_key") is not None or (current_user and current_user.is_admin)
     user_id_filter = None if is_admin else auth.get("user_id")
 
-    pagination_result = await VideoTask.all(
+    pagination_result = await VideoTask.all_with_users(
         skip=skip, 
         limit=limit, 
         user_id=user_id_filter
@@ -81,8 +83,8 @@ async def get_tasks_list(
 
     return VideoTaskList(
         tasks=[
-            VideoTaskStatus.from_orm_model(task)
-            for task in pagination_result["items"]
+            VideoTaskStatus.from_orm_model(task, user_name=user_name)
+            for task, user_name in pagination_result["items"]
         ],
         total=pagination_result["total"],
         skip=pagination_result["skip"],

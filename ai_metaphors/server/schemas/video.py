@@ -57,12 +57,13 @@ class VideoTaskStatus(BaseModel):
     temperature: float
     vllm_fix: bool
     high_quality: bool
+    user_name: str | None = None
 
     class Config:
         from_attributes = True
 
     @classmethod
-    def from_orm_model(cls, task: 'VideoTask') -> 'VideoTaskStatus':
+    def from_orm_model(cls, task: 'VideoTask', user_name: str | None = None) -> 'VideoTaskStatus':
         return cls(
             task_id=task.id,
             status=task.status,
@@ -80,7 +81,8 @@ class VideoTaskStatus(BaseModel):
             model_manim=task.model_manim,
             temperature=task.temperature,
             vllm_fix=task.vllm_fix,
-            high_quality=task.high_quality
+            high_quality=task.high_quality,
+            user_name=user_name
         )
 
 

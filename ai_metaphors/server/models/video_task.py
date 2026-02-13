@@ -1,14 +1,17 @@
-import logging
 import datetime
+import logging
 from typing import Optional
+
 from sqlalchemy import Column, String, Enum, DateTime, func, Integer, Boolean, Float, select
 from sqlalchemy.exc import SQLAlchemyError
 
 from ai_metaphors.common.core.utils.term_type import TermType
-from ai_metaphors.server.models.status import Status
-from ai_metaphors.server.settings.settings import settings
 from ai_metaphors.server.db.base_class import Base
 from ai_metaphors.server.db.session import async_session
+from ai_metaphors.server.models.status import Status
+from ai_metaphors.server.models.user import User
+from ai_metaphors.server.settings.settings import settings
+
 
 class VideoTask(Base):
     __tablename__ = 'video_task'
@@ -75,6 +78,17 @@ class VideoTask(Base):
             return await session.get(cls, task_id)
 
     @classmethod
+    async def get_with_user(cls, task_id: str) -> tuple['VideoTask', str | None] | None:
+        async with async_session() as session:
+            query = (
+                select(cls, User.name)
+                .outerjoin(User, cls.user_id == User.id)
+                .where(cls.id == task_id)
+            )
+            result = await session.execute(query)
+            return result.first()
+
+    @classmethod
     async def update(cls, task_id: str, **kwargs) -> Optional['VideoTask']:
         async with async_session() as session:
             task = await session.get(cls, task_id)
@@ -108,6 +122,40 @@ class VideoTask(Base):
 
             return {
                 "items": result.scalars().all(),
+                "total": total,
+                "skip": skip,
+                "limit": limit
+            }
+
+    @classmethod
+    async def all_with_users(cls, skip: int = 0, limit: int = 100, user_id: str | None = None):
+        from ai_metaphors.server.models.user import User
+        async with async_session() as session:
+            non_expired_threshold = func.now() - datetime.timedelta(hours=settings.URL_EXPIRATION / 3600)
+            
+            # Base filters
+            filters = [cls.created_at >= non_expired_threshold]
+            if user_id:
+                filters.append(cls.user_id == user_id)
+
+            count_query = select(func.count()).select_from(cls).where(*filters)
+            total_count = await session.execute(count_query)
+            total = total_count.scalar()
+
+            # Get paginated results with usernames
+            query = (
+                select(cls, User.name)
+                .outerjoin(User, cls.user_id == User.id)
+                .where(*filters)
+                .order_by(cls.created_at.desc())
+                .offset(skip)
+                .limit(limit)
+            )
+            result = await session.execute(query)
+            items = result.all()
+
+            return {
+                "items": items,  # List of (VideoTask, user_name) tuples
                 "total": total,
                 "skip": skip,
                 "limit": limit
