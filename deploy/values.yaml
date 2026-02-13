@@ -8,19 +8,19 @@ runAsGroup: 1001
 
 resources:
   requests:
-    cpu: 2
-    memory: 4Gi
+    cpu: 6
+    memory: 8Gi
     ephemeral-storage: 5Gi
-    nvidia.com/gpu: 2
+    nvidia.com/gpu: 4
   limits:
-    cpu: 8
-    memory: 16Gi
+    cpu: 12
+    memory: 32Gi
     ephemeral-storage: 5Gi
-    nvidia.com/gpu: 2
+    nvidia.com/gpu: 4
 
 pvc:
   data:
-    size: 15Gi
+    size: 100Gi
     mountPath: /app/animations
 
 autoscaling:
