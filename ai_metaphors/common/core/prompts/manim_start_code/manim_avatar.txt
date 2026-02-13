@@ -31,7 +31,7 @@ class PreGeneratedSpeechService(SpeechService):
                 break
 
         if text_index is None:
-            raise ValueError("Text not found in phrases.json")
+            raise ValueError("Text not found in phrases.json - Original: '%s', Normalized: '%s', Available keys: %s" % (text, normalize_text(text), list(data.keys())))
 
         audio_path = Path(f"{working_dir}/avatar/{term_name}/narration_audio/{{text_index}}.mp3")
         if not audio_path.exists():
@@ -118,25 +118,28 @@ class GenScene(VoiceoverScene):
                 text_index = value
                 break
 
-        # If avatar is found for the text
-        if text_index is not None:
-            frames_folder = f"{working_dir}/avatar/{term_name}/avatar_video_{{text_index}}/avatar_frames"
-            frame_files = sorted([
-                os.path.join(frames_folder, f)
-                for f in os.listdir(frames_folder)
-                if f.endswith(".png")
-            ])
-            frame_images = [ImageMobject(f).scale(0.6).to_corner(DL, 0) for f in frame_files]
-            frames_count = len(frame_images)
-            avatar = frame_images[0]
-            self.add(avatar)
-            frame_tracker = ValueTracker(0)
-    
-            def update_avatar(mob):
-                idx = int(frame_tracker.get_value()) % frames_count
-                mob.become(frame_images[idx])
-    
-            avatar.add_updater(update_avatar)
+        # Exit if no matching avatar is found for the text
+        if text_index is None:
+            print(f"No avatar found for text: {text}")
+            return
+
+        frames_folder = f"{working_dir}/avatar/{term_name}/avatar_video_{{text_index}}/avatar_frames"
+        frame_files = sorted([
+            os.path.join(frames_folder, f)
+            for f in os.listdir(frames_folder)
+            if f.endswith(".png")
+        ])
+        frame_images = [ImageMobject(f).scale(0.6).to_corner(DL, 0) for f in frame_files]
+        frames_count = len(frame_images)
+        avatar = frame_images[0]
+        self.add(avatar)
+        frame_tracker = ValueTracker(0)
+
+        def update_avatar(mob):
+            idx = int(frame_tracker.get_value()) % frames_count
+            mob.become(frame_images[idx])
+
+        avatar.add_updater(update_avatar)
 
         self.set_speech_service(PreGeneratedSpeechService())
         with self.voiceover(text=text) as vt:
