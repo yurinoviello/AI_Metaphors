@@ -43,6 +43,7 @@ def register_models():
         sa.Column('temperature', sa.Float, default=0.1),
         sa.Column('vllm_fix', sa.Boolean, default=False),
         sa.Column('high_quality', sa.Boolean, default=False),
+        sa.Column('manim_code', sa.String, nullable=True),
         sa.Column('s3_video_url', sa.String, nullable=True),
         sa.Column('user_id', sa.String, nullable=True, index=True),
     )

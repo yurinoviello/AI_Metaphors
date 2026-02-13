@@ -57,6 +57,7 @@ class VideoTaskStatus(BaseModel):
     temperature: float
     vllm_fix: bool
     high_quality: bool
+    manim_code: str | None = None
     user_name: str | None = None
 
     class Config:
@@ -82,6 +83,7 @@ class VideoTaskStatus(BaseModel):
             temperature=task.temperature,
             vllm_fix=task.vllm_fix,
             high_quality=task.high_quality,
+            manim_code=task.manim_code,
             user_name=user_name
         )
 

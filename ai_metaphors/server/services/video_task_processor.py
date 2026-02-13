@@ -48,13 +48,18 @@ class VideoTaskProcessor:
             await task.update(task_id=task_id, status=Status.processing)
 
             self.metaphor_processor = self.processor_setup(task, task_id)
-            self.metaphor_processor.generate_video()
+            manim_code = self.metaphor_processor.generate_video()
 
             logging.info(f"Video generation completed successfully")
 
             self.upload_video(task_id)
             logging.info(f"Video uploaded successfully")
-            await task.update(task_id=task_id, status=Status.completed, s3_video_url=self.storage_url)
+            await task.update(
+                task_id=task_id, 
+                status=Status.completed, 
+                s3_video_url=self.storage_url,
+                manim_code=manim_code
+            )
 
         except Exception as e:
             logging.error(f"Error in video generation task {task_id}: {e}", exc_info=True)

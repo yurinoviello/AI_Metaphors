@@ -37,6 +37,7 @@ class VideoTask(Base):
 
     vllm_fix = Column(Boolean, default=False)
     high_quality = Column(Boolean, default=False)
+    manim_code = Column(String, nullable=True)
 
     s3_video_url = Column(String, nullable=True)
 

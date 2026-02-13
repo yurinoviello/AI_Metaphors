@@ -81,15 +81,11 @@ class ManimProcessor:
         scripts_dir.mkdir(parents=True, exist_ok=True)
         self.script_path = scripts_dir / f"{subject_id}.py"
 
-    def write_python(self, text: str):
-        # Apply color patch
+    def write_python(self, text: str) -> str:
         code = extract_python_code(text)
-
-        # Removing this patch at the moment because it causes issues with the static analysis
-        # try:
-        #     code = "from ai_metaphors.common.static_color_refining import color_runtime_patch\n" + code
-        # except TypeError:
-        #     logging.warning("Failed to apply color patch. Using original code instead.")
+        
+        if not code:
+            code = text
 
         if code:
             try:
@@ -97,26 +93,22 @@ class ManimProcessor:
                     file.write(code)
             except FileNotFoundError as e:
                 raise RuntimeError("Cannot write manim code") from e
-        else:
-            try:
-                with self.script_path.open("w") as file:
-                    file.write(text)
-            except FileNotFoundError as e:
-                raise RuntimeError("Cannot write manim text") from e
+        
+        return code
 
-    def write_and_run_python(self, text: str):
+    def write_and_run_python(self, text: str) -> str:
         logging.debug("Starting execution...")
-        self.write_python(text)
+        code = self.write_python(text)
 
         error = self.execute_manim_script()
         if error == "success":
-            return
+            return code
 
         for tryNum in range(self._MAX_TRIES):
             logging.debug(f"Execution, {tryNum} try ...")
-            error = self.refine_code_with_static_analysis(error)
+            code, error = self.refine_code_with_static_analysis(error)
             if error == "success":
-                return
+                return code
         raise RuntimeError("Cannot execute Manim script")
 
     def execute_manim_script(self) -> str:
@@ -148,7 +140,7 @@ class ManimProcessor:
             return "success"
         return errors
 
-    def refine_code_with_static_analysis(self, error: str) -> str:
+    def refine_code_with_static_analysis(self, error: str) -> tuple[str, str]:
         logging.error(f"There was an error during execution:\n{error}")
         command = [
             self._bin_directory / "pylint",
@@ -163,15 +155,15 @@ class ManimProcessor:
         static_errors = process.stdout
 
         with self.script_path.open() as f:
-            manim_script = self._grazie_provider.request_static_refinement(
+            manim_script_raw = self._grazie_provider.request_static_refinement(
                 code=f.read(),
                 runtime_error=error,
                 static_error=static_errors,
                 svg=self.svg,
             )
 
-        self.write_python(manim_script)
-        return self.execute_manim_script()
+        code = self.write_python(manim_script_raw)
+        return code, self.execute_manim_script()
 
     @staticmethod
     def validate_video() -> int:

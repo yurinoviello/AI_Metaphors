@@ -151,7 +151,7 @@ class MetaphorProcessor:
                 task_id=self._task_id
             ).generate_avatar_and_break_into_frames(narration_text)
 
-    def _refine_video(self):
+    def _refine_video(self) -> str | None:
         if self._vllm_fix and self._manim_provider.validate_video():
             video_analysis = self._manim_provider.evaluate_video()
             logging.info("Evaluation complete")
@@ -164,7 +164,8 @@ class MetaphorProcessor:
                 svg=self._manim_provider.svg,
             )
 
-            self._manim_provider.write_and_run_python(video_refined_code)
+            return self._manim_provider.write_and_run_python(video_refined_code)
+        return None
 
     def _add_cartoon_avatar(self):
         if self._manim_type != ManimType.CARTOON_AVATAR:
@@ -176,7 +177,7 @@ class MetaphorProcessor:
             output_structure=self._output_structure
         ).generate_video_with_avatar()
 
-    def generate_video(self):
+    def generate_video(self) -> str:
         tokens_before = self._grazie_provider.num_tokens
         logging.debug(f"Current token usage: {tokens_before}")
 
@@ -186,7 +187,7 @@ class MetaphorProcessor:
         self._generate_description()
         manim_code = self._generate_manim_code()
         self._generate_avatar()
-        self._manim_provider.write_and_run_python(manim_code)
+        final_code = self._manim_provider.write_and_run_python(manim_code)
 
         tokens_after = self._grazie_provider.num_tokens - tokens_before
         logging.info(f"Tokens used: {tokens_after}, "
@@ -195,8 +196,12 @@ class MetaphorProcessor:
         logging.debug(f"Current token usage: {self._grazie_provider.num_tokens}, "
                       f"money spent: {self._count_money(self._grazie_provider.num_tokens)}$")
 
-        self._refine_video()
+        refined_code = self._refine_video()
+        if refined_code:
+            final_code = refined_code
+            
         self._add_cartoon_avatar()
+        return final_code
 
     @staticmethod
     def _count_money(tokens: int) -> float:
