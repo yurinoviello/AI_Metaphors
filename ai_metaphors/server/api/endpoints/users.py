@@ -1,6 +1,7 @@
 import bcrypt
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from starlette.concurrency import run_in_threadpool
 
 from ai_metaphors.server.api.auth import create_access_token, verify_password, admin_or_api_key
 from ai_metaphors.server.models.user import User
@@ -26,7 +27,7 @@ async def create_user(payload: UserCreate):
     user = await User.create(
         email=payload.email,
         name=payload.name,
-        password_hash=hash_password(payload.password),
+        password_hash=await run_in_threadpool(hash_password, payload.password),
         is_active=True,
     )
     if not user:
@@ -37,7 +38,7 @@ async def create_user(payload: UserCreate):
 @router.post("/login", response_model=LoginResponse)
 async def login(payload: UserLogin):
     user = await User.get_by_email(payload.email)
-    if not user or not verify_password(payload.password, user.password_hash):
+    if not user or not await run_in_threadpool(verify_password, payload.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",

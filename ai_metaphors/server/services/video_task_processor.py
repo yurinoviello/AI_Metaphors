@@ -3,15 +3,16 @@ import shutil
 from pathlib import Path
 
 import datasets
+from starlette.concurrency import run_in_threadpool
 
 from ai_metaphors.common.core import MetaphorProcessor, ManimType
 from ai_metaphors.common.core.utils import TermType
-from ai_metaphors.server.models.video_task import VideoTask
-from ai_metaphors.server.models.status import Status
-from ai_metaphors.server.services.storage_service import GCSStorageService
 from ai_metaphors.common.video_from_academic_definition import AcademicDefinitionPromptProvider
 from ai_metaphors.common.video_from_code import CodePromptProvider
 from ai_metaphors.common.video_from_definition import DefinitionPromptProvider
+from ai_metaphors.server.models.status import Status
+from ai_metaphors.server.models.video_task import VideoTask
+from ai_metaphors.server.services.storage_service import GCSStorageService
 
 
 class VideoTaskProcessor:
@@ -42,17 +43,17 @@ class VideoTaskProcessor:
             return
 
         try:
-            self.working_dir = self._set_up_working_dir(task_id)
+            self.working_dir = await run_in_threadpool(self._set_up_working_dir, task_id)
 
             logging.info(f"Starting video generation task {task_id}")
             await task.update(task_id=task_id, status=Status.processing)
 
-            self.metaphor_processor = self.processor_setup(task, task_id)
-            manim_code = self.metaphor_processor.generate_video()
+            self.metaphor_processor = await run_in_threadpool(self.processor_setup, task, task_id)
+            manim_code = await run_in_threadpool(self.metaphor_processor.generate_video)
 
             logging.info(f"Video generation completed successfully")
 
-            self.upload_video(task_id)
+            await run_in_threadpool(self.upload_video, task_id)
             logging.info(f"Video uploaded successfully")
             await task.update(
                 task_id=task_id, 
@@ -66,8 +67,8 @@ class VideoTaskProcessor:
             await task.update(task_id=task_id, status=Status.failed)
 
         finally:
-            if self.working_dir.exists():
-                shutil.rmtree(self.working_dir)
+            if hasattr(self, 'working_dir') and self.working_dir.exists():
+                await run_in_threadpool(shutil.rmtree, self.working_dir)
                 logging.info(f"Deleted working directory {self.working_dir}")
             logging.info(f"Video generation task {task_id} completed")
 
