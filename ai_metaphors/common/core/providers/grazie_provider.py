@@ -18,7 +18,7 @@ class GrazieProvider:
     GrazieProvider is a class designed to interact with the Grazie API using a specified language model.
     It facilitates generating various forms of output based on provided prompts and parameters.
 
-    :param model: A string representing the model to be used for generating responses. Defaults to "openai-gpt-4o".
+    :param model: A string representing the model to be used for generating responses. Defaults to "openai-gpt-5-2".
     :param temperature: A float that determines the randomness of the model's output. Defaults to 0.0.
     :param prompt_provider: An instance of PromptProvider that provides prompts for various subject types.
     """

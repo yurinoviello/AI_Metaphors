@@ -30,7 +30,7 @@ class VideoTask(Base):
     generate_metaphor_text = Column(Boolean, default=True)
     animation_type = Column(String, default="basic")
 
-    model = Column(String, default="openai-gpt-4o")
+    model = Column(String, default="openai-gpt-5-2")
     model_classes = Column(String, default="default")
     model_manim = Column(String, default="default")
     temperature = Column(Float, default=0.1)

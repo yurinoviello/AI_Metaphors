@@ -146,9 +146,9 @@ ai-metaphors [OPTIONS]
 | `--animation-type`         | `str`    | Type of animation to generate: `basic` (default, simple animation), `voice` (adds voice-over), `avatar` (adds animated avatar with voice-over), or `cartoon-avatar` (adds cartoon-style avatar with voice-over). |
 | `--bin-directory`          | `str`    | Path to the executable for Manim. Default is `.venv/bin`.                                                                                          |
 | `--working-dir`            | `str`    | Working directory for Manim output. Default: `./animations`.                                                                                       |
-| `--model`                  | `str`    | Language model to process with. Default: `openai-gpt-4o`.                                                                                          |
+| `--model`                  | `str`    | Language model to process with. Default: `openai-gpt-5-2`.                                                                                          |
 | `--model-classes`          | `str`    | LLM to be used specifically for processing classes. Default: `default`.                                                                            |
-| `--model-manim`            | `str`    | LLM to process only the Manim script. Default: `anthropic-claude-3.7-sonnet`.                                                                      |
+| `--model-manim`            | `str`    | LLM to process only the Manim script. Default: `default`.                                                                      |
 | `--temperature`            | `float`  | Temperature value to be used by the chosen language model. Default: `0.1`.                                                                         |
 | `--vllm-fix`               | `flag`   | **Experimental** Perform an automatic vLLM analysis and code correction.                                                                           |
 | `--auto-play`              | `flag`   | Automatically play the animation at the end of the execution.                                                                                      |
