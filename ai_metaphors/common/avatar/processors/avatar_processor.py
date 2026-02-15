@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -66,6 +67,9 @@ class AvatarProcessor:
         output_path = self._avatar_video_dir / f"{step}.mp4"
         
         ref_path = str(self._avatar_face_file)
+
+        env = os.environ.copy()
+        env["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
             
         try:
             subprocess.run([
@@ -78,7 +82,7 @@ class AvatarProcessor:
                 "--ckpt_path", "./checkpoints/float.pth",
                 "--emo", "neutral",
                 "--res_video_path", str(output_path)
-            ], check=True, cwd=self._float_model_dir)
+            ], check=True, cwd=self._float_model_dir, env=env)
             logging.debug(f"Avatar generated for {step} step")
             return output_path
         except subprocess.CalledProcessError as e:

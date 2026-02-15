@@ -6,6 +6,7 @@ import datasets
 from starlette.concurrency import run_in_threadpool
 
 from ai_metaphors import PROJECT_ROOT
+from ai_metaphors.common.utils.gpu_lock import GPULock
 from ai_metaphors.common.core import MetaphorProcessor, ManimType
 from ai_metaphors.common.core.utils import TermType
 from ai_metaphors.common.video_from_academic_definition import AcademicDefinitionPromptProvider
@@ -48,7 +49,9 @@ class VideoTaskProcessor:
             await task.update(task_id=task_id, status=Status.processing)
 
             metaphor_processor = await run_in_threadpool(self.processor_setup, task, task_id, working_dir)
-            manim_code = await run_in_threadpool(metaphor_processor.generate_video)
+            
+            with GPULock():
+                manim_code = await run_in_threadpool(metaphor_processor.generate_video)
 
             logging.info(f"Video generation completed successfully")
 
