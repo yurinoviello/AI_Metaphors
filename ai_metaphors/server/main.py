@@ -11,6 +11,7 @@ logging.basicConfig(
     format="%(levelname)s: %(message)s (%(filename)s:%(lineno)d)",
     force=True,
 )
+logging.getLogger("pytoon").setLevel(logging.WARNING)
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
