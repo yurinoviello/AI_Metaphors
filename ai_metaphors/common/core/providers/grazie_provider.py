@@ -1,3 +1,4 @@
+import logging
 import os
 from pathlib import Path
 import attrs
@@ -7,6 +8,7 @@ from grazie.api.client.gateway import AuthType, GrazieAgent, GrazieApiGatewayCli
 from grazie.api.client.chat.prompt import ChatPrompt
 from grazie.api.client.llm_parameters import LLMParameters, Parameters
 from grazie.api.client.profiles import LLMProfile
+from grazie.api.client.quota.response import Quota
 from openai import OpenAI
 import tiktoken
 
@@ -192,3 +194,12 @@ class GrazieProvider:
             input=text,
         ) as response:
             response.stream_to_file(narration_audio_file)
+
+    def get_quota(self) -> dict[str, Quota] | None:
+        try:
+            quota_info = self._client.quota()
+            logging.debug(f"Successfully retrieved quota: {quota_info}")
+            return quota_info
+        except Exception as e:
+            logging.error(f"Failed to retrieve quota from Grazie: {e}")
+            return None

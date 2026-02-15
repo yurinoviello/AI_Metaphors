@@ -179,7 +179,6 @@ class MetaphorProcessor:
 
     def generate_video(self) -> str:
         tokens_before = self._grazie_provider.num_tokens
-        logging.debug(f"Current token usage: {tokens_before}")
 
         self._generate_story()
         self._generate_one_line_story()
@@ -190,11 +189,10 @@ class MetaphorProcessor:
         final_code = self._manim_provider.write_and_run_python(manim_code)
 
         tokens_after = self._grazie_provider.num_tokens - tokens_before
-        logging.info(f"Tokens used: {tokens_after}, "
-                     f"money spent: {self._count_money(tokens_after)}$")
+        logging.info(f"Tokens used: {tokens_after}, money spent: {self._count_money(tokens_after)}$")
 
-        logging.debug(f"Current token usage: {self._grazie_provider.num_tokens}, "
-                      f"money spent: {self._count_money(self._grazie_provider.num_tokens)}$")
+        quota = self._grazie_provider.get_quota()
+        logging.info(f"Current quota: {quota}")
 
         refined_code = self._refine_video()
         if refined_code:
