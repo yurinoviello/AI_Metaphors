@@ -90,3 +90,39 @@ async def get_tasks_list(
         skip=pagination_result["skip"],
         limit=pagination_result["limit"]
     )
+
+
+@router.post("/video/tasks/{task_id}/retry", response_model=VideoResponse)
+async def retry_video_task(
+    task_id: str,
+    background_tasks: BackgroundTasks,
+    auth: dict = Depends(unified_auth),
+    current_user: User | None = Depends(get_current_user)
+):
+    result = await VideoTask.get_with_user(task_id)
+    if not result:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    task, _ = result
+
+    # Check ownership
+    is_admin = auth.get("api_key") is not None or (current_user and current_user.is_admin)
+    if not is_admin and task.user_id != auth.get("user_id"):
+        raise HTTPException(status_code=403, detail="Access forbidden")
+
+    if task.status != Status.failed:
+        raise HTTPException(status_code=400, detail=f"Cannot retry task in {task.status} status")
+
+    await VideoTask.update(
+        task_id=task_id, 
+        status=Status.queued,
+        manim_code=None,
+        s3_video_url=None
+    )
+
+    background_tasks.add_task(
+        video_task_processor.process_video_generation_task,
+        task_id,
+    )
+
+    return VideoResponse(task_id=task_id, status=Status.queued)
