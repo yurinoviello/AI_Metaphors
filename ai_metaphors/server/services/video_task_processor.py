@@ -50,7 +50,7 @@ class VideoTaskProcessor:
 
             metaphor_processor = await run_in_threadpool(self.processor_setup, task, task_id, working_dir)
             
-            with GPULock():
+            async with GPULock():
                 manim_code = await run_in_threadpool(metaphor_processor.generate_video)
 
             logging.info(f"Video generation completed successfully")

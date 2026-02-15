@@ -1,7 +1,7 @@
+import asyncio
 import fcntl
 import logging
-import time
-
+from pathlib import Path
 
 class GPULock:
     """
@@ -14,14 +14,14 @@ class GPULock:
         self._fd = None
         self._active_slot = -1
 
-    def __enter__(self) -> 'GPULock':
+    async def __aenter__(self) -> 'GPULock':
         logging.info(f"Waiting for GPU access (max parallel: {self.max_parallel})...")
         try:
             while True:
                 for slot in range(self.max_parallel):
                     lock_path = f"{self.base_lock_file}_{slot}.lock"
-                    fd = open(lock_path, "w")
                     try:
+                        fd = open(lock_path, "w")
                         # Try to acquire a non-blocking lock
                         fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
                         self._fd = fd
@@ -30,18 +30,25 @@ class GPULock:
                         return self
                     except BlockingIOError:
                         # Slot is busy, close and try next
-                        fd.close()
+                        if 'fd' in locals():
+                            fd.close()
+                        continue
+                    except Exception as e:
+                        logging.error(f"Error opening/locking {lock_path}: {e}")
+                        if 'fd' in locals():
+                            fd.close()
                         continue
                 
                 # All slots are busy, wait a bit and retry
-                time.sleep(5)
+                await asyncio.sleep(5)
         except Exception as e:
             logging.error(f"Unexpected error acquiring GPU lock: {e}")
             if self._fd:
                 self._fd.close()
+                self._fd = None
             raise
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
         try:
             if self._fd:
                 fcntl.flock(self._fd, fcntl.LOCK_UN)
