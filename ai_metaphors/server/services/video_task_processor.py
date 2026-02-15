@@ -19,9 +19,6 @@ class VideoTaskProcessor:
     _bin_directory: Path
     _ds: datasets.Dataset
     storage_service: GCSStorageService
-    working_dir: Path
-    storage_url: str | None
-    metaphor_processor: MetaphorProcessor
 
     manim_type_map = {
         "basic": ManimType.DEFAULT,
@@ -34,7 +31,6 @@ class VideoTaskProcessor:
         self._bin_directory = Path("/opt/conda/bin")
         self._ds = datasets.load_from_disk("ai_metaphors/resources/examples/definitions")
         self.storage_service = GCSStorageService()
-        self.storage_url = None
 
     async def process_video_generation_task(self, task_id: str):
         task = await VideoTask.get(task_id)
@@ -42,23 +38,24 @@ class VideoTaskProcessor:
             logging.error(f"Task {task_id} not found")
             return
 
+        working_dir = None
         try:
-            self.working_dir = await run_in_threadpool(self._set_up_working_dir, task_id)
+            working_dir = await run_in_threadpool(self._set_up_working_dir, task_id)
 
             logging.info(f"Starting video generation task {task_id}")
             await task.update(task_id=task_id, status=Status.processing)
 
-            self.metaphor_processor = await run_in_threadpool(self.processor_setup, task, task_id)
-            manim_code = await run_in_threadpool(self.metaphor_processor.generate_video)
+            metaphor_processor = await run_in_threadpool(self.processor_setup, task, task_id, working_dir)
+            manim_code = await run_in_threadpool(metaphor_processor.generate_video)
 
             logging.info(f"Video generation completed successfully")
 
-            await run_in_threadpool(self.upload_video, task_id)
+            storage_url = await run_in_threadpool(self.upload_video, task_id, metaphor_processor)
             logging.info(f"Video uploaded successfully")
             await task.update(
                 task_id=task_id, 
                 status=Status.completed, 
-                s3_video_url=self.storage_url,
+                s3_video_url=storage_url,
                 manim_code=manim_code
             )
 
@@ -67,12 +64,12 @@ class VideoTaskProcessor:
             await task.update(task_id=task_id, status=Status.failed)
 
         finally:
-            if hasattr(self, 'working_dir') and self.working_dir.exists():
-                await run_in_threadpool(shutil.rmtree, self.working_dir)
-                logging.info(f"Deleted working directory {self.working_dir}")
+            if working_dir and working_dir.exists():
+                await run_in_threadpool(shutil.rmtree, working_dir)
+                logging.info(f"Deleted working directory {working_dir}")
             logging.info(f"Video generation task {task_id} completed")
 
-    def processor_setup(self, task: VideoTask, task_id: str) -> MetaphorProcessor:
+    def processor_setup(self, task: VideoTask, task_id: str, working_dir: Path) -> MetaphorProcessor:
         term_name: str | None = task.term_name
         term_value: str | None = task.term_definition
         metaphor: str | None = task.metaphor
@@ -129,7 +126,7 @@ class VideoTaskProcessor:
             term_type=task.term_type,
             manim_type=manim_type,
             bin_directory=self._bin_directory,
-            working_dir=self.working_dir,
+            working_dir=working_dir,
             model=task.model,
             model_classes=task.model_classes,
             model_manim=task.model_manim,
@@ -140,15 +137,17 @@ class VideoTaskProcessor:
             task_id=task_id
         )
 
-    def upload_video(self, task_id: str):
-        output_structure = self.metaphor_processor.get_output_structure()
+    def upload_video(self, task_id: str, metaphor_processor: MetaphorProcessor) -> str:
+        output_structure = metaphor_processor.get_output_structure()
         video_path = output_structure.get_final_video_path()
 
         storage_key = f"{task_id}/{video_path.name}"
-        self.storage_url = self.storage_service.upload_file(video_path, storage_key)
+        storage_url = self.storage_service.upload_file(video_path, storage_key)
 
-        if self.storage_url is None:
+        if storage_url is None:
             raise RuntimeError("Failed to upload video to storage")
+        
+        return storage_url
 
     @staticmethod
     def _set_up_working_dir(task_id: str):
