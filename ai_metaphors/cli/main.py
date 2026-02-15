@@ -196,6 +196,7 @@ def main():
             format="%(levelname)s: %(message)s (%(filename)s:%(lineno)d)",
         )
         logging.getLogger("pytoon").setLevel(logging.WARNING)
+        logging.getLogger("urllib3").setLevel(logging.INFO)
     match args.term_kind:
         case TermType.DEFINITION_METAPHOR:
             term = {

@@ -12,6 +12,7 @@ logging.basicConfig(
     force=True,
 )
 logging.getLogger("pytoon").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.INFO)
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
