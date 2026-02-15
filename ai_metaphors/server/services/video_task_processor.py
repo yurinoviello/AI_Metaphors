@@ -5,6 +5,7 @@ from pathlib import Path
 import datasets
 from starlette.concurrency import run_in_threadpool
 
+from ai_metaphors import PROJECT_ROOT
 from ai_metaphors.common.core import MetaphorProcessor, ManimType
 from ai_metaphors.common.core.utils import TermType
 from ai_metaphors.common.video_from_academic_definition import AcademicDefinitionPromptProvider
@@ -29,7 +30,8 @@ class VideoTaskProcessor:
 
     def __init__(self):
         self._bin_directory = Path("/opt/conda/bin")
-        self._ds = datasets.load_from_disk("ai_metaphors/resources/examples/definitions")
+        ds_path = PROJECT_ROOT / "resources/examples/definitions"
+        self._ds = datasets.load_from_disk(str(ds_path))
         self.storage_service = GCSStorageService()
 
     async def process_video_generation_task(self, task_id: str):
@@ -76,12 +78,14 @@ class VideoTaskProcessor:
         if task.use_dataset_example != -1:
             match task.term_type:
                 case TermType.DEFINITION_METAPHOR:
-                    ds = datasets.load_from_disk("ai_metaphors/resources/examples/definitions")
+                    ds_path = PROJECT_ROOT / "resources/examples/definitions"
+                    ds = datasets.load_from_disk(str(ds_path))
                     term_name = ds[task.use_dataset_example]["name"]
                     term_value = ds[task.use_dataset_example]["definition"]
                     metaphor = ds[task.use_dataset_example]["metaphor"]
                 case TermType.CODE_METAPHOR:
-                    ds = datasets.load_from_disk("ai_metaphors/resources/examples/codes")
+                    ds_path = PROJECT_ROOT / "resources/examples/codes"
+                    ds = datasets.load_from_disk(str(ds_path))
                     term_name = ds[task.use_dataset_example]["name"]
                     term_value = ds[task.use_dataset_example]["folder"]
                 case _:

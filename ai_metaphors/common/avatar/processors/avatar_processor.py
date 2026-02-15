@@ -1,11 +1,11 @@
 import json
 import logging
-import os
-import subprocess
 import shutil
+import subprocess
 from pathlib import Path
 
-from ai_metaphors.common.core.providers.grazie_provider import GrazieProvider
+from ai_metaphors import PROJECT_ROOT
+from ai_metaphors.common.core.providers import GrazieProvider
 
 
 class AvatarProcessor:
@@ -23,7 +23,7 @@ class AvatarProcessor:
     _narration_text_file: Path
     _narration_audio_dir: Path
     _avatar_video_dir: Path
-    _avatar_face_file = Path("ai_metaphors/resources/avatar_face.jpg")
+    _avatar_face_file = PROJECT_ROOT / "resources/avatar_face.jpg"
     _float_model_dir: Path
     _phrases_mapping_dir: Path
     _task_id: str | None
@@ -64,13 +64,10 @@ class AvatarProcessor:
         self._avatar_video_dir = self._avatar_dir / f"avatar_video_{step}"
         self._avatar_video_dir.mkdir(parents=True, exist_ok=True)
         output_path = self._avatar_video_dir / f"{step}.mp4"
-        original_dir = os.getcwd()
+        
+        ref_path = str(self._avatar_face_file)
+            
         try:
-            os.chdir(self._float_model_dir)
-            if self._task_id is None:
-                ref_path = f"../../{self._avatar_face_file}"
-            else:
-                ref_path = f"../../../{self._avatar_face_file}"
             subprocess.run([
                 "python", "generate.py",
                 "--ref_path", ref_path,
@@ -81,14 +78,12 @@ class AvatarProcessor:
                 "--ckpt_path", "./checkpoints/float.pth",
                 "--emo", "neutral",
                 "--res_video_path", str(output_path)
-            ], check=True)
+            ], check=True, cwd=self._float_model_dir)
             logging.debug(f"Avatar generated for {step} step")
             return output_path
         except subprocess.CalledProcessError as e:
             logging.error(f"Failed to generate avatar for {step} step:\n{e}")
             raise
-        finally:
-            os.chdir(original_dir)
 
     def _save_texts_to_json(self):
         json_str = json.dumps(self._text_to_dir_name, ensure_ascii=False)

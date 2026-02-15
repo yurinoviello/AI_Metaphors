@@ -1,14 +1,15 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from ai_metaphors.common.core.utils.manim_type import ManimType, SafeDict
+from ai_metaphors.common.core.utils import ManimType, SafeDict
+from ai_metaphors import PROJECT_ROOT
 from ai_metaphors.common.static_color_refining.palette import PALETTE_HEX
 
 
 class PromptProvider(ABC):
     _LANGUAGE = "Python"
-    _BASE_PATH: Path = Path("ai_metaphors/common/core/prompts")
-    _SVG_DIRECTORY: Path = Path("ai_metaphors/resources/SVGs")
+    _BASE_PATH: Path = PROJECT_ROOT / "common/core/prompts"
+    _SVG_DIRECTORY: Path = PROJECT_ROOT / "resources/SVGs"
 
     # Remove black color from allowed, because the background is black already
     _ALLOWED_SVG_COLORS = ", ".join(PALETTE_HEX).replace(", #000000", "")
