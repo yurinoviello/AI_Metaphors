@@ -1,6 +1,12 @@
 import asyncio
 import fcntl
+import gc
 import logging
+
+try:
+    import torch
+except ImportError:
+    torch = None
 
 from ai_metaphors.server.settings.settings import settings
 
@@ -52,6 +58,12 @@ class GPULock:
 
     async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
         try:
+            # Cleanup memory before releasing the lock to ensure memory is free for the next task
+            gc.collect()
+            if torch and torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                logging.info("GPU cache cleared.")
+
             if self._fd:
                 fcntl.flock(self._fd, fcntl.LOCK_UN)
                 self._fd.close()
