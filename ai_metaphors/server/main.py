@@ -11,13 +11,13 @@ logging.basicConfig(
     format="%(levelname)s: %(message)s (%(filename)s:%(lineno)d)",
     force=True,
 )
-logging.getLogger("pytoon").setLevel(logging.WARNING)
+logging.getLogger("pytoon").setLevel(logging.INFO)
 logging.getLogger("urllib3").setLevel(logging.INFO)
-logging.getLogger("moviepy").setLevel(logging.WARNING)
-logging.getLogger("proglog").setLevel(logging.WARNING)
-logging.getLogger("httpx").setLevel(logging.WARNING)
-logging.getLogger("httpcore").setLevel(logging.WARNING)
-logging.getLogger("openai").setLevel(logging.WARNING)
+logging.getLogger("moviepy").setLevel(logging.INFO)
+logging.getLogger("proglog").setLevel(logging.INFO)
+logging.getLogger("httpx").setLevel(logging.INFO)
+logging.getLogger("httpcore").setLevel(logging.INFO)
+logging.getLogger("openai").setLevel(logging.INFO)
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
