@@ -124,7 +124,8 @@ class ManimProcessor:
         # Triton Fix
         env = os.environ.copy()
         env["SETUPTOOLS_USE_DISTUTILS"] = "stdlib"
-        env["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128,garbage_collection_threshold:0.8"
+        env["CUDA_MEMORY_FRACTION"] = str(settings.GPU_FRACTION)
+        env["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:64,garbage_collection_threshold:0.8"
 
         manim_command = [
             self._bin_directory / "manim",

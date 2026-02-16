@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     GPU_TOTAL_MEMORY_MB: int = 14 * 1024  # Total GPU memory (14 GiB * 1024, server has 14.58 GiB)
     GPU_MAX_PARALLEL: int = 4  # Max parallel tasks (3072 * 4 = 12288 MiB ~ 12 GiB)
     GPU_MEMORY_MB: float = GPU_TOTAL_MEMORY_MB / GPU_MAX_PARALLEL  # Target memory per task (~3.5 GiB)
+    GPU_FRACTION: float = min(0.95, GPU_MEMORY_MB / GPU_TOTAL_MEMORY_MB)
 
     API_KEYS: str
 

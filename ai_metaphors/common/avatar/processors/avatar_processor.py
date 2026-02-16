@@ -7,6 +7,7 @@ from pathlib import Path
 
 from ai_metaphors import PROJECT_ROOT
 from ai_metaphors.common.core.providers import GrazieProvider
+from ai_metaphors.server.settings.settings import settings
 
 
 class AvatarProcessor:
@@ -69,7 +70,9 @@ class AvatarProcessor:
         ref_path = str(self._avatar_face_file)
 
         env = os.environ.copy()
-        env["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
+        fraction = settings.GPU_FRACTION
+        env["CUDA_MEMORY_FRACTION"] = str(fraction)
+        env["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:64,garbage_collection_threshold:0.8"
             
         try:
             subprocess.run([
