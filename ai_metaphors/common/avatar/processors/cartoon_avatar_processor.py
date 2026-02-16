@@ -4,6 +4,8 @@ import re
 import subprocess
 from pathlib import Path
 
+from starlette.concurrency import run_in_threadpool
+
 from ai_metaphors import PROJECT_ROOT
 from ai_metaphors.common.output_structure.output_structure import OutputStructure
 from ai_metaphors.common.utils.gpu_lock import GPULock
@@ -70,10 +72,10 @@ class CartoonAvatarProcessor:
 
         async with GPULock():
             try:
-                subprocess.run(command, check=True, env=env)
+                await run_in_threadpool(subprocess.run, command, check=True, env=env)
                 logging.info("Cartoon avatar generation subprocess completed successfully.")
-            except subprocess.CalledProcessError as e:
-                logging.error(f"Cartoon avatar generation failed:\nSTDOUT: {e.stdout}\nSTDERR: {e.stderr}")
-                raise RuntimeError(f"Cartoon avatar generation failed with exit code {e.returncode}") from e
+            except Exception as e:
+                logging.error(f"Cartoon avatar generation failed: {e}")
+                raise
 
         self._rename_output_video()
