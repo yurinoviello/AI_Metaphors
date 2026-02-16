@@ -47,17 +47,22 @@ class AvatarProcessor:
         self._float_model_dir = self._working_dir / "float_model"
         self._phrases_mapping_dir = self._avatar_dir / self._PHRASES_MAPPING_FILE_NAME
 
-    def _extract_frames_from_video(self, video_path: Path):
+    async def _extract_frames_from_video(self, video_path: Path):
         output_dir = self._avatar_video_dir / self._AVATAR_FRAME_DIR
         output_dir.mkdir(parents=True, exist_ok=True)
         output_pattern = output_dir / f"{self._output_prefix}_%04d.png"
+        
+        script_path = PROJECT_ROOT / "common/avatar/processors/run_extract_frames.py"
+        
         command = [
-            "ffmpeg",
-            "-i", str(video_path),
-            "-vf", f"fps={self._FPS}",
-            str(output_pattern)
+            "python", str(script_path),
+            "--video_path", str(video_path),
+            "--output_pattern", str(output_pattern),
+            "--fps", str(self._FPS)
         ]
-        subprocess.run([c for c in command if c], capture_output=True, text=True, check=True)
+        
+        await run_in_threadpool(subprocess.run, command, check=True)
+        logging.info(f"Frames extracted to {output_dir}")
 
     def _generate_narration_audio(self, step: str, text: str) -> Path:
         file = self._narration_audio_dir / f"{step}.mp3"
@@ -113,4 +118,4 @@ class AvatarProcessor:
             for text, index in self._text_to_dir_name.items():
                 audio_file = self._generate_narration_audio(index, text)
                 output_path = await self._generate_avatar(index, audio_file)
-                self._extract_frames_from_video(output_path)
+                await self._extract_frames_from_video(output_path)
