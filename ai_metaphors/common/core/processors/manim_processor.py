@@ -1,10 +1,12 @@
 import json
 import logging
-import os
 import re
 import subprocess
 from pathlib import Path
 
+from starlette.concurrency import run_in_threadpool
+
+from ai_metaphors import PROJECT_ROOT
 from ai_metaphors.common.core.providers.grazie_provider import GrazieProvider
 from ai_metaphors.common.core.utils.image_utils import extract_key_frames
 from ai_metaphors.common.core.utils.text_utils import extract_python_code
@@ -105,55 +107,47 @@ class ManimProcessor:
         
         return code
 
-    def write_and_run_python(self, text: str) -> str:
+    async def write_and_run_python(self, text: str) -> str:
         logging.debug("Starting execution...")
         code = self.write_python(text)
 
-        error = self.execute_manim_script()
+        error = await self.execute_manim_script()
         if error == "success":
             return code
 
         for tryNum in range(self._MAX_TRIES):
             logging.debug(f"Execution, {tryNum} try ...")
-            code, error = self.refine_code_with_static_analysis(error)
+            code, error = await self.refine_code_with_static_analysis(error)
             if error == "success":
                 return code
         raise RuntimeError("Cannot execute Manim script")
 
-    def execute_manim_script(self) -> str:
-        # Triton Fix
-        env = os.environ.copy()
-        env["SETUPTOOLS_USE_DISTUTILS"] = "stdlib"
-        env["CUDA_MEMORY_FRACTION"] = str(settings.GPU_FRACTION)
-        env["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:64,garbage_collection_threshold:0.8"
-
-        manim_command = [
-            self._bin_directory / "manim",
-            "-p" if self._auto_play else None,
-            "-qh" if self._high_quality else "-ql",
-            self.script_path,
-            "--save_sections",
-            "--media_dir",
-            self._media_dir,
-            "--log_dir",
-            self._log_dir,
-            "--progress_bar",
-            "none"
+    async def execute_manim_script(self) -> str:
+        script_path = PROJECT_ROOT / "common/core/processors/run_manim.py"
+        
+        command = [
+            "python", str(script_path),
+            "--manim_path", str(self._bin_directory / "manim"),
+            "--script_path", str(self.script_path),
+            "--media_dir", str(self._media_dir),
+            "--log_dir", str(self._log_dir),
+            "--fraction", str(settings.GPU_FRACTION)
         ]
+        
+        if self._high_quality:
+            command.append("--high_quality")
+        if self._auto_play:
+            command.append("--auto_play")
 
         try:
-            process = subprocess.run([c for c in manim_command if c], capture_output=True, text=True, check=False, env=env)
-        except FileNotFoundError as e:
-            raise RuntimeError("Manim executable not found") from e
-
-        errors = process.stderr
-
-        if process.returncode == 0:
+            await run_in_threadpool(subprocess.run, command, check=True)
             self.split_animation()
             return "success"
-        return errors
+        except Exception as e:
+            logging.error(f"Manim execution failed: {e}")
+            return str(e)
 
-    def refine_code_with_static_analysis(self, error: str) -> tuple[str, str]:
+    async def refine_code_with_static_analysis(self, error: str) -> tuple[str, str]:
         logging.error(f"There was an error during execution:\n{error}")
         command = [
             self._bin_directory / "pylint",
@@ -163,7 +157,7 @@ class ManimProcessor:
         try:
             process = subprocess.run(command, capture_output=True, text=True, check=False)
         except FileNotFoundError as e:
-            raise RuntimeError("Manim executable not found") from e
+            raise RuntimeError("Pylint executable not found") from e
 
         static_errors = process.stdout
 
@@ -176,7 +170,7 @@ class ManimProcessor:
             )
 
         code = self.write_python(manim_script_raw)
-        return code, self.execute_manim_script()
+        return code, await self.execute_manim_script()
 
     @staticmethod
     def validate_video() -> int:

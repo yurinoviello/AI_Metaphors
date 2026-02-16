@@ -151,7 +151,7 @@ class MetaphorProcessor:
                 task_id=self._task_id
             ).generate_avatar_and_break_into_frames(narration_text)
 
-    def _refine_video(self) -> str | None:
+    async def _refine_video(self) -> str | None:
         if self._vllm_fix and self._manim_provider.validate_video():
             video_analysis = self._manim_provider.evaluate_video()
             logging.info("Evaluation complete")
@@ -164,7 +164,7 @@ class MetaphorProcessor:
                 svg=self._manim_provider.svg,
             )
 
-            return self._manim_provider.write_and_run_python(video_refined_code)
+            return await self._manim_provider.write_and_run_python(video_refined_code)
         return None
 
     async def _add_cartoon_avatar(self):
@@ -187,7 +187,7 @@ class MetaphorProcessor:
         self._generate_description()
         manim_code = self._generate_manim_code()
         await self._generate_avatar()
-        final_code = self._manim_provider.write_and_run_python(manim_code)
+        final_code = await self._manim_provider.write_and_run_python(manim_code)
 
         tokens_after = self._grazie_provider.num_tokens - tokens_before
         logging.info(f"Tokens used: {tokens_after}, money spent: {self._count_money(tokens_after)}$")
@@ -195,7 +195,7 @@ class MetaphorProcessor:
         quota = self._grazie_provider.get_quota()
         logging.info(f"Current quota: {quota}")
 
-        refined_code = self._refine_video()
+        refined_code = await self._refine_video()
         if refined_code:
             final_code = refined_code
             
