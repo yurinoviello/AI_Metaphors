@@ -6,9 +6,6 @@ import torch
 
 
 def run_generation(audio_path, transcript, video_path, output_path, fps, working_dir, fraction):
-    # Setup logging to see what's happening
-    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-    
     # Lazy imports inside the function to avoid issues during startup
     from moviepy.video.io.VideoFileClip import VideoFileClip
     from pytoon.animator import animate
