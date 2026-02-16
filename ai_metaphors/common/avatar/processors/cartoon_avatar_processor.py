@@ -68,20 +68,12 @@ class CartoonAvatarProcessor:
             "--fraction", str(fraction)
         ]
 
-        try:
-            async with GPULock():
-                result = subprocess.run(
-                    command,
-                    capture_output=True,
-                    text=True,
-                    check=True,
-                    env=env
-                )
-            logging.info("Cartoon avatar generation subprocess completed successfully.")
-            if result.stdout:
-                logging.debug(f"Subprocess STDOUT: {result.stdout}")
-        except subprocess.CalledProcessError as e:
-            logging.error(f"Cartoon avatar generation failed:\nSTDOUT: {e.stdout}\nSTDERR: {e.stderr}")
-            raise RuntimeError(f"Cartoon avatar generation failed with exit code {e.returncode}") from e
+        async with GPULock():
+            try:
+                subprocess.run(command, check=True, env=env)
+                logging.info("Cartoon avatar generation subprocess completed successfully.")
+            except subprocess.CalledProcessError as e:
+                logging.error(f"Cartoon avatar generation failed:\nSTDOUT: {e.stdout}\nSTDERR: {e.stderr}")
+                raise RuntimeError(f"Cartoon avatar generation failed with exit code {e.returncode}") from e
 
         self._rename_output_video()
