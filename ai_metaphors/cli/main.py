@@ -197,6 +197,9 @@ def main():
         )
         logging.getLogger("pytoon").setLevel(logging.WARNING)
         logging.getLogger("urllib3").setLevel(logging.INFO)
+        logging.getLogger("httpx").setLevel(logging.WARNING)
+        logging.getLogger("httpcore").setLevel(logging.WARNING)
+        logging.getLogger("openai").setLevel(logging.WARNING)
     match args.term_kind:
         case TermType.DEFINITION_METAPHOR:
             term = {

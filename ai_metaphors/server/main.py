@@ -15,6 +15,9 @@ logging.getLogger("pytoon").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.INFO)
 logging.getLogger("moviepy").setLevel(logging.WARNING)
 logging.getLogger("proglog").setLevel(logging.WARNING)
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
+logging.getLogger("openai").setLevel(logging.WARNING)
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
