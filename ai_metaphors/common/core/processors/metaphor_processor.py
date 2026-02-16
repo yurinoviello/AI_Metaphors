@@ -141,10 +141,10 @@ class MetaphorProcessor:
         logging.debug("Manim code created")
         return manim_code
 
-    def _generate_avatar(self):
+    async def _generate_avatar(self):
         if self._manim_type == ManimType.AVATAR:
             narration_text = re.findall(r'\*\*Narrator\*\*:\s*```(.*?)```', self._description, re.DOTALL)
-            AvatarProcessor(
+            await AvatarProcessor(
                 working_dir=self._working_dir,
                 description=self._description,
                 subject_id=self._subject_id,
@@ -167,18 +167,18 @@ class MetaphorProcessor:
             return self._manim_provider.write_and_run_python(video_refined_code)
         return None
 
-    def _add_cartoon_avatar(self):
+    async def _add_cartoon_avatar(self):
         if self._manim_type != ManimType.CARTOON_AVATAR:
             return
         logging.info("Adding cartoon avatar...")
-        CartoonAvatarProcessor(
+        await CartoonAvatarProcessor(
             description=self._description,
             one_line_story=self._one_line_story,
             output_structure=self._output_structure,
             working_dir=self._working_dir
         ).generate_video_with_avatar()
 
-    def generate_video(self) -> str:
+    async def generate_video(self) -> str:
         tokens_before = self._grazie_provider.num_tokens
 
         self._generate_story()
@@ -186,7 +186,7 @@ class MetaphorProcessor:
         self._generate_classes()
         self._generate_description()
         manim_code = self._generate_manim_code()
-        self._generate_avatar()
+        await self._generate_avatar()
         final_code = self._manim_provider.write_and_run_python(manim_code)
 
         tokens_after = self._grazie_provider.num_tokens - tokens_before
@@ -199,7 +199,7 @@ class MetaphorProcessor:
         if refined_code:
             final_code = refined_code
             
-        self._add_cartoon_avatar()
+        await self._add_cartoon_avatar()
         return final_code
 
     @staticmethod

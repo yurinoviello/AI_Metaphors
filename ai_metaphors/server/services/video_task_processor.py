@@ -6,7 +6,6 @@ import datasets
 from starlette.concurrency import run_in_threadpool
 
 from ai_metaphors import PROJECT_ROOT
-from ai_metaphors.common.utils.gpu_lock import GPULock
 from ai_metaphors.common.core import MetaphorProcessor, ManimType
 from ai_metaphors.common.core.utils import TermType
 from ai_metaphors.common.video_from_academic_definition import AcademicDefinitionPromptProvider
@@ -45,22 +44,21 @@ class VideoTaskProcessor:
         try:
             working_dir = await run_in_threadpool(self._set_up_working_dir, task_id)
 
-            async with GPULock():
-                logging.info(f"Starting video generation task {task_id}")
-                await task.update(task_id=task_id, status=Status.processing)
-                metaphor_processor = await run_in_threadpool(self.processor_setup, task, task_id, working_dir)
-                manim_code = await run_in_threadpool(metaphor_processor.generate_video)
+            logging.info(f"Starting video generation task {task_id}")
+            await task.update(task_id=task_id, status=Status.processing)
+            metaphor_processor = await run_in_threadpool(self.processor_setup, task, task_id, working_dir)
+            manim_code = await metaphor_processor.generate_video()
 
-                logging.info(f"Video generation completed successfully")
+            logging.info(f"Video generation completed successfully")
 
-                storage_url = await run_in_threadpool(self.upload_video, task_id, metaphor_processor)
-                logging.info(f"Video uploaded successfully")
-                await task.update(
-                    task_id=task_id, 
-                    status=Status.completed, 
-                    s3_video_url=storage_url,
-                    manim_code=manim_code
-                )
+            storage_url = await run_in_threadpool(self.upload_video, task_id, metaphor_processor)
+            logging.info(f"Video uploaded successfully")
+            await task.update(
+                task_id=task_id, 
+                status=Status.completed, 
+                s3_video_url=storage_url,
+                manim_code=manim_code
+            )
 
         except Exception as e:
             logging.error(f"Error in video generation task {task_id}: {e}", exc_info=True)

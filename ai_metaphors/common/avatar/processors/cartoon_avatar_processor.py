@@ -6,6 +6,7 @@ from pathlib import Path
 
 from ai_metaphors import PROJECT_ROOT
 from ai_metaphors.common.output_structure.output_structure import OutputStructure
+from ai_metaphors.common.utils.gpu_lock import GPULock
 from ai_metaphors.server.settings.settings import settings
 
 
@@ -47,7 +48,7 @@ class CartoonAvatarProcessor:
         Path(self._video_path).unlink()
         Path(self._output_path).rename(Path(self._output_path).parent / "GenScene.mp4")
 
-    def generate_video_with_avatar(self):
+    async def generate_video_with_avatar(self):
         # Use subprocess to run the generation in a completely isolated environment
         env = os.environ.copy()
         fraction = settings.GPU_FRACTION
@@ -68,13 +69,14 @@ class CartoonAvatarProcessor:
         ]
 
         try:
-            result = subprocess.run(
-                command,
-                capture_output=True,
-                text=True,
-                check=True,
-                env=env
-            )
+            async with GPULock():
+                result = subprocess.run(
+                    command,
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                    env=env
+                )
             logging.info("Cartoon avatar generation subprocess completed successfully.")
             if result.stdout:
                 logging.debug(f"Subprocess STDOUT: {result.stdout}")

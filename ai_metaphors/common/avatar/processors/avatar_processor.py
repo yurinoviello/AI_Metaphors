@@ -7,6 +7,7 @@ from pathlib import Path
 
 from ai_metaphors import PROJECT_ROOT
 from ai_metaphors.common.core.providers import GrazieProvider
+from ai_metaphors.common.utils.gpu_lock import GPULock
 from ai_metaphors.server.settings.settings import settings
 
 
@@ -97,7 +98,7 @@ class AvatarProcessor:
         with open(self._phrases_mapping_dir, "w", encoding="utf-8") as f:
             f.write(json_str)
 
-    def generate_avatar_and_break_into_frames(self, texts: list[str]):
+    async def generate_avatar_and_break_into_frames(self, texts: list[str]):
         if self._task_id is None:
             subprocess.run(["sh", "ai_metaphors/resources/setup_float_model.sh"], check=True)
         else:
@@ -105,7 +106,8 @@ class AvatarProcessor:
         self._text_to_dir_name = {text: str(i) for i, text in enumerate(texts)}
         self._save_texts_to_json()
 
-        for text, index in self._text_to_dir_name.items():
-            audio_file = self._generate_narration_audio(index, text)
-            output_path = self._generate_avatar(index, audio_file)
-            self._extract_frames_from_video(output_path)
+        async with GPULock():
+            for text, index in self._text_to_dir_name.items():
+                audio_file = self._generate_narration_audio(index, text)
+                output_path = self._generate_avatar(index, audio_file)
+                self._extract_frames_from_video(output_path)
