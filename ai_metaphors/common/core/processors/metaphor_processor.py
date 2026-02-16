@@ -174,7 +174,8 @@ class MetaphorProcessor:
         CartoonAvatarProcessor(
             description=self._description,
             one_line_story=self._one_line_story,
-            output_structure=self._output_structure
+            output_structure=self._output_structure,
+            working_dir=self._working_dir
         ).generate_video_with_avatar()
 
     def generate_video(self) -> str:

@@ -51,16 +51,16 @@ class VideoTaskProcessor:
                 metaphor_processor = await run_in_threadpool(self.processor_setup, task, task_id, working_dir)
                 manim_code = await run_in_threadpool(metaphor_processor.generate_video)
 
-            logging.info(f"Video generation completed successfully")
+                logging.info(f"Video generation completed successfully")
 
-            storage_url = await run_in_threadpool(self.upload_video, task_id, metaphor_processor)
-            logging.info(f"Video uploaded successfully")
-            await task.update(
-                task_id=task_id, 
-                status=Status.completed, 
-                s3_video_url=storage_url,
-                manim_code=manim_code
-            )
+                storage_url = await run_in_threadpool(self.upload_video, task_id, metaphor_processor)
+                logging.info(f"Video uploaded successfully")
+                await task.update(
+                    task_id=task_id, 
+                    status=Status.completed, 
+                    s3_video_url=storage_url,
+                    manim_code=manim_code
+                )
 
         except Exception as e:
             logging.error(f"Error in video generation task {task_id}: {e}", exc_info=True)
