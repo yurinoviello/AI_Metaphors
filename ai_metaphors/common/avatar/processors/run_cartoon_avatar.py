@@ -14,8 +14,12 @@ def run_generation(audio_path, transcript, video_path, output_path, fps, working
     from pytoon.animator import animate
 
     if torch.cuda.is_available():
+        # Set max_split_size_mb to avoid fragmentation
         torch.cuda.set_per_process_memory_fraction(fraction, 0)
         logging.info(f"Set CUDA memory fraction to {fraction}")
+
+    os.environ["CUDA_MEMORY_FRACTION"] = str(fraction)
+    os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:64,garbage_collection_threshold:0.8"
 
     os.chdir(working_dir)
     logging.info(f"Changed working directory to {working_dir}")
