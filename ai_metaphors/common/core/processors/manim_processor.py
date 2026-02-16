@@ -1,13 +1,14 @@
-import logging
-from pathlib import Path
-import subprocess
-import re
 import json
+import logging
 import os
+import re
+import subprocess
+from pathlib import Path
 
 from ai_metaphors.common.core.providers.grazie_provider import GrazieProvider
 from ai_metaphors.common.core.utils.image_utils import extract_key_frames
 from ai_metaphors.common.core.utils.text_utils import extract_python_code
+from ai_metaphors.server.settings.settings import settings
 
 
 class ManimProcessor:
@@ -89,8 +90,16 @@ class ManimProcessor:
 
         if code:
             try:
+                # Calculate a memory fraction for a hard limit
+                fraction = min(0.95, settings.GPU_MEMORY_MB / settings.GPU_TOTAL_MEMORY_MB)
+                memory_limit_header = (
+                    "import torch\n\n"
+                    f"if torch.cuda.is_available():\n"
+                    f"    torch.cuda.set_per_process_memory_fraction({fraction:.4f}, 0)\n\n"
+                )
+                
                 with self.script_path.open("w") as file:
-                    file.write(code)
+                    file.write(memory_limit_header + code)
             except FileNotFoundError as e:
                 raise RuntimeError("Cannot write manim code") from e
         
@@ -115,7 +124,7 @@ class ManimProcessor:
         # Triton Fix
         env = os.environ.copy()
         env["SETUPTOOLS_USE_DISTUTILS"] = "stdlib"
-        env["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
+        env["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128,garbage_collection_threshold:0.8"
 
         manim_command = [
             self._bin_directory / "manim",

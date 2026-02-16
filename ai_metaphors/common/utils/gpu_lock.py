@@ -1,16 +1,18 @@
 import asyncio
 import fcntl
 import logging
-from pathlib import Path
+
+from ai_metaphors.server.settings.settings import settings
+
 
 class GPULock:
     """
     Inter-process semaphore based on multiple file locks.
     Limits simultaneous GPU usage by different Gunicorn workers to a maximum number.
     """
-    def __init__(self, base_lock_file: str = "/tmp/gpu_video_gen", max_parallel: int = 4):
+    def __init__(self, base_lock_file: str = "/tmp/gpu_video_gen"):
         self.base_lock_file = base_lock_file
-        self.max_parallel = max_parallel
+        self.max_parallel = settings.GPU_MAX_PARALLEL
         self._fd = None
         self._active_slot = -1
 
