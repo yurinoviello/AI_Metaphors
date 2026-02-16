@@ -127,6 +127,8 @@ class ManimProcessor:
             self._media_dir,
             "--log_dir",
             self._log_dir,
+            "--progress_bar",
+            "none"
         ]
 
         try:
