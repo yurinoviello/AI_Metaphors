@@ -1,27 +1,12 @@
 import logging
-import multiprocessing
 import os
 import re
+import subprocess
 from pathlib import Path
 
-from moviepy.video.io.VideoFileClip import VideoFileClip
-from pytoon.animator import animate
-
+from ai_metaphors import PROJECT_ROOT
 from ai_metaphors.common.output_structure.output_structure import OutputStructure
-
-
-def _run_pytoon_in_process(working_dir: Path, audio_path: str, transcript: str, video_path: str, fps: int, output_path: str):
-    """
-    Runs pytoon animation in a separate process to isolate the working directory and 'temp' folder.
-    """
-    os.chdir(working_dir)
-    # Re-import inside the process to ensure isolation if needed, 
-    # though it should be fine as it's a separate process.
-    animation = animate(audio_file=audio_path, transcript=transcript)
-    
-    # We also do the export inside the process because it might create temp files too
-    background_clip = VideoFileClip(video_path).with_fps(fps).with_duration(animation.duration)
-    animation.export(path=output_path, background=background_clip, scale=0.4)
+from ai_metaphors.server.settings.settings import settings
 
 
 class CartoonAvatarProcessor:
@@ -63,22 +48,38 @@ class CartoonAvatarProcessor:
         Path(self._output_path).rename(Path(self._output_path).parent / "GenScene.mp4")
 
     def generate_video_with_avatar(self):
-        # Run in a separate process to isolate os.chdir and 'temp' directory
-        process = multiprocessing.Process(
-            target=_run_pytoon_in_process,
-            args=(
-                self._working_dir,
-                self._audio_path,
-                self._get_transcript(),
-                self._video_path,
-                self._fps,
-                self._output_path
-            )
-        )
-        process.start()
-        process.join()
+        # Use subprocess to run the generation in a completely isolated environment
+        env = os.environ.copy()
+        fraction = settings.GPU_FRACTION
+        env["CUDA_MEMORY_FRACTION"] = str(fraction)
+        env["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:64,garbage_collection_threshold:0.8"
 
-        if process.exitcode != 0:
-            raise RuntimeError(f"Cartoon avatar generation failed with exit code {process.exitcode}")
+        script_path = PROJECT_ROOT / "common/avatar/processors/run_cartoon_avatar.py"
+
+        command = [
+            "python", str(script_path),
+            "--audio_path", self._audio_path,
+            "--transcript", self._get_transcript(),
+            "--video_path", self._video_path,
+            "--output_path", self._output_path,
+            "--fps", str(self._fps),
+            "--working_dir", str(self._working_dir),
+            "--fraction", str(fraction)
+        ]
+
+        try:
+            result = subprocess.run(
+                command,
+                capture_output=True,
+                text=True,
+                check=True,
+                env=env
+            )
+            logging.info("Cartoon avatar generation subprocess completed successfully.")
+            if result.stdout:
+                logging.debug(f"Subprocess STDOUT: {result.stdout}")
+        except subprocess.CalledProcessError as e:
+            logging.error(f"Cartoon avatar generation failed:\nSTDOUT: {e.stdout}\nSTDERR: {e.stderr}")
+            raise RuntimeError(f"Cartoon avatar generation failed with exit code {e.returncode}") from e
 
         self._rename_output_video()
