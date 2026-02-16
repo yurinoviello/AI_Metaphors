@@ -5,6 +5,8 @@ import shutil
 import subprocess
 from pathlib import Path
 
+from starlette.concurrency import run_in_threadpool
+
 from ai_metaphors import PROJECT_ROOT
 from ai_metaphors.common.core.providers import GrazieProvider
 from ai_metaphors.common.utils.gpu_lock import GPULock
@@ -63,7 +65,7 @@ class AvatarProcessor:
         logging.debug(f"Narration audio created for {step} step")
         return file
 
-    def _generate_avatar(self, step: str, audio_file: Path) -> Path:
+    async def _generate_avatar(self, step: str, audio_file: Path) -> Path:
         self._avatar_video_dir = self._avatar_dir / f"avatar_video_{step}"
         self._avatar_video_dir.mkdir(parents=True, exist_ok=True)
         output_path = self._avatar_video_dir / f"{step}.mp4"
@@ -74,19 +76,20 @@ class AvatarProcessor:
         fraction = settings.GPU_FRACTION
         env["CUDA_MEMORY_FRACTION"] = str(fraction)
         env["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:64,garbage_collection_threshold:0.8"
+
+        script_path = PROJECT_ROOT / "common/avatar/processors/run_avatar.py"
+
+        command = [
+            "python", str(script_path),
+            "--ref_path", ref_path,
+            "--aud_path", str(audio_file),
+            "--res_video_path", str(output_path),
+            "--working_dir", str(self._float_model_dir),
+            "--fraction", str(fraction)
+        ]
             
         try:
-            subprocess.run([
-                "python", "generate.py",
-                "--ref_path", ref_path,
-                "--aud_path", str(audio_file),
-                "--seed", "15",
-                "--a_cfg_scale", "2",
-                "--e_cfg_scale", "2",
-                "--ckpt_path", "./checkpoints/float.pth",
-                "--emo", "neutral",
-                "--res_video_path", str(output_path)
-            ], check=True, cwd=self._float_model_dir, env=env)
+            await run_in_threadpool(subprocess.run, command, check=True, env=env)
             logging.debug(f"Avatar generated for {step} step")
             return output_path
         except subprocess.CalledProcessError as e:
@@ -109,5 +112,5 @@ class AvatarProcessor:
         async with GPULock():
             for text, index in self._text_to_dir_name.items():
                 audio_file = self._generate_narration_audio(index, text)
-                output_path = self._generate_avatar(index, audio_file)
+                output_path = await self._generate_avatar(index, audio_file)
                 self._extract_frames_from_video(output_path)
