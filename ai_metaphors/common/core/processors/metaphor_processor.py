@@ -142,14 +142,14 @@ class MetaphorProcessor:
         return manim_code
 
     async def _generate_avatar(self):
-        if self._manim_type == ManimType.AVATAR:
-            narration_text = re.findall(r'\*\*Narrator\*\*:\s*```(.*?)```', self._description, re.DOTALL)
-            await AvatarProcessor(
-                working_dir=self._working_dir,
-                description=self._description,
-                subject_id=self._subject_id,
-                task_id=self._task_id
-            ).generate_avatar_and_break_into_frames(narration_text)
+        logging.info("Adding human avatar...")
+        narration_text = re.findall(r'\*\*Narrator\*\*:\s*```(.*?)```', self._description, re.DOTALL)
+        await AvatarProcessor(
+            working_dir=self._working_dir,
+            description=self._description,
+            subject_id=self._subject_id,
+            task_id=self._task_id
+        ).generate_avatar_and_break_into_frames(narration_text)
 
     async def _refine_video(self) -> str | None:
         if self._vllm_fix and self._manim_provider.validate_video():
@@ -168,8 +168,6 @@ class MetaphorProcessor:
         return None
 
     async def _add_cartoon_avatar(self):
-        if self._manim_type != ManimType.CARTOON_AVATAR:
-            return
         logging.info("Adding cartoon avatar...")
         await CartoonAvatarProcessor(
             description=self._description,
@@ -186,7 +184,8 @@ class MetaphorProcessor:
         self._generate_classes()
         self._generate_description()
         manim_code = self._generate_manim_code()
-        await self._generate_avatar()
+        if self._manim_type == ManimType.AVATAR:
+            await self._generate_avatar()
         final_code = await self._manim_provider.write_and_run_python(manim_code)
 
         tokens_after = self._grazie_provider.num_tokens - tokens_before
@@ -198,8 +197,9 @@ class MetaphorProcessor:
         refined_code = await self._refine_video()
         if refined_code:
             final_code = refined_code
-            
-        await self._add_cartoon_avatar()
+
+        if self._manim_type == ManimType.CARTOON_AVATAR:
+            await self._add_cartoon_avatar()
         return final_code
 
     @staticmethod
