@@ -64,9 +64,9 @@ class AvatarProcessor:
         await run_in_threadpool(subprocess.run, command, check=True)
         logging.info(f"Frames extracted to {output_dir}")
 
-    def _generate_narration_audio(self, step: str, text: str) -> Path:
+    async def _generate_narration_audio(self, step: str, text: str) -> Path:
         file = self._narration_audio_dir / f"{step}.mp3"
-        GrazieProvider.get_narration_audio(text, file)
+        await GrazieProvider.get_narration_audio(text, file)
         logging.debug(f"Narration audio created for {step} step")
         return file
 
@@ -116,6 +116,6 @@ class AvatarProcessor:
 
         async with GPULock():
             for text, index in self._text_to_dir_name.items():
-                audio_file = self._generate_narration_audio(index, text)
+                audio_file = await self._generate_narration_audio(index, text)
                 output_path = await self._generate_avatar(index, audio_file)
                 await self._extract_frames_from_video(output_path)

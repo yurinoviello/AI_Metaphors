@@ -162,7 +162,7 @@ class ManimProcessor:
         static_errors = process.stdout
 
         with self.script_path.open() as f:
-            manim_script_raw = self._grazie_provider.request_static_refinement(
+            manim_script_raw = await self._grazie_provider.request_static_refinement(
                 code=f.read(),
                 runtime_error=error,
                 static_error=static_errors,
@@ -182,10 +182,10 @@ class ManimProcessor:
             refine_video_quality = input("Do you want to refine the video quality? Enter 0 for NO or 1 for YES:")
         return refine_video_quality == 1
 
-    def evaluate_video(self) -> str:
+    async def evaluate_video(self) -> str:
         key_frames = extract_key_frames(self._frames_dir)
 
-        return self._grazie_provider.request_video_evaluation(
+        return await self._grazie_provider.request_video_evaluation(
             code=self.script_path.read_text(),
             instructions=self.description_file.read_text(),
             images=key_frames,

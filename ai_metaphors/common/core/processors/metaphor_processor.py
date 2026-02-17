@@ -1,17 +1,19 @@
 import json
 import logging
-from pathlib import Path
 import re
+from pathlib import Path
+
+from starlette.concurrency import run_in_threadpool
 
 from ai_metaphors.common.avatar.processors.avatar_processor import AvatarProcessor
 from ai_metaphors.common.avatar.processors.cartoon_avatar_processor import CartoonAvatarProcessor
-from ai_metaphors.common.core.utils import TermType
-from ai_metaphors.common.output_structure.output_structure import OutputStructure
-from ai_metaphors.common.core.providers.prompt_provider import PromptProvider
-from ai_metaphors.common.core.providers.grazie_provider import GrazieProvider
 from ai_metaphors.common.core.processors.manim_processor import ManimProcessor
+from ai_metaphors.common.core.providers.grazie_provider import GrazieProvider
+from ai_metaphors.common.core.providers.prompt_provider import PromptProvider
+from ai_metaphors.common.core.utils import TermType
 from ai_metaphors.common.core.utils.manim_type import ManimType
 from ai_metaphors.common.core.utils.text_utils import extract_json, extract_content
+from ai_metaphors.common.output_structure.output_structure import OutputStructure
 
 
 class MetaphorProcessor:
@@ -91,29 +93,33 @@ class MetaphorProcessor:
     def get_output_structure(self):
         return self._output_structure
 
-    def _generate_story(self):
+    async def _generate_story(self):
         if self._term_type == TermType.ACADEMIC_DEFINITION:
-            self._story = extract_content(self._grazie_provider.get_term_definition())
+            content = await self._grazie_provider.get_term_definition()
+            self._story = extract_content(content)
             logging.info(f"Term definition: {self._story}")
         elif self._story is None:
-            self._story = extract_content(self._grazie_provider.get_metaphor())
+            content = await self._grazie_provider.get_metaphor()
+            self._story = extract_content(content)
             logging.info(f"Metaphor: {self._story}")
 
-    def _generate_one_line_story(self):
+    async def _generate_one_line_story(self):
         if self._story is None:
             return
         if self._term_type == TermType.ACADEMIC_DEFINITION:
-            self._one_line_story = extract_content(self._grazie_provider.get_one_line_term_definition(self._story))
+            content = await self._grazie_provider.get_one_line_term_definition(self._story)
+            self._one_line_story = extract_content(content)
             logging.info(f"One-line term definition: {self._one_line_story}")
         else:
-            self._one_line_story = extract_content(self._grazie_provider.get_one_line_metaphor(self._story))
+            content = await self._grazie_provider.get_one_line_metaphor(self._story)
+            self._one_line_story = extract_content(content)
             logging.info(f"One-line Metaphor: {self._one_line_story}")
 
-    def _generate_classes(self):
+    async def _generate_classes(self):
         if self._model_classes != "default":
             self._grazie_provider.change_model(self._model_classes)
 
-        classes = self._grazie_provider.get_classes(self._story, self._manim_provider.svg)
+        classes = await self._grazie_provider.get_classes(self._story, self._manim_provider.svg)
         logging.debug("Classes created")
         self._classes_dict = extract_json(classes)
         with self._manim_provider.classes_file.open(mode="w", encoding="utf-8") as json_file:
@@ -121,17 +127,20 @@ class MetaphorProcessor:
         self._grazie_provider.change_model(self._model)
         logging.debug("Classes extracted")
 
-    def _generate_description(self):
-        self._description = self._grazie_provider.get_description(self._story, self._one_line_story, str(self._classes_dict))
+    async def _generate_description(self):
+        self._description = await self._grazie_provider.get_description(
+            self._story, self._one_line_story, str(self._classes_dict)
+        )
+
         with self._manim_provider.description_file.open(mode="w", encoding="utf-8") as text_file:
             text_file.write(self._description)
         logging.info("Description created")
 
-    def _generate_manim_code(self) -> str:
+    async def _generate_manim_code(self) -> str:
         if self._model_manim != "default":
             self._grazie_provider.change_model(self._model_manim)
 
-        manim_code = self._grazie_provider.get_manim(
+        manim_code = await self._grazie_provider.get_manim(
             self._story,
             self._one_line_story,
             str(self._classes_dict),
@@ -153,13 +162,21 @@ class MetaphorProcessor:
 
     async def _refine_video(self) -> str | None:
         if self._vllm_fix and self._manim_provider.validate_video():
-            video_analysis = self._manim_provider.evaluate_video()
+            video_analysis = await self._manim_provider.evaluate_video()
             logging.info("Evaluation complete")
             logging.debug(f"Video Evaluation: {video_analysis}")
 
-            video_refined_code = self._grazie_provider.request_video_refinement(
-                instructions=self._manim_provider.description_file.read_text(),
-                code=self._manim_provider.script_path.read_text(),
+            def get_refined_params():
+                return {
+                    "instructions": self._manim_provider.description_file.read_text(),
+                    "code": self._manim_provider.script_path.read_text(),
+                }
+
+            params = await run_in_threadpool(get_refined_params)
+
+            video_refined_code = await self._grazie_provider.request_video_refinement(
+                instructions=params["instructions"],
+                code=params["code"],
                 errors_explanation=video_analysis,
                 svg=self._manim_provider.svg,
             )
@@ -179,11 +196,11 @@ class MetaphorProcessor:
     async def generate_video(self) -> str:
         tokens_before = self._grazie_provider.num_tokens
 
-        self._generate_story()
-        self._generate_one_line_story()
-        self._generate_classes()
-        self._generate_description()
-        manim_code = self._generate_manim_code()
+        await self._generate_story()
+        await self._generate_one_line_story()
+        await self._generate_classes()
+        await self._generate_description()
+        manim_code = await self._generate_manim_code()
         if self._manim_type == ManimType.AVATAR:
             await self._generate_avatar()
         final_code = await self._manim_provider.write_and_run_python(manim_code)
@@ -191,7 +208,7 @@ class MetaphorProcessor:
         tokens_after = self._grazie_provider.num_tokens - tokens_before
         logging.info(f"Tokens used: {tokens_after}, money spent: {self._count_money(tokens_after)}$")
 
-        quota = self._grazie_provider.get_quota()
+        quota = await self._grazie_provider.get_quota()
         logging.info(f"Current quota: {quota}")
 
         refined_code = await self._refine_video()
