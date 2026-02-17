@@ -5,12 +5,9 @@ import subprocess
 import sys
 
 
-def run_manim(manim_path, script_path, media_dir, log_dir, high_quality, auto_play, fraction):
-    # Set CUDA environment variables
+def run_manim(manim_path, script_path, media_dir, log_dir, high_quality, auto_play):
     env = os.environ.copy()
     env["SETUPTOOLS_USE_DISTUTILS"] = "stdlib"
-    env["CUDA_MEMORY_FRACTION"] = str(fraction)
-    env["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:64,garbage_collection_threshold:0.8"
 
     manim_command = [
         manim_path,
@@ -57,7 +54,6 @@ if __name__ == "__main__":
     parser.add_argument("--log_dir", required=True)
     parser.add_argument("--high_quality", action="store_true")
     parser.add_argument("--auto_play", action="store_true")
-    parser.add_argument("--fraction", type=float, required=True)
 
     args = parser.parse_args()
 
@@ -68,5 +64,4 @@ if __name__ == "__main__":
         log_dir=args.log_dir,
         high_quality=args.high_quality,
         auto_play=args.auto_play,
-        fraction=args.fraction
     )

@@ -131,7 +131,6 @@ class ManimProcessor:
             "--script_path", str(self.script_path),
             "--media_dir", str(self._media_dir),
             "--log_dir", str(self._log_dir),
-            "--fraction", str(settings.GPU_FRACTION)
         ]
         
         if self._high_quality:
