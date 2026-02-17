@@ -1,11 +1,13 @@
+import datetime
 import logging
 from uuid import uuid4
+
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 
 from ai_metaphors.server.api.auth import unified_auth, get_current_user
+from ai_metaphors.server.models.status import Status
 from ai_metaphors.server.models.user import User
 from ai_metaphors.server.models.video_task import VideoTask
-from ai_metaphors.server.models.status import Status
 from ai_metaphors.server.schemas.video import VideoResponse, VideoRequest, VideoTaskStatus, VideoTaskList
 from ai_metaphors.server.services.video_task_processor import VideoTaskProcessor
 
@@ -116,6 +118,7 @@ async def retry_video_task(
     await VideoTask.update(
         task_id=task_id, 
         status=Status.queued,
+        created_at=datetime.datetime.now(datetime.timezone.utc),
         manim_code=None,
         s3_video_url=None
     )
