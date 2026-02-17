@@ -141,7 +141,7 @@ class ManimProcessor:
 
         try:
             await run_in_threadpool(subprocess.run, command, check=True)
-            self.split_animation()
+            await self.split_animation()
             return "success"
         except Exception as e:
             logging.error(f"Manim execution failed: {e}")
@@ -191,7 +191,7 @@ class ManimProcessor:
             images=key_frames,
         )
 
-    def split_animation(self) -> None:
+    async def split_animation(self) -> None:
         """Split the main animation into individual section videos."""
         if not self._validate_files():
             return
@@ -203,7 +203,7 @@ class ManimProcessor:
         sections_dir = self._prepare_output_directory()
         width = max(2, len(str(len(sections) - 1)))
         
-        self._process_sections(sections, sections_dir, width)
+        await self._process_sections(sections, sections_dir, width)
     
     def _validate_files(self) -> bool:
         """Validate that required files exist."""
@@ -239,7 +239,7 @@ class ManimProcessor:
         
         return sections_dir
     
-    def _process_sections(self, sections: list, sections_dir: Path, width: int) -> None:
+    async def _process_sections(self, sections: list, sections_dir: Path, width: int) -> None:
         """Process each section and create individual video files."""
         # Helper: turn an arbitrary section title into a safe file-name
         def _sanitize(name: str) -> str:
@@ -257,29 +257,24 @@ class ManimProcessor:
             safe_title = _sanitize(title)
             target = sections_dir / f"{index:0{width}d}_{safe_title}.mp4"
             
-            self._extract_section_video(start_time, duration, target, index, title)
+            await self._extract_section_video(start_time, duration, target, index, title)
             start_time += duration
     
-    def _extract_section_video(self, start_time: float, duration: float, 
+    async def _extract_section_video(self, start_time: float, duration: float, 
                                target: Path, index: int, title: str) -> None:
         """Extract a section of the video using ffmpeg."""
-        ffmpeg_cmd = [
-            "ffmpeg",
-            "-y",                                   # overwrite if exists
-            "-ss", f"{start_time:.3f}",             # seek to start time
-            "-i", str(self._movie_file),
-            "-t",  f"{duration:.3f}",               # exact length
-            "-c",  "copy",                          # stream copy
-            str(target),
+        script_path = PROJECT_ROOT / "common/core/processors/run_split_video.py"
+        
+        command = [
+            "python", str(script_path),
+            "--start_time", f"{start_time:.3f}",
+            "--duration", f"{duration:.3f}",
+            "--movie_file", str(self._movie_file),
+            "--target", str(target)
         ]
         
         try:
-            subprocess.run(
-                ffmpeg_cmd,
-                check=True,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.STDOUT,
-            )
+            await run_in_threadpool(subprocess.run, command, check=True)
             logging.debug(f"Wrote {target.name}")
-        except subprocess.CalledProcessError as exc:
-            logging.error(f"FFmpeg failed for section {index} ({title}):\n{exc}")
+        except Exception as exc:
+            logging.error(f"FFmpeg split script failed for section {index} ({title}):\n{exc}")
