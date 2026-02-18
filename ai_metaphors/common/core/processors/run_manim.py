@@ -20,7 +20,9 @@ def run_manim(manim_path, script_path, media_dir, log_dir, high_quality, auto_pl
         "--log_dir",
         log_dir,
         "--progress_bar",
-        "none"
+        "none",
+        "--verbosity",
+        "WARNING"
     ]
 
     # Filter out None values
