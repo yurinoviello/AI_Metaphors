@@ -16,9 +16,9 @@ class Settings(BaseSettings):
     URL_EXPIRATION: int = 604800 # 604800 sec = 24 h * 7 = 1 week
 
     # GPU Resources
-    GPU_TOTAL_MEMORY_MB: int = 21 * 1024  # Total GPU memory (21 GiB * 1024, server has 22.5 GiB)
-    GPU_MAX_PARALLEL: int = 3  # Max parallel tasks
-    GPU_MEMORY_MB: float = GPU_TOTAL_MEMORY_MB / GPU_MAX_PARALLEL  # Target memory per task (7 GiB)
+    GPU_TOTAL_MEMORY_MB: int = 5 * 1024  # Total GPU memory (5 GiB * 1024, server has 5.6 GiB)
+    GPU_MAX_PARALLEL: int = 1  # Max parallel tasks
+    GPU_MEMORY_MB: float = GPU_TOTAL_MEMORY_MB / GPU_MAX_PARALLEL  # Target memory per task (5 GiB)
     GPU_FRACTION: float = min(0.95, GPU_MEMORY_MB / GPU_TOTAL_MEMORY_MB)
 
     API_KEYS: str

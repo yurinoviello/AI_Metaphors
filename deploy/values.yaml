@@ -8,15 +8,15 @@ runAsGroup: 1001
 
 resources:
   requests:
-    cpu: 6
-    memory: 32Gi
+    cpu: 2
+    memory: 4Gi
     ephemeral-storage: 5Gi
-    nvidia.com/gpu: 4
+    nvidia.com/gpu: 1
   limits:
-    cpu: 12
-    memory: 32Gi
+    cpu: 4
+    memory: 8Gi
     ephemeral-storage: 5Gi
-    nvidia.com/gpu: 4
+    nvidia.com/gpu: 1
 
 pvc:
   data:
