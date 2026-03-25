@@ -1,16 +1,19 @@
 # AI Metaphors
 
-This Python module generates metaphors, associated classes, descriptions, and Manim animation code for a given term. It integrates several providers, including **GrazieProvider** and **ManimProvider**, to produce results and animations.
+This is the repository of the paper **“ANVIL: Analogies and Videos for CS Lecturers.”** (AIED 2026)
+
+
+This Python module generates analogies, associated classes, descriptions, and Manim animation code for a given term. It integrates several providers, including **GrazieProvider** and **ManimProvider**, to produce results and animations.
 
 ## **Overview**
 
 The script performs the following steps:
 
 1. **Input**: A term name and its definition.
-2. **Metaphor Generation**: Optionally generates a metaphor using the Grazie API.
-3. **Class Creation**: Produces JSON-formatted classes based on the term and metaphor.
-4. **Description Generation**: Generates a description of the metaphor's animation.
-5. **Manim Code**: Creates animation code using Manim based on the provided term, metaphor, classes, and description.
+2. **Analogy Generation**: Optionally generates a analogy using the Grazie API.
+3. **Class Creation**: Produces JSON-formatted classes based on the term and analogy.
+4. **Description Generation**: Generates a description of the analogy's animation.
+5. **Manim Code**: Creates animation code using Manim based on the provided term, analogy, classes, and description.
 6. **Execution**: Runs the generated Manim script to produce the animation.
 
 ---
@@ -76,6 +79,8 @@ To set up the project and install all dependencies using **Poetry**, follow thes
 
    ```bash
    poetry lock --no-update
+   poetry run pip install "setuptools<81"
+   poetry run pip install --retries 3 --no-cache-dir --no-build-isolation openai-whisper==2023031
    poetry install
    ```
 
@@ -118,8 +123,8 @@ ai-metaphors [OPTIONS]
 | `--use-dataset-example`    | `int`    | Use an example from the dataset (index between 0 and 13). Set `-1` to disable. Default is `-1`. |
 | `--term-name`              | `str`    | The name of the term (required if `use-dataset-example` is not set).                            |
 | `--term-definition`        | `str`    | Definition of the term (required).                                                              |
-| `--metaphor`               | `str`    | The metaphor associated with the term. If `--generate-metaphor` is set, this will be ignored.   |
-| `--generate-metaphor-text` | `flag`   | Flag to generate the metaphor automatically.                                                    |
+| `--analogy`               | `str`    | The analogy associated with the term. If `--generate-analogy` is set, this will be ignored.   |
+| `--generate-analogy-text` | `flag`   | Flag to generate the analogy automatically.                                                    |
 | `--add-voice`              | `flag`   | Flag to add voice feature to the animation.                                                     |
 | `--bin-directory`          | `str`    | Path to the executable for Manim. Default is `.venv/bin`.                                       |
 | `--working-dir`            | `str`    | Working directory for Manim output. Default: `./animations`.                                    |
@@ -134,12 +139,12 @@ ai-metaphors [OPTIONS]
 
 1. **With Manually Provided Inputs**:
    ```bash
-   ai-metaphors --term-name Boolean --term-definition 'A data type that has one of two possible values (usually denoted true and false) intended to represent the two truth values of logic and Boolean algebra.' --metaphor "Imagine a light switch in your house. The switch can only be in one of two positions: ON or OFF.\n\n- When the switch is ON, it represents "true" – the light is working.\n- When the switch is OFF, it represents "false" – the light is not working.\n\nA Boolean is like this light switch. It can only hold one of two states: true (ON) or false (OFF)."
+   ai-metaphors --term-name Boolean --term-definition 'A data type that has one of two possible values (usually denoted true and false) intended to represent the two truth values of logic and Boolean algebra.' --analogy "Imagine a light switch in your house. The switch can only be in one of two positions: ON or OFF.\n\n- When the switch is ON, it represents "true" – the light is working.\n- When the switch is OFF, it represents "false" – the light is not working.\n\nA Boolean is like this light switch. It can only hold one of two states: true (ON) or false (OFF)."
    ```
 
-2. **Generating a Metaphor**:
+2. **Generating a Analogy**:
    ```bash
-   ai-metaphors --term-name Boolean --term-definition 'A data type that has one of two possible values (usually denoted true and false) intended to represent the two truth values of logic and Boolean algebra.' --generate-metaphor
+   ai-metaphors --term-name Boolean --term-definition 'A data type that has one of two possible values (usually denoted true and false) intended to represent the two truth values of logic and Boolean algebra.' --generate-analogy
    ```
 
 3. **Using a Dataset Example**:
@@ -171,7 +176,7 @@ ai-metaphors [OPTIONS]
 ## **Output**
 
 1. **Console Outputs**:
-   - Displays the term name, term definition, generated metaphor, and progress messages for each step.
+   - Displays the term name, term definition, generated analogy, and progress messages for each step.
    - Outputs errors for missing paths or inputs.
 
 2. **Manim Animation**:
@@ -189,7 +194,7 @@ The script checks for:
    If the `--working-dir` does not exist, the script exits with an error.
 3. **Empty required inputs**:  
    If `--term-name` or `--term-definition` is empty, the script exits with an error.
-4. **Metaphor Requirements**:  
-   If `--generate-metaphor` is **not** used, a metaphor must be provided.
+4. **Analogy Requirements**:  
+   If `--generate-analogy` is **not** used, a analogy must be provided.
 
 ---

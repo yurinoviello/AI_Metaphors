@@ -11,7 +11,7 @@ torch = { version = "2.6.0+cpu", source = "torch-cpu" }
 torchaudio = { version = "2.6.0+cpu", source = "torch-cpu" }
 llvmlite = "0.44.0"
 numba = "0.61.0"
-numpy = "2.1.3"
+numpy = "<2"
 manim = { git = "https://github.com/yurinoviello/manim.git", rev ="custom_manim" }
 fonttools = "4.56.0"
 manimpango = "0.6.0"
