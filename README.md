@@ -1,7 +1,13 @@
 # AI Metaphors
 
-This is the repository of the paper **“ANVIL: Analogies and Videos for CS Lecturers.”** (AIED 2026)
-
+> [!WARNING]
+> ⚠️ **Paper snapshot / archival version** ⚠️
+>
+> This repository corresponds to the version used for the paper **“ANVIL: Analogies and Videos for CS Lecturers”** (AIED 2026).
+>
+> It is kept for **archival and reproducibility purposes** and is **deprecated for active use and development**.
+>
+> For the most up-to-date code and documentation, please refer to the `master` branch [here](https://github.com/yurinoviello/AI_Metaphors).
 
 This Python module generates analogies, associated classes, descriptions, and Manim animation code for a given term. It integrates several providers, including **GrazieProvider** and **ManimProvider**, to produce results and animations.
 
