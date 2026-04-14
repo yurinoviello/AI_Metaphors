@@ -238,3 +238,18 @@ The script checks for:
   ```bash
   docker-compose build --no-cache
   ```
+---
+
+## Contributors
+
+**Paper Authors**
+- [Yuri Noviello](https://scholar.google.com/citations?user=dA01N3AAAAAJ&hl=en)
+- [Anastasiia Birillo](https://scholar.google.com/citations?user=V6PG0nwAAAAJ&hl=en)
+- [Gosia Migut](http://scholar.google.com/citations?user=ckUXUWYAAAAJ&hl=en)
+
+**Development Team**
+- Aleksei Rostovskii ([@ARostovsky](https://github.com/ARostovsky))
+- Anna Potriasaeva ([@anchouls](https://github.com/anchouls))
+- Ilya Vlasov ([@GirZ0n](https://github.com/GirZ0n))
+- Stanislav Sandler (stanislav.sandler@jetbrains.com)
+- Yuri Noviello ([@yurinoviello](https://github.com/yurinoviello))
